@@ -3,7 +3,7 @@
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { Magnetic } from '@/components/ui/magnetic'
-import { Phone, Mail, MapPin, ArrowRight, Droplets, ShieldCheck, Twitter, Linkedin, Instagram, Sparkles } from 'lucide-react'
+import { Phone, Mail, MapPin, ArrowRight, ShieldCheck, Twitter, Linkedin, Instagram, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -58,9 +58,9 @@ export function Footer({ onCtaClick }: FooterProps) {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16">
           {/* Brand */}
           <div className="md:col-span-2 space-y-8">
-            <div className="flex items-center gap-3 group cursor-pointer">
-              <div className="w-14 h-14 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 group-hover:rotate-6 transition-transform">
-                <Droplets className="w-8 h-8 text-white fill-current" />
+            <div className="flex items-center gap-4 group cursor-pointer">
+              <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 group-hover:rotate-6 transition-transform p-3">
+                <img src="/logo-custom.svg" alt="Rohr-Blitz Logo" className="w-full h-full object-contain brightness-0 invert" />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black italic uppercase tracking-tighter leading-none">{t('header.logo')}</span>

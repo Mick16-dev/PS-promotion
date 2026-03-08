@@ -26,14 +26,14 @@ export function Header({ onEmergencyClick }: HeaderProps) {
           {/* Logo */}
           <motion.div 
             whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-2 group cursor-pointer"
+            className="flex items-center gap-4 group cursor-pointer"
           >
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(var(--primary),0.3)]">
-              <Droplets className="w-7 h-7 text-primary-foreground group-hover:rotate-12 transition-transform" />
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 group-hover:rotate-6 transition-transform p-3">
+              <img src="/logo-custom.svg" alt="Rohr-Blitz Logo" className="w-full h-full object-contain brightness-0 invert" />
             </div>
-            <div className="flex flex-col -gap-1">
-              <span className="text-2xl font-black text-foreground tracking-tighter leading-none italic uppercase">Rohr-Blitz</span>
-              <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] leading-none ml-0.5">Premium Plumbing</span>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black italic uppercase tracking-tighter leading-none">{t('header.logo')}</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary">Premium Plumbing</span>
             </div>
           </motion.div>
 
