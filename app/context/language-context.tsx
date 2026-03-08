@@ -63,11 +63,66 @@ const translations: Record<Language, Record<string, string>> = {
     'testimonials.verified': 'Verified Customer',
     
     // Trust
-    'trust.title': 'Why Choose Marcus Plumbing',
+    'trust.title': 'Trusted by Thousands',
     'trust.response': '30 min average response',
     'trust.certified': 'Certified Technicians',
     'trust.guarantee': 'Satisfaction Guarantee',
     'trust.insurance': 'Fully Insured',
+    
+    // Features Section
+    'features.badge': 'Why Choose Us',
+    'features.title': 'Why Choose Marcus Plumbing?',
+    'features.subtitle': 'We combine cutting-edge AI technology with master plumber expertise to deliver faster, more accurate, and cost-effective solutions.',
+    'features.painPoint': 'The Problem',
+    'features.solution': 'Our Solution',
+    
+    // AI Diagnosis Pillar
+    'features.ai-diagnosis.title': 'AI-Powered Diagnosis',
+    'features.ai-diagnosis.tagline': 'Instant issue identification with repair guidance',
+    'features.ai-diagnosis.pain': 'Traditional plumbing inspections require scheduling, waiting for a technician, and paying for diagnostic visits just to understand the problem.',
+    'features.ai-diagnosis.solution': 'Our AI analyzes your photo in seconds, identifies the exact issue, and provides a detailed breakdown of required repairs, tools, and parts.',
+    'features.ai-diagnosis.benefit1': 'Identifies 50+ common plumbing issues from a single photo',
+    'features.ai-diagnosis.benefit2': 'Lists exact parts needed (with model numbers) so you can price-compare',
+    'features.ai-diagnosis.benefit3': 'Provides difficulty rating so you know if it\'s DIY or requires a pro',
+    
+    // Time & Cost Pillar
+    'features.time-cost.title': 'Time & Cost Savings',
+    'features.time-cost.tagline': 'No wasted hours or surprise invoices',
+    'features.time-cost.pain': 'Emergency plumber calls average $150-300 just for showing up, plus hourly rates and markup on parts.',
+    'features.time-cost.solution': 'Get an upfront estimate before any technician arrives. Know the exact cost range, timeline, and what you\'re paying for.',
+    'features.time-cost.benefit1': 'Save 40% on average vs. traditional emergency call-outs',
+    'features.time-cost.benefit2': 'Transparent pricing with no hidden fees or surprise charges',
+    'features.time-cost.benefit3': 'Skip the diagnostic fee entirely with our AI pre-assessment',
+    
+    // Reliability Pillar
+    'features.reliability.title': 'Reliability & Support',
+    'features.reliability.tagline': '24/7 availability with guaranteed workmanship',
+    'features.reliability.pain': 'Most plumbers are booked days out, and weekend or night calls cost double. Warranties are often unclear or non-existent.',
+    'features.reliability.solution': 'Our network of 50+ certified technicians ensures same-day availability. Every job includes a 2-year workmanship guarantee.',
+    'features.reliability.benefit1': '30-minute average response time for emergencies',
+    'features.reliability.benefit2': '2-year warranty on all repairs with no fine print',
+    'features.reliability.benefit3': 'Background-checked, licensed, and fully insured technicians',
+    
+    // AI Deep Dive
+    'features.howItWorks': 'How It Works',
+    'features.aiDeepDive.title': 'From Photo to Fixed in 4 Simple Steps',
+    'features.aiDeepDive.step1.title': 'Snap a Photo',
+    'features.aiDeepDive.step1.desc': 'Take a clear photo of the leak, clog, or damaged fixture. Our AI works with any smartphone camera.',
+    'features.aiDeepDive.step2.title': 'AI Analysis',
+    'features.aiDeepDive.step2.desc': 'Our trained model analyzes the image, cross-references 10,000+ plumbing cases, and identifies the issue type and severity.',
+    'features.aiDeepDive.step3.title': 'Detailed Report',
+    'features.aiDeepDive.step3.desc': 'Receive a breakdown of the problem, required parts (with links), estimated repair time, and cost range.',
+    'features.aiDeepDive.step4.title': 'Get It Fixed',
+    'features.aiDeepDive.step4.desc': 'Book a certified technician who arrives prepared with the right tools and parts, or tackle it yourself with our guidance.',
+    
+    // Results Stats
+    'features.results.title': 'Real Results, Real Savings',
+    'features.results.diagnosis': 'Avg. diagnosis time',
+    'features.results.savings': 'Cost savings vs. traditional',
+    'features.results.accuracy': 'Diagnosis accuracy',
+    'features.results.satisfaction': 'Customer rating',
+    'features.cta': 'Try AI Diagnosis Free',
+    'features.ctaSubtext': 'No credit card required. Get your estimate in under 5 minutes.',
     
     // Pricing
     'pricing.title': 'Transparent Pricing',
@@ -141,11 +196,66 @@ const translations: Record<Language, Record<string, string>> = {
     'testimonials.verified': 'Verifizierter Kunde',
     
     // Trust
-    'trust.title': 'Warum Marcus Plumbing',
+    'trust.title': 'Von Tausenden vertraut',
     'trust.response': '30 Min. durchschnittliche Reaktionszeit',
     'trust.certified': 'Zertifizierte Techniker',
     'trust.guarantee': 'Zufriedenheitsgarantie',
     'trust.insurance': 'Vollversichert',
+    
+    // Features Section
+    'features.badge': 'Warum wir',
+    'features.title': 'Warum Marcus Plumbing wählen?',
+    'features.subtitle': 'Wir kombinieren KI-Technologie mit Meister-Expertise für schnellere, genauere und kostengünstigere Lösungen.',
+    'features.painPoint': 'Das Problem',
+    'features.solution': 'Unsere Lösung',
+    
+    // AI Diagnosis Pillar
+    'features.ai-diagnosis.title': 'KI-gestützte Diagnose',
+    'features.ai-diagnosis.tagline': 'Sofortige Problemerkennung mit Reparaturanleitung',
+    'features.ai-diagnosis.pain': 'Herkömmliche Inspektionen erfordern Terminvereinbarung, Warten und Bezahlung nur für die Diagnose.',
+    'features.ai-diagnosis.solution': 'Unsere KI analysiert Ihr Foto in Sekunden, identifiziert das Problem und liefert eine detaillierte Aufschlüsselung der Reparatur.',
+    'features.ai-diagnosis.benefit1': 'Erkennt 50+ häufige Sanitärprobleme aus einem Foto',
+    'features.ai-diagnosis.benefit2': 'Listet benötigte Teile mit Modellnummern zum Preisvergleich',
+    'features.ai-diagnosis.benefit3': 'Gibt Schwierigkeitsgrad an: DIY oder Profi erforderlich',
+    
+    // Time & Cost Pillar
+    'features.time-cost.title': 'Zeit- & Kostenersparnis',
+    'features.time-cost.tagline': 'Keine verschwendete Zeit oder überraschende Rechnungen',
+    'features.time-cost.pain': 'Notfall-Klempner kosten 150-300€ nur fürs Erscheinen, plus Stundensätze und Materialaufschläge.',
+    'features.time-cost.solution': 'Erhalten Sie einen Kostenvoranschlag, bevor ein Techniker kommt. Keine versteckten Kosten.',
+    'features.time-cost.benefit1': 'Durchschnittlich 40% günstiger als traditionelle Notrufe',
+    'features.time-cost.benefit2': 'Transparente Preise ohne versteckte Gebühren',
+    'features.time-cost.benefit3': 'Keine Diagnosegebühr dank KI-Voranalyse',
+    
+    // Reliability Pillar
+    'features.reliability.title': 'Zuverlässigkeit & Support',
+    'features.reliability.tagline': '24/7 Verfügbarkeit mit Arbeitsgarantie',
+    'features.reliability.pain': 'Die meisten Klempner sind Tage ausgebucht, Wochenend- oder Nachteinsätze kosten das Doppelte.',
+    'features.reliability.solution': 'Unser Netzwerk von 50+ zertifizierten Technikern garantiert Verfügbarkeit am selben Tag.',
+    'features.reliability.benefit1': '30 Minuten durchschnittliche Reaktionszeit bei Notfällen',
+    'features.reliability.benefit2': '2 Jahre Garantie auf alle Reparaturen',
+    'features.reliability.benefit3': 'Überprüfte, lizenzierte und vollversicherte Techniker',
+    
+    // AI Deep Dive
+    'features.howItWorks': 'So funktioniert\'s',
+    'features.aiDeepDive.title': 'Vom Foto zur Reparatur in 4 Schritten',
+    'features.aiDeepDive.step1.title': 'Foto machen',
+    'features.aiDeepDive.step1.desc': 'Fotografieren Sie das Leck, die Verstopfung oder die beschädigte Armatur. Funktioniert mit jedem Smartphone.',
+    'features.aiDeepDive.step2.title': 'KI-Analyse',
+    'features.aiDeepDive.step2.desc': 'Unser Modell analysiert das Bild, vergleicht mit 10.000+ Fällen und identifiziert Problem und Schweregrad.',
+    'features.aiDeepDive.step3.title': 'Detaillierter Bericht',
+    'features.aiDeepDive.step3.desc': 'Erhalten Sie eine Aufschlüsselung des Problems, benötigte Teile, geschätzte Reparaturzeit und Kostenspanne.',
+    'features.aiDeepDive.step4.title': 'Reparatur',
+    'features.aiDeepDive.step4.desc': 'Buchen Sie einen Techniker, der mit den richtigen Werkzeugen ankommt, oder reparieren Sie selbst mit unserer Anleitung.',
+    
+    // Results Stats
+    'features.results.title': 'Echte Ergebnisse, echte Ersparnisse',
+    'features.results.diagnosis': 'Durchschn. Diagnosezeit',
+    'features.results.savings': 'Ersparnis vs. traditionell',
+    'features.results.accuracy': 'Diagnosegenauigkeit',
+    'features.results.satisfaction': 'Kundenbewertung',
+    'features.cta': 'KI-Diagnose kostenlos testen',
+    'features.ctaSubtext': 'Keine Kreditkarte erforderlich. Schätzung in unter 5 Minuten.',
     
     // Pricing
     'pricing.title': 'Transparente Preise',
