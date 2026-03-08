@@ -167,7 +167,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
             transition={{ delay: 0.4 }}
             className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-xs font-black bg-primary text-primary-foreground rounded-xl uppercase tracking-[0.2em] shadow-lg shadow-primary/20"
           >
-            <Sparkles className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4 text-secondary" />
             {t('hero.badge')}
           </motion.span>
           
@@ -245,7 +245,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                         transition={{ delay: 0.3 }}
                         className="bg-card/40 backdrop-blur-md rounded-3xl p-8 mb-8 border border-white/20"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">AI Estimate</p>
+                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">Master Estimate</p>
                         <p className="text-5xl font-black text-foreground italic">
                           {estimate.min}-{estimate.max}€
                         </p>
@@ -287,12 +287,6 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                             </div>
                             <span className="block text-sm font-black uppercase tracking-widest text-foreground">{t('funnel.step1.formats')}</span>
                           </label>
-                          {/* AI Scanning Line Animation */}
-                          <motion.div 
-                            animate={{ top: ['0%', '100%', '0%'] }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-0 group-hover:opacity-100"
-                          />
                         </div>
                       </div>
                     )}
@@ -304,7 +298,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                             <div className="relative">
                                <img src={formData.imagePreview} alt="Issue" className="w-24 h-24 object-cover rounded-[1.5rem] ring-4 ring-white shadow-xl" />
                                <div className="absolute -top-3 -right-3 bg-secondary p-1.5 rounded-full shadow-lg">
-                                  <Sparkles className="w-4 h-4 text-white" />
+                                  <CheckCircle className="w-4 h-4 text-white" />
                                </div>
                             </div>
                           )}
@@ -377,7 +371,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                             onClick={handleSeverityContinue}
                             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-widest py-8 rounded-2xl text-lg shadow-2xl shadow-primary/20"
                           >
-                            Analyze severity
+                            Calculate Assessment
                           </Button>
                         </div>
                       </div>

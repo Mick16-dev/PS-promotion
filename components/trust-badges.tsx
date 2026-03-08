@@ -105,7 +105,7 @@ export function TrustBadges() {
                   transition={{ repeat: Infinity, duration: 4 }}
                   className="absolute -top-2 -right-2"
                  >
-                   <Sparkles className="w-4 h-4 text-white/30" />
+                   <Award className="w-4 h-4 text-white/30" />
                  </motion.div>
               </div>
               

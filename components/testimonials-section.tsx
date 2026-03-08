@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/app/context/language-context'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, CheckCircle, Play, Quote, X, Sparkles, UserCheck } from 'lucide-react'
+import { Star, CheckCircle, Play, Quote, X, ShieldCheck, UserCheck } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -26,8 +26,8 @@ const testimonials = [
     locationEn: 'Munich',
     locationDe: 'München',
     rating: 5,
-    textEn: 'The AI diagnosis tool gave me an accurate estimate before they even arrived. No surprises with the final bill. Great service!',
-    textDe: 'Das KI-Diagnose-Tool gab mir eine genaue Schätzung, bevor sie überhaupt ankamen. Keine Überraschungen bei der Endabrechnung. Toller Service!',
+    textEn: 'The expert diagnosis tool gave me an accurate estimate before they even arrived. No surprises with the final bill. Great service!',
+    textDe: 'Das Experten-Diagnose-Tool gab mir eine genaue Schätzung, bevor sie überhaupt ankamen. Keine Überraschungen bei der Endabrechnung. Toller Service!',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
     hasVideo: false
   },
@@ -186,7 +186,7 @@ export function TestimonialsSection() {
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-success/70">
                   {t('testimonials.verified') || "Verified Professional Intervention"}
                 </span>
-                <Sparkles className="w-4 h-4 text-secondary ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ShieldCheck className="w-4 h-4 text-secondary ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </motion.div>
           ))}

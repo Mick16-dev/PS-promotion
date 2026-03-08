@@ -28,12 +28,12 @@ export function Footer({ onCtaClick }: FooterProps) {
         >
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/20 rounded-full blur-[100px] group-hover:bg-secondary/30 transition-colors" />
           
-          <Sparkles className="w-12 h-12 text-secondary mx-auto mb-8 animate-pulse-premium" />
+          <ShieldCheck className="w-12 h-12 text-secondary mx-auto mb-8 animate-pulse-premium" />
           <h2 className="text-4xl sm:text-6xl font-black mb-8 tracking-tighter italic uppercase leading-none">
             Ready for a <span className="text-secondary">Gold Standard</span> Fix?
           </h2>
           <p className="text-white/60 text-xl font-medium mb-12 max-w-2xl mx-auto italic">
-            Experience the future of plumbing with AI diagnostics and 24/7 elite response.
+            Experience the future of plumbing with expert master diagnostics and 24/7 elite response.
           </p>
           
           <Button 
@@ -65,7 +65,7 @@ export function Footer({ onCtaClick }: FooterProps) {
               </div>
             </div>
             <p className="text-white/50 font-medium leading-relaxed max-w-sm italic">
-               Redefining residential restoration through machine learning and elite craftsmaship. Available 24/7 across every major German hub.
+               Redefining residential restoration through expert diagnostic tools and elite craftsmanship. Available 24/7 across every major German hub.
             </p>
             
             <div className="space-y-4">
@@ -106,10 +106,10 @@ export function Footer({ onCtaClick }: FooterProps) {
                   <ShieldCheck className="w-6 h-6 text-success" />
                   <span className="text-[8px] font-black uppercase tracking-widest text-center">Certified Meister</span>
                </div>
-               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-secondary" />
-                  <span className="text-[8px] font-black uppercase tracking-widest text-center">AI Pioneer 2026</span>
-               </div>
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
+                   <Phone className="w-6 h-6 text-secondary" />
+                   <span className="text-[8px] font-black uppercase tracking-widest text-center">24/7 Emergency</span>
+                </div>
             </div>
           </div>
         </div>

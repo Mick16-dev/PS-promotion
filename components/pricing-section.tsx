@@ -3,7 +3,7 @@
 import { useLanguage } from '@/app/context/language-context'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Check, Sparkles, Zap, ShieldCheck, Crown } from 'lucide-react'
+import { Check, ShieldCheck, Clock, Crown, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const plans = [
@@ -30,17 +30,17 @@ const plans = [
     id: 'standard',
     nameKey: 'pricing.standard',
     price: 199,
-    icon: Zap,
+    icon: Clock,
     featuresEn: [
       'Priority response (under 1 hour)',
-      'AI-powered diagnostics',
+      'Master digital diagnostics',
       '24/7 phone support',
       'Extended parts warranty',
       'Quarterly maintenance check'
     ],
     featuresDe: [
       'Prioritäts-Reaktion (unter 1 Stunde)',
-      'KI-gestützte Diagnose',
+      'Digitale Meister-Diagnose',
       '24/7 Telefon-Support',
       'Erweiterte Teile-Garantie',
       'Vierteljährliche Wartung'
@@ -54,7 +54,7 @@ const plans = [
     icon: Crown,
     featuresEn: [
       'Emergency priority (under 30 min)',
-      'Advanced AI diagnostics + video',
+      'Advanced master diagnostics + video',
       'Dedicated account manager',
       'Lifetime parts warranty',
       'Monthly preventive maintenance',
@@ -62,7 +62,7 @@ const plans = [
     ],
     featuresDe: [
       'Notfall-Priorität (unter 30 Min)',
-      'Erweiterte KI-Diagnose + Video',
+      'Erweiterte Meister-Diagnose + Video',
       'Persönlicher Ansprechpartner',
       'Lebenslange Teile-Garantie',
       'Monatliche Prävention',
@@ -104,7 +104,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           className="text-center mb-24"
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
-            <Sparkles className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4" />
             Pricing & Protection Plans
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
@@ -136,7 +136,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
             >
               {plan.popular && (
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 fill-current" />
+                  <ShieldCheck className="w-4 h-4 fill-current" />
                   {t('pricing.popular')}
                 </div>
               )}

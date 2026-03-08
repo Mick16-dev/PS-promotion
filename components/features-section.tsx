@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { 
-  Brain, 
+  ClipboardCheck, 
   PiggyBank, 
   Shield, 
   Wrench, 
@@ -17,7 +17,8 @@ import {
   Timer,
   HeartHandshake,
   ArrowRight,
-  Sparkles
+  ShieldCheck,
+  Search
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -28,7 +29,7 @@ interface FeaturesSectionProps {
 const pillars = [
   {
     id: 'ai-diagnosis',
-    icon: Brain,
+    icon: Search,
     color: 'text-secondary',
     bg: 'bg-secondary/10',
     border: 'border-secondary/20'
@@ -49,9 +50,9 @@ const pillars = [
   },
 ]
 
-const aiSteps = [
+const diagnosisSteps = [
   { icon: Camera, step: 1 },
-  { icon: Brain, step: 2 },
+  { icon: Search, step: 2 },
   { icon: FileText, step: 3 },
   { icon: Wrench, step: 4 },
 ]
@@ -70,7 +71,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   }
 
   return (
@@ -86,7 +87,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
           className="text-center mb-24"
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
-            <Sparkles className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4" />
             {t('features.badge')}
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
@@ -158,7 +159,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                 <div className="space-y-6">
                   <div className="flex items-center gap-3">
                      <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
-                        <Zap className="w-6 h-6 text-secondary" />
+                        <Wrench className="w-6 h-6 text-secondary" />
                      </div>
                      <h3 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">
                         {t(`features.${activePillar}.title`)}
@@ -199,7 +200,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                  <div className="space-y-10 relative">
                     <div className="absolute left-6 top-10 bottom-10 w-px bg-white/20" />
                     
-                    {aiSteps.map((step, idx) => (
+                    {diagnosisSteps.map((step, idx) => (
                       <motion.div 
                         key={step.step}
                         initial={{ opacity: 0, x: 20 }}
