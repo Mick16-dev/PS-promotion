@@ -32,10 +32,12 @@ This document tracks the progress of transforming the Rohr-Blitz landing page in
 - [x] **Elite Footer**: Final conversion anchor with premium branding, legal transparency, and cinematic mesh-gradient.
 - [x] **Interactive Modal**: Finalized lead capture modal with elite glass-styling, cinematic step-transitions, and success celebration.
 
-## 🎨 Phase 5: Content & Assets
-- [x] **AI Asset Generation**: Generated 3+ high-fidelity photorealistic assets for hero, luxury bathroom, and pipe details.
-- [ ] **Bilingual Copy Pass**: Ensure elite, professional tone across EN/DE translations.
-- [ ] **Performance Audit**: Ensure 95+ Lighthouse scores across all metrics.
+## 👑 Phase 6: Elite World-Class Upgrade (Bespoke & AEO)
+- [ ] **Magnetic Interaction Design**: Implement tactile magnetic pull on primary CTAs.
+- [ ] **Spatial Narrativity**: Implement "Sticky Stacking" section transitions for physical presence.
+- [ ] **Master Expert Authority (E-E-A-T)**: Add "Master Technician" profiles and certification showcase.
+- [ ] **Blueprint Diagnostic UX**: Upgrade "AI Scanning" to a high-fidelity "Engineering Blueprint" animation.
+- [ ] **AEO Entity Expansion**: Scale JSON-LD schema with technical glossary and local service entities.
 
 ---
 *Last Updated: 2026-03-08*
