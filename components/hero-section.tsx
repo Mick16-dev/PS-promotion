@@ -118,8 +118,8 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2500))
+    // Simulate Blueprint Scanning phase
+    await new Promise(resolve => setTimeout(resolve, 3500))
     
     if (formData.issueType) {
       setEstimate(calculateEstimate(formData.issueType, formData.severity))

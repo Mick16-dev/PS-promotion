@@ -38,19 +38,19 @@ export default function Home() {
         <FeaturesSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={3}>
+      <StackingSection index={4}>
         <BeforeAfterGallery onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={4}>
+      <StackingSection index={5}>
         <TestimonialsSection />
       </StackingSection>
       
-      <StackingSection index={5}>
+      <StackingSection index={6}>
         <PricingSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={6}>
+      <StackingSection index={7}>
         <FaqSection />
       </StackingSection>
       
