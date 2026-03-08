@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, Loader2 } from 'lucide-react'
+import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, Loader2, Sparkles, ShieldCheck, MapPin } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { cn } from '@/lib/utils'
 
 type IssueCategory = 'leaking' | 'clogged' | 'broken' | 'installation'
 
@@ -116,7 +118,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     setIsSubmitting(true)
     
     // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise(resolve => setTimeout(resolve, 2500))
     
     if (formData.issueType) {
       setEstimate(calculateEstimate(formData.issueType, formData.severity))
@@ -127,10 +129,10 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   }
 
   const issueCategories: { type: IssueCategory; icon: React.ReactNode; color: string }[] = [
-    { type: 'leaking', icon: <Droplet className="w-6 h-6" />, color: 'text-blue-500' },
-    { type: 'clogged', icon: <CircleOff className="w-6 h-6" />, color: 'text-amber-500' },
-    { type: 'broken', icon: <Wrench className="w-6 h-6" />, color: 'text-red-500' },
-    { type: 'installation', icon: <Plus className="w-6 h-6" />, color: 'text-emerald-500' }
+    { type: 'leaking', icon: <Droplet className="w-8 h-8" />, color: 'text-blue-500' },
+    { type: 'clogged', icon: <CircleOff className="w-8 h-8" />, color: 'text-secondary' },
+    { type: 'broken', icon: <Wrench className="w-8 h-8" />, color: 'text-destructive' },
+    { type: 'installation', icon: <Plus className="w-8 h-8" />, color: 'text-success' }
   ]
 
   const severityLabels = [
@@ -141,252 +143,297 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     t('severity.5')
   ]
 
-  if (isSuccess) {
-    return (
-      <section className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/30">
-        <Card className="w-full max-w-lg border-success/30 shadow-xl">
-          <CardContent className="pt-8 pb-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-success/10 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-10 h-10 text-success" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">{t('funnel.success.title')}</h2>
-            <p className="text-muted-foreground mb-6">{t('funnel.success.desc')}</p>
-            
-            {estimate && (
-              <div className="bg-muted/50 rounded-2xl p-6 mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Preliminary Estimate</p>
-                <p className="text-3xl font-bold text-foreground">
-                  {estimate.min} - {estimate.max} EUR
-                </p>
-              </div>
-            )}
-            
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
-              <Clock className="w-5 h-5" />
-              <span>{t('funnel.success.eta')}: <strong className="text-foreground">15-30 min</strong></span>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-    )
+  const variants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
   }
 
   return (
-    <section className="pt-24 pb-16 px-4 min-h-screen bg-gradient-to-b from-background to-muted/30">
-      <div className="max-w-4xl mx-auto">
+    <section className="relative pt-32 pb-24 px-4 min-h-screen mesh-gradient overflow-hidden">
+      <div className="absolute inset-0 grain-overlay opacity-50" />
+      
+      <div className="max-w-6xl mx-auto relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
         {/* Hero Text */}
-        <div className="text-center mb-10">
-          <span className="inline-block px-4 py-1.5 mb-4 text-sm font-medium bg-primary/10 text-primary rounded-full">
+        <motion.div 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex-1 text-left lg:max-w-xl"
+        >
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-xs font-black bg-primary text-primary-foreground rounded-xl uppercase tracking-[0.2em] shadow-lg shadow-primary/20"
+          >
+            <Sparkles className="w-4 h-4" />
             {t('hero.badge')}
-          </span>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 text-balance leading-tight">
+          </motion.span>
+          
+          <h1 className="text-5xl sm:text-6xl font-black text-foreground mb-6 leading-[1.05] tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
             {t('hero.title')}
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+          
+          <p className="text-xl text-muted-foreground mb-8 leading-relaxed font-medium max-w-lg">
             {t('hero.subtitle')}
           </p>
-        </div>
 
-        {/* Progress Indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3, 4].map((s) => (
-            <div
-              key={s}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                s === step ? 'w-8 bg-secondary' : s < step ? 'w-8 bg-success' : 'w-8 bg-muted'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Step 1: Image Upload */}
-        {step === 1 && (
-          <Card className="shadow-xl">
-            <CardContent className="pt-8 pb-8">
-              <h2 className="text-xl font-semibold text-foreground text-center mb-6">{t('funnel.step1.title')}</h2>
-              <div
-                onDrop={handleImageDrop}
-                onDragOver={(e) => e.preventDefault()}
-                className="border-2 border-dashed border-border rounded-2xl p-12 text-center cursor-pointer hover:border-secondary hover:bg-secondary/5 transition-all"
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <p className="text-lg font-medium text-foreground mb-1">{t('funnel.step1.desc')}</p>
-                  <p className="text-sm text-muted-foreground">{t('funnel.step1.formats')}</p>
-                </label>
+          <div className="flex flex-wrap gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6 text-success" />
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 2: Issue Category */}
-        {step === 2 && (
-          <Card className="shadow-xl">
-            <CardContent className="pt-8 pb-8">
-              <div className="flex items-center gap-4 mb-6">
-                {formData.imagePreview && (
-                  <img 
-                    src={formData.imagePreview} 
-                    alt="Uploaded issue" 
-                    className="w-20 h-20 object-cover rounded-xl"
-                  />
-                )}
-                <div>
-                  <h2 className="text-xl font-semibold text-foreground">{t('funnel.step2.title')}</h2>
-                </div>
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">Verified Experts</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-secondary" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {issueCategories.map(({ type, icon, color }) => (
-                  <button
-                    key={type}
-                    onClick={() => handleIssueSelect(type)}
-                    className={`p-6 rounded-2xl border-2 transition-all hover:border-secondary hover:shadow-md ${
-                      formData.issueType === type ? 'border-secondary bg-secondary/5' : 'border-border bg-card'
-                    }`}
-                  >
-                    <div className={`${color} mb-3`}>{icon}</div>
-                    <p className="font-medium text-foreground">{t(`issue.${type}`)}</p>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">15m Response</span>
+            </div>
+          </div>
+        </motion.div>
 
-        {/* Step 3: Severity Slider */}
-        {step === 3 && (
-          <Card className="shadow-xl">
-            <CardContent className="pt-8 pb-8">
-              <h2 className="text-xl font-semibold text-foreground text-center mb-2">{t('funnel.step3.title')}</h2>
-              <p className="text-muted-foreground text-center mb-8">{t('funnel.step3.desc')}</p>
-              
-              <div className="max-w-md mx-auto">
-                <div className="mb-8">
-                  <Slider
-                    value={[formData.severity]}
-                    onValueChange={handleSeverityChange}
-                    min={1}
-                    max={5}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
-                
-                <div className="flex justify-between text-sm mb-8">
-                  {severityLabels.map((label, i) => (
-                    <span 
-                      key={i} 
-                      className={`${formData.severity === i + 1 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}
-                    >
-                      {label}
-                    </span>
+        {/* Funnel Card */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex-1 w-full max-w-lg"
+        >
+          <Card className="glass-card overflow-hidden rounded-[2.5rem] border-white/40 shadow-2xl">
+            <CardContent className="p-8 sm:p-10">
+              {/* Progress Pillar */}
+              {!isSuccess && (
+                <div className="flex items-center justify-between gap-3 mb-10">
+                  {[1, 2, 3, 4].map((s) => (
+                    <div key={s} className="flex-1 relative h-2">
+                       <div className="absolute inset-0 bg-muted/30 rounded-full" />
+                       <motion.div 
+                        initial={false}
+                        animate={{ width: s <= step ? '100%' : '0%' }}
+                        className={cn(
+                          "absolute inset-0 rounded-full transition-all duration-500",
+                          s < step ? "bg-success" : "bg-secondary"
+                        )}
+                       />
+                    </div>
                   ))}
                 </div>
+              )}
 
-                <div className={`text-center p-4 rounded-2xl mb-6 ${
-                  formData.severity >= 4 ? 'bg-destructive/10 text-destructive' : 
-                  formData.severity >= 3 ? 'bg-amber-500/10 text-amber-600' : 
-                  'bg-success/10 text-success'
-                }`}>
-                  <p className="font-semibold text-lg">{severityLabels[formData.severity - 1]}</p>
-                </div>
+              <AnimatePresence mode="wait">
+                {isSuccess ? (
+                  <motion.div
+                    key="success"
+                    variants={variants}
+                    initial="initial"
+                    animate="animate"
+                    className="text-center"
+                  >
+                    <div className="w-24 h-24 mx-auto mb-8 bg-success rounded-[2rem] flex items-center justify-center shadow-xl shadow-success/20 animate-float">
+                      <CheckCircle className="w-12 h-12 text-success-foreground" />
+                    </div>
+                    <h2 className="text-3xl font-black text-foreground mb-4 italic uppercase">{t('funnel.success.title')}</h2>
+                    <p className="text-muted-foreground mb-8 font-medium">{t('funnel.success.desc')}</p>
+                    
+                    {estimate && (
+                      <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="bg-card/40 backdrop-blur-md rounded-3xl p-8 mb-8 border border-white/20"
+                      >
+                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">AI Estimate</p>
+                        <p className="text-5xl font-black text-foreground italic">
+                          {estimate.min}-{estimate.max}€
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    <div className="flex items-center justify-center gap-3 py-4 px-6 bg-primary rounded-2xl text-primary-foreground shadow-lg shadow-primary/20">
+                      <MapPin className="w-5 h-5 text-secondary animate-pulse" />
+                      <span className="font-bold uppercase tracking-wider text-sm">
+                        {t('funnel.success.eta')}: 15-30 min
+                      </span>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={step}
+                    variants={variants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{ duration: 0.4, ease: "anticipate" }}
+                  >
+                    {step === 1 && (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="text-2xl font-black tracking-tighter uppercase italic mb-2">{t('funnel.step1.title')}</h2>
+                          <p className="text-muted-foreground font-medium">{t('funnel.step1.desc')}</p>
+                        </div>
+                        
+                        <div
+                          onDrop={handleImageDrop}
+                          onDragOver={(e) => e.preventDefault()}
+                          className="relative group border-4 border-dashed border-border hover:border-secondary rounded-[2rem] p-12 text-center cursor-pointer transition-all duration-500 hover:bg-white/50"
+                        >
+                          <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" id="image-upload" />
+                          <label htmlFor="image-upload" className="cursor-pointer block">
+                            <div className="w-20 h-20 mx-auto mb-6 bg-primary/5 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                              <Upload className="w-10 h-10 text-primary group-hover:text-secondary transition-colors" />
+                            </div>
+                            <span className="block text-sm font-black uppercase tracking-widest text-foreground">{t('funnel.step1.formats')}</span>
+                          </label>
+                          {/* AI Scanning Line Animation */}
+                          <motion.div 
+                            animate={{ top: ['0%', '100%', '0%'] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-0 group-hover:opacity-100"
+                          />
+                        </div>
+                      </div>
+                    )}
 
-                <Button 
-                  onClick={handleSeverityContinue}
-                  className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold"
-                  size="lg"
-                >
-                  Continue
-                </Button>
-              </div>
+                    {step === 2 && (
+                      <div className="space-y-8">
+                        <div className="flex items-center gap-6">
+                          {formData.imagePreview && (
+                            <div className="relative">
+                               <img src={formData.imagePreview} alt="Issue" className="w-24 h-24 object-cover rounded-[1.5rem] ring-4 ring-white shadow-xl" />
+                               <div className="absolute -top-3 -right-3 bg-secondary p-1.5 rounded-full shadow-lg">
+                                  <Sparkles className="w-4 h-4 text-white" />
+                               </div>
+                            </div>
+                          )}
+                          <h2 className="text-2xl font-black tracking-tighter uppercase italic">{t('funnel.step2.title')}</h2>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          {issueCategories.map(({ type, icon, color }) => (
+                            <motion.button
+                              key={type}
+                              whileHover={{ y: -5 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleIssueSelect(type)}
+                              className={cn(
+                                "relative p-6 rounded-[2rem] border-2 text-left transition-all duration-300",
+                                formData.issueType === type 
+                                  ? "border-secondary bg-white shadow-xl shadow-secondary/10" 
+                                  : "border-border/50 bg-card/30 hover:bg-white hover:border-secondary/30"
+                              )}
+                            >
+                              <div className={cn(color, "mb-4")}>{icon}</div>
+                              <p className="font-black text-xs uppercase tracking-widest text-foreground leading-tight">{t(`issue.${type}`)}</p>
+                              {formData.issueType === type && (
+                                <div className="absolute top-4 right-4 text-secondary">
+                                  <CheckCircle className="w-5 h-5" />
+                                </div>
+                              )}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {step === 3 && (
+                      <div className="space-y-8">
+                        <h2 className="text-2xl font-black tracking-tighter uppercase italic text-center">{t('funnel.step3.title')}</h2>
+                        
+                        <div className="max-w-md mx-auto space-y-12">
+                          <div className="px-4">
+                            <Slider
+                              value={[formData.severity]}
+                              onValueChange={handleSeverityChange}
+                              min={1}
+                              max={5}
+                              step={1}
+                              className="w-full"
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between text-[10px] font-black uppercase tracking-tighter text-muted-foreground px-1">
+                            {severityLabels.map((label, i) => (
+                              <span key={i} className={cn("transition-colors", formData.severity === i + 1 ? "text-primary" : "")}>{label}</span>
+                            ))}
+                          </div>
+
+                          <motion.div 
+                            animate={{ scale: [1, 1.02, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className={cn(
+                              "text-center p-8 rounded-[2rem] shadow-xl",
+                              formData.severity >= 4 ? "bg-destructive/10 text-destructive-foreground shadow-destructive/5" : 
+                              formData.severity >= 3 ? "bg-amber-500/10 text-amber-600 shadow-amber-500/5" : 
+                              "bg-success/10 text-success shadow-success/5"
+                            )}
+                          >
+                            <p className="font-black text-3xl uppercase italic">{severityLabels[formData.severity - 1]}</p>
+                          </motion.div>
+
+                          <Button 
+                            onClick={handleSeverityContinue}
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-widest py-8 rounded-2xl text-lg shadow-2xl shadow-primary/20"
+                          >
+                            Analyze severity
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {step === 4 && (
+                      <div className="space-y-8">
+                        <h2 className="text-2xl font-black tracking-tighter uppercase italic text-center">{t('funnel.step4.title')}</h2>
+                        
+                        <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto">
+                          {[
+                            { id: 'name', label: t('form.name'), type: 'text' },
+                            { id: 'phone', label: t('form.phone'), type: 'tel' },
+                            { id: 'email', label: t('form.email'), type: 'email' },
+                            { id: 'address', label: t('form.address'), type: 'text' }
+                          ].map((field) => (
+                            <div key={field.id} className="space-y-2">
+                              <Label htmlFor={field.id} className="text-[10px] font-black uppercase tracking-widest ml-1">{field.label}</Label>
+                              <Input
+                                id={field.id}
+                                type={field.type}
+                                required
+                                value={(formData as any)[field.id]}
+                                onChange={(e) => setFormData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                                className="bg-white/50 border-white/40 rounded-xl h-12 focus:ring-secondary"
+                              />
+                            </div>
+                          ))}
+
+                          <Button 
+                            disabled={isSubmitting}
+                            className="w-full bg-secondary text-white hover:bg-secondary/90 font-black uppercase tracking-[0.2em] h-16 rounded-2xl mt-6 shadow-xl shadow-secondary/20 relative group overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                            {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : t('funnel.cta')}
+                          </Button>
+                        </form>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </CardContent>
           </Card>
-        )}
-
-        {/* Step 4: Contact Form - CTA #1 */}
-        {step === 4 && (
-          <Card className="shadow-xl">
-            <CardContent className="pt-8 pb-8">
-              <h2 className="text-xl font-semibold text-foreground text-center mb-6">{t('funnel.step4.title')}</h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-                <div>
-                  <Label htmlFor="name" className="text-foreground">{t('form.name')}</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="mt-1.5"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="phone" className="text-foreground">{t('form.phone')}</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="mt-1.5"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="email" className="text-foreground">{t('form.email')}</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="mt-1.5"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="address" className="text-foreground">{t('form.address')}</Label>
-                  <Input
-                    id="address"
-                    type="text"
-                    required
-                    value={formData.address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    className="mt-1.5"
-                  />
-                </div>
-
-                <Button 
-                  type="button"
-                  onClick={onCtaClick}
-                  disabled={isSubmitting}
-                  className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold mt-6"
-                  size="lg"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    t('funnel.cta')
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+          
+          <div className="mt-8 flex items-center justify-center gap-8 text-muted-foreground/60">
+             <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">GDPR Ready</span>
+             </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

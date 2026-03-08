@@ -7,6 +7,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
+import { HelpCircle, Sparkles, MessageSquare } from 'lucide-react'
 
 const faqs = [
   {
@@ -50,31 +53,97 @@ const faqs = [
 export function FaqSection() {
   const { language, t } = useLanguage()
 
-  return (
-    <section className="py-20 px-4 bg-background">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-center mb-10 text-balance">
-          {t('faq.title')}
-        </h2>
+  // SEO: FAQ Schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": language === 'de' ? faq.questionDe : faq.questionEn,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": language === 'de' ? faq.answerDe : faq.answerEn
+      }
+    }))
+  }
 
-        <Accordion type="single" collapsible className="space-y-4">
+  return (
+    <section className="py-32 px-4 relative overflow-hidden bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-secondary/5 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-[120px]" />
+
+      <div className="max-w-4xl mx-auto relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-24"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
+            <HelpCircle className="w-4 h-4" />
+            Clear Answers
+          </span>
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-muted decoration-8 underline-offset-8">
+            {t('faq.title')}
+          </h2>
+          <div className="flex items-center justify-center gap-3 text-muted-foreground font-black uppercase tracking-[0.2em] text-xs">
+             <MessageSquare className="w-4 h-4 text-secondary" />
+             Still have questions? Chat with our AI expert.
+          </div>
+        </motion.div>
+
+        <Accordion type="single" collapsible className="space-y-6">
           {faqs.map((faq, index) => (
-            <AccordionItem 
-              key={index} 
-              value={`item-${index}`}
-              className="border border-border rounded-2xl px-6 bg-card shadow-sm"
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+              viewport={{ once: true }}
             >
-              <AccordionTrigger className="text-left hover:no-underline py-5">
-                <span className="font-semibold text-foreground">
-                  {language === 'de' ? faq.questionDe : faq.questionEn}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-5 text-muted-foreground leading-relaxed">
-                {language === 'de' ? faq.answerDe : faq.answerEn}
-              </AccordionContent>
-            </AccordionItem>
+              <AccordionItem 
+                value={`item-${index}`}
+                className="group border border-border/50 rounded-[2.5rem] px-8 bg-white/40 backdrop-blur-xl shadow-xl transition-all duration-500 hover:bg-white hover:border-primary/20 overflow-hidden"
+              >
+                <AccordionTrigger className="text-left hover:no-underline py-8">
+                  <span className="text-xl sm:text-2xl font-black text-foreground italic uppercase tracking-tighter group-hover:text-primary transition-colors pr-6">
+                    {language === 'de' ? faq.questionDe : faq.questionEn}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-8 text-lg font-medium text-muted-foreground leading-relaxed italic pr-12">
+                   <div className="flex gap-4">
+                      <div className="w-1 h-auto bg-secondary/30 rounded-full shrink-0" />
+                      <div>{language === 'de' ? faq.answerDe : faq.answerEn}</div>
+                   </div>
+                </AccordionContent>
+              </AccordionItem>
+            </motion.div>
           ))}
         </Accordion>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mt-24 p-12 glass-card rounded-[3rem] border-secondary/20 flex flex-col items-center text-center relative overflow-hidden group"
+        >
+           <div className="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 group-hover:opacity-10 transition-opacity blur-3xl" />
+           <Sparkles className="w-10 h-10 text-secondary mb-6 animate-pulse-premium" />
+           <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground mb-4">
+              Cant find what you need?
+           </h3>
+           <p className="text-muted-foreground font-medium mb-8 max-w-lg">
+              Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.
+           </p>
+           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-xl transition-all active:scale-95">
+              Request VIP Support
+           </Button>
+        </motion.div>
       </div>
     </section>
   )

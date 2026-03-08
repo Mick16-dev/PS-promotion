@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Sparkles, MoveHorizontal } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ComparisonSliderProps {
   beforeImage: string
@@ -37,7 +38,7 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl cursor-ew-resize select-none"
+      className="relative w-full aspect-[4/5] sm:aspect-[4/3] overflow-hidden rounded-[2rem] cursor-ew-resize select-none border border-white/20 shadow-2xl group"
       onMouseMove={handleMouseMove}
       onMouseDown={(e) => handleMove(e.clientX)}
       onTouchMove={handleTouchMove}
@@ -45,13 +46,13 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
     >
       {/* After Image (background) */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
         style={{ backgroundImage: `url(${afterImage})` }}
       />
       
       {/* Before Image (clipped) */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
         style={{ 
           backgroundImage: `url(${beforeImage})`,
           clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`
@@ -60,29 +61,29 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
 
       {/* Slider Line */}
       <div
-        className="absolute top-0 bottom-0 w-1 bg-card shadow-lg"
+        className="absolute top-0 bottom-0 w-1 bg-white/50 backdrop-blur-md shadow-[0_0_20px_rgba(255,255,255,0.5)]"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
       >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-card rounded-full shadow-lg flex items-center justify-center">
-          <div className="flex gap-0.5">
-            <div className="w-0.5 h-4 bg-muted-foreground rounded" />
-            <div className="w-0.5 h-4 bg-muted-foreground rounded" />
-          </div>
-        </div>
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ repeat: Infinity, duration: 3 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white backdrop-blur-xl rounded-2xl shadow-2xl flex items-center justify-center border border-white/50"
+        >
+          <MoveHorizontal className="w-6 h-6 text-primary" />
+        </motion.div>
       </div>
 
       {/* Labels */}
-      <div className="absolute top-4 left-4 px-3 py-1.5 bg-foreground/80 text-background text-sm font-medium rounded-lg">
+      <div className="absolute top-6 left-6 px-4 py-2 bg-black/40 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl border border-white/10">
         {beforeLabel}
       </div>
-      <div className="absolute top-4 right-4 px-3 py-1.5 bg-success/90 text-success-foreground text-sm font-medium rounded-lg">
+      <div className="absolute top-6 right-6 px-4 py-2 bg-success/80 backdrop-blur-md text-success-foreground text-[10px] font-black uppercase tracking-[0.2em] rounded-xl border border-white/10">
         {afterLabel}
       </div>
     </div>
   )
 }
 
-// Plumbing-specific projects
 const projects = [
   {
     id: 1,
@@ -121,49 +122,76 @@ export function BeforeAfterGallery({ onCtaClick }: BeforeAfterGalleryProps) {
   const { language, t } = useLanguage()
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-3 text-balance">
+    <section className="py-32 px-4 relative overflow-hidden bg-background">
+      <div className="absolute inset-0 mesh-gradient opacity-20" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-24"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6 shadow-sm">
+            <Sparkles className="w-4 h-4" />
+            {t('gallery.badge') || "Visual Excellence"}
+          </span>
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-primary decoration-8 underline-offset-8">
             {t('gallery.title')}
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
             {t('gallery.subtitle')}
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {projects.map((project) => (
-            <Card key={project.id} className="overflow-hidden border-0 shadow-lg">
+        <div className="grid md:grid-cols-3 gap-10 mb-24">
+          {projects.map((project, idx) => (
+            <motion.div 
+              key={project.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.15 }}
+              whileHover={{ y: -10 }}
+              className="group"
+            >
               <ComparisonSlider
                 beforeImage={project.beforeImage}
                 afterImage={project.afterImage}
                 beforeLabel={language === 'de' ? 'Vorher' : 'Before'}
                 afterLabel={language === 'de' ? 'Nachher' : 'After'}
               />
-              <CardContent className="pt-4">
-                <h3 className="font-semibold text-foreground mb-1">
+              <div className="pt-8 px-2">
+                <h3 className="text-2xl font-black text-foreground mb-2 italic uppercase tracking-tighter">
                   {language === 'de' ? project.titleDe : project.titleEn}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground font-medium italic">
                   {language === 'de' ? project.descDe : project.descEn}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           ))}
         </div>
 
         {/* CTA #3 */}
-        <div className="text-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
           <Button 
             onClick={onCtaClick}
             size="lg"
-            className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-20 px-12 rounded-2xl shadow-2xl shadow-primary/20 group relative overflow-hidden"
           >
-            {t('gallery.cta')}
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            <span className="relative z-10 flex items-center gap-3">
+              {t('gallery.cta')}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+            </span>
           </Button>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { 
@@ -8,15 +9,17 @@ import {
   PiggyBank, 
   Shield, 
   Wrench, 
-  ChevronDown,
   CheckCircle2,
   Zap,
   Camera,
   FileText,
   CircleDollarSign,
   Timer,
-  HeartHandshake
+  HeartHandshake,
+  ArrowRight,
+  Sparkles
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FeaturesSectionProps {
   onCtaClick: () => void
@@ -26,20 +29,23 @@ const pillars = [
   {
     id: 'ai-diagnosis',
     icon: Brain,
-    color: 'bg-secondary/10 text-secondary',
-    iconBg: 'bg-secondary',
+    color: 'text-secondary',
+    bg: 'bg-secondary/10',
+    border: 'border-secondary/20'
   },
   {
     id: 'time-cost',
     icon: PiggyBank,
-    color: 'bg-emerald-500/10 text-emerald-600',
-    iconBg: 'bg-emerald-500',
+    color: 'text-success',
+    bg: 'bg-success/10',
+    border: 'border-success/20'
   },
   {
     id: 'reliability',
     icon: Shield,
-    color: 'bg-primary/10 text-primary',
-    iconBg: 'bg-primary',
+    color: 'text-primary',
+    bg: 'bg-primary/10',
+    border: 'border-primary/20'
   },
 ]
 
@@ -52,187 +58,177 @@ const aiSteps = [
 
 export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
   const { t } = useLanguage()
-  const [expandedPillar, setExpandedPillar] = useState<string | null>('ai-diagnosis')
+  const [activePillar, setActivePillar] = useState<string>('ai-diagnosis')
 
-  const togglePillar = (id: string) => {
-    setExpandedPillar(expandedPillar === id ? null : id)
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
   }
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-32 px-4 relative overflow-hidden bg-background">
+      <div className="absolute inset-0 mesh-gradient opacity-30" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 bg-secondary/10 text-secondary text-sm font-medium rounded-full mb-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-24"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
+            <Sparkles className="w-4 h-4" />
             {t('features.badge')}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4 text-balance">
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
             {t('features.title')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
             {t('features.subtitle')}
           </p>
-        </div>
+        </motion.div>
 
-        {/* Three Pillars */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-16">
-          {pillars.map((pillar) => {
-            const isExpanded = expandedPillar === pillar.id
-            return (
-              <div
-                key={pillar.id}
-                className={`bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 ${
-                  isExpanded ? 'ring-2 ring-secondary/50' : ''
-                }`}
-              >
-                {/* Pillar Header */}
-                <button
-                  onClick={() => togglePillar(pillar.id)}
-                  className="w-full p-6 flex items-start gap-4 text-left hover:bg-muted/50 transition-colors"
-                >
-                  <div className={`w-12 h-12 rounded-xl ${pillar.iconBg} flex items-center justify-center shrink-0`}>
-                    <pillar.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-lg mb-1">
-                      {t(`features.${pillar.id}.title`)}
-                    </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {t(`features.${pillar.id}.tagline`)}
-                    </p>
-                  </div>
-                  <ChevronDown 
-                    className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform duration-300 ${
-                      isExpanded ? 'rotate-180' : ''
-                    }`} 
-                  />
-                </button>
-
-                {/* Expanded Content */}
-                <div className={`overflow-hidden transition-all duration-300 ${
-                  isExpanded ? 'max-h-[600px]' : 'max-h-0'
-                }`}>
-                  <div className="px-6 pb-6 space-y-4">
-                    <div className="h-px bg-border" />
-                    
-                    {/* Pain Point */}
-                    <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
-                      <p className="text-sm text-destructive font-medium mb-1">
-                        {t('features.painPoint')}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t(`features.${pillar.id}.pain`)}
-                      </p>
-                    </div>
-
-                    {/* Solution */}
-                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-                      <p className="text-sm text-emerald-600 font-medium mb-1">
-                        {t('features.solution')}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t(`features.${pillar.id}.solution`)}
-                      </p>
-                    </div>
-
-                    {/* Benefits List */}
-                    <ul className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span className="text-sm text-foreground">
-                            {t(`features.${pillar.id}.benefit${i}`)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+        {/* Pillar Selection Grid */}
+        <motion.div 
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-3 gap-8 mb-24"
+        >
+          {pillars.map((pillar) => (
+            <motion.div
+              key={pillar.id}
+              variants={item}
+              whileHover={{ y: -10 }}
+              onClick={() => setActivePillar(pillar.id)}
+              className={cn(
+                "group cursor-pointer p-8 rounded-[2.5rem] border-2 transition-all duration-500",
+                activePillar === pillar.id 
+                  ? cn("bg-white shadow-2xl scale-[1.02]", pillar.border)
+                  : "bg-card/30 border-border/50 hover:bg-white/50"
+              )}
+            >
+              <div className={cn(
+                "w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-xl",
+                activePillar === pillar.id ? pillar.bg : "bg-muted/50"
+              )}>
+                <pillar.icon className={cn("w-8 h-8", activePillar === pillar.id ? pillar.color : "text-muted-foreground")} />
               </div>
-            )
-          })}
-        </div>
-
-        {/* AI Diagnosis Deep Dive */}
-        <div className="bg-card rounded-2xl border border-border p-8 lg:p-12">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            {/* Left: How It Works */}
-            <div>
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary text-sm font-medium rounded-full mb-4">
-                <Zap className="w-4 h-4" />
-                {t('features.howItWorks')}
-              </span>
-              <h3 className="text-2xl font-bold text-foreground mb-6">
-                {t('features.aiDeepDive.title')}
+              
+              <h3 className="text-2xl font-black text-foreground mb-4 italic uppercase tracking-tighter">
+                {t(`features.${pillar.id}.title`)}
               </h3>
-
-              {/* Steps */}
-              <div className="space-y-6">
-                {aiSteps.map((step, index) => (
-                  <div key={step.step} className="flex gap-4">
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                        <step.icon className="w-5 h-5 text-secondary-foreground" />
-                      </div>
-                      {index < aiSteps.length - 1 && (
-                        <div className="absolute left-1/2 top-10 w-0.5 h-6 bg-border -translate-x-1/2" />
-                      )}
-                    </div>
-                    <div className="flex-1 pb-2">
-                      <h4 className="font-semibold text-foreground mb-1">
-                        {t(`features.aiDeepDive.step${step.step}.title`)}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {t(`features.aiDeepDive.step${step.step}.desc`)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right: Stats & CTA */}
-            <div className="bg-muted/50 rounded-2xl p-8">
-              <h4 className="font-semibold text-foreground mb-6">
-                {t('features.results.title')}
-              </h4>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-card rounded-xl p-4 text-center">
-                  <Timer className="w-6 h-6 text-secondary mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">5 min</div>
-                  <p className="text-xs text-muted-foreground">{t('features.results.diagnosis')}</p>
-                </div>
-                <div className="bg-card rounded-xl p-4 text-center">
-                  <CircleDollarSign className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">40%</div>
-                  <p className="text-xs text-muted-foreground">{t('features.results.savings')}</p>
-                </div>
-                <div className="bg-card rounded-xl p-4 text-center">
-                  <CheckCircle2 className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">95%</div>
-                  <p className="text-xs text-muted-foreground">{t('features.results.accuracy')}</p>
-                </div>
-                <div className="bg-card rounded-xl p-4 text-center">
-                  <HeartHandshake className="w-6 h-6 text-destructive mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">4.9/5</div>
-                  <p className="text-xs text-muted-foreground">{t('features.results.satisfaction')}</p>
-                </div>
-              </div>
-
-              <Button 
-                onClick={onCtaClick}
-                className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold"
-                size="lg"
-              >
-                {t('features.cta')}
-              </Button>
-              <p className="text-xs text-center text-muted-foreground mt-3">
-                {t('features.ctaSubtext')}
+              
+              <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+                {t(`features.${pillar.id}.tagline`)}
               </p>
+
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-secondary group-hover:gap-4 transition-all">
+                Learn more <ArrowRight className="w-4 h-4" />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Feature Deep Dive - Glass Card */}
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={activePillar}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-card rounded-[3rem] p-8 lg:p-20 border-white/40 shadow-2xl relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+            
+            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+              {/* Left Side: Detail & Timeline */}
+              <div className="space-y-12">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                     <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                        <Zap className="w-6 h-6 text-secondary" />
+                     </div>
+                     <h3 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">
+                        {t(`features.${activePillar}.title`)}
+                     </h3>
+                  </div>
+                  <p className="text-xl text-muted-foreground font-medium leading-relaxed italic">
+                    {t(`features.${activePillar}.solution`)}
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                   {[1, 2, 3].map((i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center gap-4 bg-white/40 backdrop-blur-md p-5 rounded-2xl border border-white/20 shadow-sm"
+                      >
+                         <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-5 h-5 text-success" />
+                         </div>
+                         <span className="font-bold text-foreground tracking-tight">{t(`features.${activePillar}.benefit${i}`)}</span>
+                      </motion.div>
+                   ))}
+                </div>
+              </div>
+
+              {/* Right Side: Timeline/Steps */}
+              <div className="bg-primary rounded-[2.5rem] p-10 lg:p-14 shadow-2xl shadow-primary/20 relative group">
+                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary rounded-full blur-3xl opacity-30 group-hover:opacity-60 transition-opacity" />
+                 
+                 <h4 className="text-xl font-black text-white italic uppercase tracking-widest mb-12 flex items-center gap-3">
+                    <Timer className="w-6 h-6 text-secondary animate-pulse" />
+                    How it works
+                 </h4>
+
+                 <div className="space-y-10 relative">
+                    <div className="absolute left-6 top-10 bottom-10 w-px bg-white/20" />
+                    
+                    {aiSteps.map((step, idx) => (
+                      <motion.div 
+                        key={step.step}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.15 }}
+                        className="flex gap-8 relative z-10"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0 ring-4 ring-primary border border-white/20 group-hover:scale-110 transition-transform">
+                          <step.icon className="w-5 h-5 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-1">Step {step.step}</p>
+                          <h5 className="text-lg font-bold text-white mb-1 tracking-tight">{t(`features.aiDeepDive.step${step.step}.title`)}</h5>
+                          <p className="text-sm text-white/60 font-medium leading-relaxed">{t(`features.aiDeepDive.step${step.step}.desc`)}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                 </div>
+
+                 <Button 
+                    onClick={onCtaClick}
+                    className="w-full mt-12 bg-secondary text-white hover:bg-secondary/90 font-black uppercase tracking-[0.2em] py-8 rounded-2xl text-lg shadow-xl shadow-secondary/20 transition-all active:scale-95"
+                 >
+                    {t('features.cta')}
+                 </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   )
