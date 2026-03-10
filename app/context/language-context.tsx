@@ -133,6 +133,18 @@ const translations: Record<Language, Record<string, string>> = {
     'pricing.popular': 'Most Popular',
     'pricing.month': 'month',
 
+    // Services helper text
+    'services.commonIssues': 'Typical plumbing problems',
+    'services.leaks': 'Leaking pipes, taps and radiators',
+    'services.blocks': 'Blocked toilets, showers and kitchen sinks',
+    'services.heating': 'Problems with hot water and heating',
+    'services.emergency': 'Emergency water damage and burst pipes',
+    'services.projects': 'Planned work and renovations',
+    'services.bathroom': 'Bathroom modernisation and new fittings',
+    'services.kitchen': 'Kitchen sinks, dishwashers and washing machines',
+    'services.replacement': 'Replacement of old pipe sections and fittings',
+    'services.checks': 'Checking existing installations before buying or renting',
+
     // FAQ
     'faq.title': 'Questions we hear a lot',
     'faq.cta': 'Ask a question',
@@ -267,6 +279,18 @@ const translations: Record<Language, Record<string, string>> = {
     'pricing.cta': 'Plan wählen',
     'pricing.popular': 'Beliebteste',
     'pricing.month': 'Monat',
+
+    // Services helper text
+    'services.commonIssues': 'Typische Sanitärprobleme',
+    'services.leaks': 'Undichte Leitungen, tropfende Hähne und Heizkörper',
+    'services.blocks': 'Verstopfte Toiletten, Duschen und Küchenspülen',
+    'services.heating': 'Probleme mit Warmwasser und Heizung',
+    'services.emergency': 'Wasserschäden und Rohrbrüche im Notfall',
+    'services.projects': 'Geplante Arbeiten und Renovierungen',
+    'services.bathroom': 'Badmodernisierung und neue Armaturen',
+    'services.kitchen': 'Küchenspülen, Geschirrspüler und Waschmaschinen',
+    'services.replacement': 'Erneuerung alter Rohrabschnitte und Armaturen',
+    'services.checks': 'Überprüfung bestehender Anlagen vor Kauf oder Miete',
 
     // FAQ
     'faq.title': 'Fragen, die uns oft gestellt werden',

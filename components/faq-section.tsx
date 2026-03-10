@@ -14,40 +14,40 @@ import { HelpCircle, MessageSquare } from 'lucide-react'
 
 const faqs = [
   {
-    questionEn: 'How does the Master visual diagnostic tool work?',
-    questionDe: 'Wie funktioniert das visuelle Meister-Diagnose-Tool?',
-    answerEn: 'Simply upload a photo of your plumbing issue, and our master technicians analyze the image to provide an instant preliminary estimate. A certified expert then reviews your case and contacts you within 30 minutes.',
-    answerDe: 'Laden Sie einfach ein Foto Ihres Sanitärproblems hoch, und unsere Sanitärmeister analysieren das Bild, um sofort eine vorläufige Schätzung zu liefern. Ein zertifizierter Experte prüft dann Ihren Fall und kontaktiert Sie innerhalb von 30 Minuten.'
+    questionEn: 'How fast can you come in an emergency?',
+    questionDe: 'Wie schnell kommen Sie im Notfall?',
+    answerEn: 'In most cases in Berlin and the surrounding area we can be with you on the same day, often within a few hours. At night we first check by phone what is urgent and what can wait until the morning.',
+    answerDe: 'In den meisten Fällen in Berlin und Umgebung sind wir noch am selben Tag bei Ihnen, oft innerhalb weniger Stunden. Nachts klären wir telefonisch, was wirklich dringend ist und was bis zum Morgen warten kann.'
   },
   {
-    questionEn: 'What is your emergency response time?',
-    questionDe: 'Wie schnell reagieren Sie bei Notfällen?',
-    answerEn: 'Our average emergency response time is under 30 minutes for Premium plan members. Standard plans receive priority response within 1-2 hours. We operate 24/7, 365 days a year.',
-    answerDe: 'Unsere durchschnittliche Notfall-Reaktionszeit liegt für Premium-Mitglieder unter 30 Minuten. Standardpläne erhalten eine Prioritätsreaktion innerhalb von 1-2 Stunden. Wir arbeiten 24/7, 365 Tage im Jahr.'
+    questionEn: 'What does a typical repair cost?',
+    questionDe: 'Was kostet eine typische Reparatur?',
+    answerEn: 'The price depends on the effort and material. On the phone we give you a rough price range. On site we explain again what we recommend and what it will cost before we start.',
+    answerDe: 'Der Preis hängt vom Aufwand und vom Material ab. Am Telefon nennen wir Ihnen einen groben Kostenrahmen. Vor Ort erklären wir noch einmal, was wir empfehlen und was es kostet, bevor wir anfangen.'
   },
   {
-    questionEn: 'Are your technicians certified?',
-    questionDe: 'Sind Ihre Techniker zertifiziert?',
-    answerEn: 'Yes, all our technicians are fully certified, licensed, and insured. They undergo regular training and background checks. We maintain the highest standards in the industry.',
-    answerDe: 'Ja, alle unsere Techniker sind vollständig zertifiziert, lizenziert und versichert. Sie werden regelmäßig geschult und überprüft. Wir halten die höchsten Standards der Branche ein.'
+    questionEn: 'Do you also do small jobs?',
+    questionDe: 'Machen Sie auch kleine Aufträge?',
+    answerEn: 'Yes. A dripping tap, a new siphon or a blocked toilet are exactly the kind of jobs we do every day.',
+    answerDe: 'Ja. Eine tropfende Armatur, ein neuer Siphon oder eine verstopfte Toilette sind genau die Einsätze, die wir täglich machen.'
   },
   {
-    questionEn: 'What areas do you service?',
-    questionDe: 'Welche Gebiete bedienen Sie?',
-    answerEn: 'We currently service all major German cities including Berlin, Munich, Hamburg, Frankfurt, Cologne, and their surrounding areas. Enter your postal code during booking to confirm coverage.',
-    answerDe: 'Wir bedienen derzeit alle großen deutschen Städte, darunter Berlin, München, Hamburg, Frankfurt, Köln und deren Umgebung. Geben Sie bei der Buchung Ihre Postleitzahl ein, um die Abdeckung zu bestätigen.'
+    questionEn: 'Do I have to prepare anything before you arrive?',
+    questionDe: 'Muss ich vor Ihrem Besuch etwas vorbereiten?',
+    answerEn: 'If possible, clear the area in front of the affected place (sink, toilet, access hatch) and keep pets away. Everything else we bring with us.',
+    answerDe: 'Wenn möglich, räumen Sie den Bereich vor der betroffenen Stelle (Waschbecken, Toilette, Revisionsöffnung) frei und halten Sie Haustiere fern. Alles andere bringen wir mit.'
   },
   {
-    questionEn: 'What payment methods do you accept?',
-    questionDe: 'Welche Zahlungsmethoden akzeptieren Sie?',
-    answerEn: 'We accept all major credit cards, PayPal, bank transfers, and cash. For subscription plans, we offer monthly or annual billing with a 15% discount on annual payments.',
-    answerDe: 'Wir akzeptieren alle gängigen Kreditkarten, PayPal, Banküberweisungen und Bargeld. Für Abonnementpläne bieten wir monatliche oder jährliche Abrechnung mit 15% Rabatt bei jährlicher Zahlung.'
+    questionEn: 'Which areas do you cover?',
+    questionDe: 'Welche Gebiete decken Sie ab?',
+    answerEn: 'We mainly work in Berlin and the surrounding area. For larger jobs we are also happy to drive a bit further – simply ask us by phone.',
+    answerDe: 'Wir sind hauptsächlich in Berlin und Umgebung unterwegs. Für größere Arbeiten fahren wir auch gerne ein Stück weiter – sprechen Sie uns einfach telefonisch an.'
   },
   {
-    questionEn: 'Is the estimate guaranteed?',
-    questionDe: 'Ist die Schätzung garantiert?',
-    answerEn: 'Our expert-generated estimates are preliminary and based on the information provided. The final price is confirmed after on-site inspection. We guarantee no surprise charges beyond the quoted range without your approval.',
-    answerDe: 'Unsere expertengestützten Schätzungen sind vorläufig und basieren auf den bereitgestellten Informationen. Der endgültige Preis wird nach der Vor-Ort-Inspektion bestätigt. Wir garantieren keine Überraschungskosten über den genannten Bereich hinaus ohne Ihre Zustimmung.'
+    questionEn: 'How can I pay?',
+    questionDe: 'Wie kann ich bezahlen?',
+    answerEn: 'You can usually pay in cash or by bank transfer. For recurring customers and businesses we are happy to agree individual arrangements.',
+    answerDe: 'In der Regel können Sie bar oder per Überweisung zahlen. Für Stammkunden und Unternehmen vereinbaren wir gerne individuelle Regelungen.'
   }
 ]
 
@@ -75,9 +75,6 @@ export function FaqSection() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-secondary/5 rounded-full blur-[120px]" />
-      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-[120px]" />
-
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -85,16 +82,18 @@ export function FaqSection() {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground text-xs font-semibold rounded-xl uppercase tracking-[0.15em] mb-6">
             <HelpCircle className="w-4 h-4" />
-            Clear Answers
+            {language === 'de' ? 'Gut zu wissen' : 'Good to know'}
           </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-muted decoration-8 underline-offset-8">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 tracking-tight">
             {t('faq.title')}
           </h2>
-          <div className="flex items-center justify-center gap-3 text-muted-foreground font-black uppercase tracking-[0.2em] text-xs">
+          <div className="flex items-center justify-center gap-3 text-muted-foreground text-xs">
             <MessageSquare className="w-4 h-4 text-secondary" />
-            Still have questions? Chat with our support expert.
+            {language === 'de'
+              ? 'Wenn Sie unsicher sind, rufen Sie lieber einmal mehr an.'
+              : 'If you are unsure, it is better to call us once more.'}
           </div>
         </motion.div>
 
@@ -109,14 +108,14 @@ export function FaqSection() {
             >
               <AccordionItem
                 value={`item-${index}`}
-                className="group border border-border/50 rounded-[2.5rem] px-8 bg-white/40 backdrop-blur-xl shadow-xl transition-all duration-500 hover:bg-white hover:border-primary/20 overflow-hidden"
+                className="group border border-border/60 rounded-2xl px-6 bg-card shadow-sm overflow-hidden"
               >
                 <AccordionTrigger className="text-left hover:no-underline py-8">
-                  <span className="text-xl sm:text-2xl font-black text-foreground italic uppercase tracking-tighter group-hover:text-primary transition-colors pr-6">
+                  <span className="text-lg sm:text-xl font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors pr-6">
                     {language === 'de' ? faq.questionDe : faq.questionEn}
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-8 text-lg font-medium text-muted-foreground leading-relaxed italic pr-12">
+                <AccordionContent className="pb-6 text-sm text-muted-foreground leading-relaxed pr-6">
                   <div className="flex gap-4">
                     <div className="w-1 h-auto bg-secondary/30 rounded-full shrink-0" />
                     <div>{language === 'de' ? faq.answerDe : faq.answerEn}</div>
@@ -131,10 +130,9 @@ export function FaqSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-24 p-12 glass-card rounded-[3rem] border-secondary/20 flex flex-col items-center text-center relative overflow-hidden group"
+          className="mt-16 p-8 rounded-2xl border border-secondary/30 bg-muted flex flex-col items-center text-center"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 group-hover:opacity-10 transition-opacity blur-3xl" />
-          <HelpCircle className="w-10 h-10 text-secondary mb-6 animate-pulse-premium" />
+          <HelpCircle className="w-8 h-8 text-secondary mb-4" />
           <h3 className="text-2xl font-bold tracking-tight text-foreground mb-4">
             {t('faq.moreHelpTitle') || "Can't find what you need?"}
           </h3>

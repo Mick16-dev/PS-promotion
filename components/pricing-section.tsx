@@ -119,18 +119,15 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-8 items-center"
+          className="grid md:grid-cols-3 gap-6 items-start"
         >
           {plans.map((plan) => (
             <motion.div 
               key={plan.id} 
               variants={item as any}
-              whileHover={{ y: -10 }}
               className={cn(
-                "relative group p-8 lg:p-10 rounded-[3.5rem] transition-all duration-500",
-                plan.popular 
-                  ? "bg-primary border-4 border-secondary text-primary-foreground shadow-2xl shadow-primary/40 scale-105 z-20" 
-                  : "bg-white/50 backdrop-blur-xl border border-white/60 text-foreground"
+                "relative p-6 lg:p-7 rounded-2xl border bg-card text-foreground",
+                plan.popular && "border-secondary"
               )}
             >
               {plan.popular && (
@@ -140,19 +137,19 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                 </div>
               )}
               
-              <div className="mb-10 text-center">
+              <div className="mb-8 text-center">
                  <div className={cn(
                    "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6",
                    plan.popular ? "bg-white/10" : "bg-primary/10"
                  )}>
                    <plan.icon className={cn("w-7 h-7", plan.popular ? "text-secondary" : "text-primary")} />
                  </div>
-                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">
+                 <h3 className="text-xl font-semibold tracking-tight mb-2">
                     {t(plan.nameKey)}
                  </h3>
                  <div className="flex items-baseline justify-center gap-1">
-                   <span className="text-xs font-black uppercase tracking-widest opacity-50">EUR</span>
-                   <span className="text-5xl font-black italic tracking-tighter">{plan.price}</span>
+                   <span className="text-xs font-semibold uppercase tracking-wide opacity-60">EUR</span>
+                   <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
                    <span className={cn(
                      "text-xs font-black uppercase tracking-widest",
                      plan.popular ? "text-white/60" : "text-muted-foreground"
@@ -161,12 +158,9 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                  </div>
               </div>
 
-              <div className={cn(
-                "h-px w-full mb-10 border-0",
-                plan.popular ? "bg-white/20" : "bg-border/50"
-              )} />
+              <div className="h-px w-full mb-6 bg-border/60" />
 
-              <ul className="space-y-5 mb-12">
+              <ul className="space-y-3 mb-6">
                 {(language === 'de' ? plan.featuresDe : plan.featuresEn).map((feature, i) => (
                   <li key={i} className="flex items-center gap-4">
                     <div className={cn(
