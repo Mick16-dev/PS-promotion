@@ -46,13 +46,13 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
     >
       {/* After Image (background) */}
       <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${afterImage})` }}
       />
 
       {/* Before Image (clipped) */}
       <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${beforeImage})`,
           clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`
@@ -136,7 +136,7 @@ export function BeforeAfterGallery({ onCtaClick }: BeforeAfterGalleryProps) {
             <BadgeCheck className="w-4 h-4" />
             {t('gallery.badge') || "Visual Excellence"}
           </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-primary decoration-8 underline-offset-8">
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase">
             {t('gallery.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">

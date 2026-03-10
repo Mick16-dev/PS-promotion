@@ -33,7 +33,7 @@ export function MasterExpertSection() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 gap-24 items-center">
-          {/* Left: Authority Text */}
+          {/* Left: Team Story */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -43,29 +43,26 @@ export function MasterExpertSection() {
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary text-xs font-black rounded-xl uppercase tracking-[0.2em]">
                 <ShieldCheck className="w-4 h-4" />
-                Verified E-E-A-T Excellence
+                {language === 'de' ? 'Ihr Rohr‑Blitz Team' : 'Your Rohr-Blitz Team'}
               </span>
               <h2 className="text-4xl sm:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-[1.1]">
-                {language === 'de' ? 'Meisterhafte Präzision.' : 'Master Level Precision.'} <br />
-                <span className="text-secondary underline decoration-8 underline-offset-8 decoration-secondary/30">
-                  {language === 'de' ? 'Echte Experten.' : 'Real Human Experts.'}
-                </span>
+                {language === 'de' ? 'Menschen, die Ihr Zuhause schützen.' : 'People who protect your home.'}
               </h2>
             </div>
 
             <p className="text-xl text-muted-foreground font-medium leading-relaxed italic">
               {language === 'de'
-                ? 'Hinter unseren digitalen Werkzeugen stehen echte deutsche Handwerksmeister. Jede Diagnose wird von zertifizierten Experten validiert, um höchste Sicherheit und Qualität zu garantieren.'
-                : 'Behind our digital diagnostic tools stand real German Master Craftsmen. Every diagnosis is validated by certified experts to guarantee the highest safety and quality standards.'}
+                ? 'Hinter jedem Einsatz steht ein kleines, eingespieltes Team aus Meister-Installateuren. Wir kennen unsere Kunden beim Namen, kommen pünktlich und verlassen Ihr Zuhause so sauber, wie wir es vorgefunden haben.'
+                : 'Behind every call-out is a tight-knit crew of master plumbers who know you by name, show up on time, and leave your home as clean as they found it.'}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-6">
-              {[
-                { icon: Award, labelDe: 'Zertifizierter Meisterbetrieb', labelEn: 'Certified Master Business' },
-                { icon: GraduationCap, labelDe: 'Regulierte Qualifikationen', labelEn: 'Regulated Qualifications' },
-                { icon: Microscope, labelDe: 'Präzisions-Diagnostik', labelEn: 'Precision Diagnostics' },
-                { icon: ShieldCheck, labelDe: 'Haftungs-Garantie', labelEn: 'Liability Guaranteed' },
-              ].map((item, i) => (
+                {[
+                  { icon: Award, labelDe: 'Über 20 Jahre Erfahrung vor Ort', labelEn: '20+ years local experience' },
+                  { icon: GraduationCap, labelDe: 'Regelmäßige Schulungen & Zertifikate', labelEn: 'Ongoing training & certifications' },
+                  { icon: Microscope, labelDe: 'Sorgfältige Diagnose statt Schnellschuss', labelEn: 'Careful diagnosis, not guesswork' },
+                  { icon: ShieldCheck, labelDe: 'Saubere Arbeit & Haftungs-Garantie', labelEn: 'Clean workmanship & liability cover' },
+                ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 bg-card/30 p-4 rounded-2xl border border-white/40">
                   <item.icon className="w-5 h-5 text-secondary" />
                   <span className="text-xs font-black uppercase tracking-wider">{language === 'de' ? item.labelDe : item.labelEn}</span>
@@ -73,15 +70,7 @@ export function MasterExpertSection() {
               ))}
             </div>
 
-            <div className="pt-8">
-              <Image
-                src="/certification-seal.png"
-                alt="Certification Seal"
-                width={120}
-                height={120}
-                className="opacity-80 grayscale hover:grayscale-0 transition-all duration-700"
-              />
-            </div>
+            {/* Removed decorative certification seal image */}
           </motion.div>
 
           {/* Right: Expert Profiles */}

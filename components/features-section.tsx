@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
@@ -73,7 +74,6 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
 
   return (
     <section className="py-32 px-4 relative overflow-hidden bg-background">
-      <div className="absolute inset-0 mesh-gradient opacity-30" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
@@ -87,7 +87,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
             <ShieldCheck className="w-4 h-4" />
             {t('features.badge')}
           </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase">
             {t('features.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
@@ -116,10 +116,12 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                   : "bg-card/30 border-border/50 hover:bg-white/50"
               )}
             >
-              <div className={cn(
-                "w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-xl",
-                activePillar === pillar.id ? pillar.bg : "bg-muted/50"
-              )}>
+              <div
+                className={cn(
+                  "w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-xl",
+                  activePillar === pillar.id ? pillar.bg : "bg-muted/50"
+                )}
+              >
                 <pillar.icon className={cn("w-8 h-8", activePillar === pillar.id ? pillar.color : "text-muted-foreground")} />
               </div>
 
@@ -131,9 +133,12 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                 {t(`features.${pillar.id}.tagline`)}
               </p>
 
-              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-secondary group-hover:gap-4 transition-all">
+              <Link
+                href="/team"
+                className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-secondary hover:text-secondary/80 transition-colors"
+              >
                 {t('features.learnMore')} <ArrowRight className="w-4 h-4" />
-              </div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>

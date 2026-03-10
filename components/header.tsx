@@ -25,10 +25,9 @@ export function Header({ onEmergencyClick }: HeaderProps) {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <motion.div 
-            whileHover={{ scale: 1.02 }}
             className="flex items-center gap-4 group cursor-pointer"
           >
-            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 group-hover:rotate-6 transition-transform p-3">
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 p-3">
               <img src="/logo-custom.svg" alt="Rohr-Blitz Logo" className="w-full h-full object-contain brightness-0 invert" />
             </div>
             <div className="flex flex-col">

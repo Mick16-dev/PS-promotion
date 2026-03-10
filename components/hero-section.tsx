@@ -151,8 +151,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   }
 
   return (
-    <section className="relative pt-32 pb-24 px-4 min-h-screen mesh-gradient overflow-hidden">
-      <div className="absolute inset-0 grain-overlay opacity-50" />
+    <section className="relative pt-32 pb-24 px-4 min-h-screen bg-background overflow-hidden">
 
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
         {/* Hero Text */}
@@ -172,7 +171,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
             {t('hero.badge')}
           </motion.span>
 
-          <h1 className="text-5xl sm:text-6xl font-black text-foreground mb-6 leading-[1.05] tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+          <h1 className="text-5xl sm:text-6xl font-black text-foreground mb-6 leading-[1.05] tracking-tighter italic uppercase">
             {t('hero.title')}
           </h1>
 
