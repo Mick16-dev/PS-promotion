@@ -61,9 +61,9 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex gap-1">
       {[...Array(5)].map((_, i) => (
-        <Star 
-          key={i} 
-          className={`w-3.5 h-3.5 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-muted/30'}`} 
+        <Star
+          key={i}
+          className={`w-3.5 h-3.5 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-muted/30'}`}
         />
       ))}
     </div>
@@ -90,9 +90,9 @@ export function TestimonialsSection() {
   return (
     <section className="py-32 px-4 relative overflow-hidden bg-background">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
-      
+
       <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -100,28 +100,28 @@ export function TestimonialsSection() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 text-success text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
             <UserCheck className="w-4 h-4" />
-            Verified Elite Reviews
+            {t('testimonials.verifiedTitle')}
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-success decoration-8 underline-offset-8">
             {t('testimonials.title')}
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 text-muted-foreground bg-muted/30 p-8 rounded-[2rem] border border-border/50 max-w-3xl mx-auto backdrop-blur-sm">
             <div className="flex flex-col items-center gap-2">
-               <div className="flex items-center gap-1">
-                 <StarRating rating={5} />
-                 <span className="font-black text-foreground text-2xl tracking-tighter italic ml-2">4.9/5</span>
-               </div>
-               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Global Satisfaction Score</span>
+              <div className="flex items-center gap-1">
+                <StarRating rating={5} />
+                <span className="font-black text-foreground text-2xl tracking-tighter italic ml-2">4.9/5</span>
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('testimonials.globalScore')}</span>
             </div>
             <div className="w-px h-12 bg-border hidden sm:block" />
             <div className="flex flex-col items-center gap-2">
-               <span className="font-black text-foreground text-2xl tracking-tighter italic uppercase text-secondary">500+</span>
-               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Verified Cases Resolved</span>
+              <span className="font-black text-foreground text-2xl tracking-tighter italic uppercase text-secondary">500+</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t('testimonials.casesResolved')}</span>
             </div>
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
@@ -129,27 +129,27 @@ export function TestimonialsSection() {
           className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
         >
           {testimonials.map((testimonial) => (
-            <motion.div 
+            <motion.div
               key={testimonial.id}
               variants={item}
               whileHover={{ y: -10 }}
               className="group relative bg-white/50 backdrop-blur-xl border border-white/60 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-8 lg:p-12 rounded-[3.5rem] overflow-hidden transition-all duration-500 hover:bg-white hover:border-primary/20"
             >
               <div className="absolute top-8 right-12 opacity-5 group-hover:opacity-10 transition-opacity">
-                 <Quote className="w-24 h-24 text-primary fill-current" />
+                <Quote className="w-24 h-24 text-primary fill-current" />
               </div>
 
               <div className="flex items-center gap-6 mb-10 relative z-10">
                 <div className="relative">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl group-hover:rotate-3 transition-transform duration-500">
-                    <img 
-                      src={testimonial.avatar} 
+                    <img
+                      src={testimonial.avatar}
                       alt={language === 'de' ? testimonial.nameDe : testimonial.nameEn}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   {testimonial.hasVideo && (
-                    <motion.button 
+                    <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setVideoModal(testimonial.id)}
@@ -166,11 +166,11 @@ export function TestimonialsSection() {
                     </h3>
                   </div>
                   <div className="flex items-center gap-3">
-                     <p className="text-xs font-black uppercase tracking-[0.2em] text-secondary">
-                        {language === 'de' ? testimonial.locationDe : testimonial.locationEn}
-                     </p>
-                     <div className="w-1 h-1 rounded-full bg-border" />
-                     <StarRating rating={testimonial.rating} />
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-secondary">
+                      {language === 'de' ? testimonial.locationDe : testimonial.locationEn}
+                    </p>
+                    <div className="w-1 h-1 rounded-full bg-border" />
+                    <StarRating rating={testimonial.rating} />
                   </div>
                 </div>
               </div>
@@ -184,7 +184,7 @@ export function TestimonialsSection() {
                   <CheckCircle className="w-3.5 h-3.5 text-success" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-success/70">
-                  {t('testimonials.verified') || "Verified Professional Intervention"}
+                  {t('testimonials.verifiedIntervention')}
                 </span>
                 <ShieldCheck className="w-4 h-4 text-secondary ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
@@ -195,21 +195,21 @@ export function TestimonialsSection() {
         {/* Cinematic Video Modal */}
         <AnimatePresence>
           {videoModal && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-6 sm:p-12 cursor-pointer"
               onClick={() => setVideoModal(null)}
             >
-              <button 
+              <button
                 className="absolute top-8 right-8 w-16 h-16 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
                 onClick={() => setVideoModal(null)}
               >
                 <X className="w-8 h-8" />
               </button>
 
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
@@ -221,21 +221,21 @@ export function TestimonialsSection() {
                   <Play className="w-10 h-10 fill-current ml-1" />
                 </div>
                 <h4 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-4">
-                  {t('testimonials.videoTitle') || "Case #892: Professional Restoration"}
+                  {t('testimonials.videoTitle')}
                 </h4>
                 <p className="text-white/40 font-black uppercase tracking-[0.3em] text-sm italic">
-                  Cinematic Testimonial Loading...
+                  {t('testimonials.videoLoading')}
                 </p>
-                
+
                 <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4">
-                   <div className="h-[2px] w-48 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        className="h-full bg-secondary"
-                      />
-                   </div>
+                  <div className="h-[2px] w-48 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                      className="h-full bg-secondary"
+                    />
+                  </div>
                 </div>
               </motion.div>
             </motion.div>

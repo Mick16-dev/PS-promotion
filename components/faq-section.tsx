@@ -87,14 +87,14 @@ export function FaqSection() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
             <HelpCircle className="w-4 h-4" />
-            Clear Answers
+            {t('faq.badge')}
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-muted decoration-8 underline-offset-8">
             {t('faq.title')}
           </h2>
           <div className="flex items-center justify-center gap-3 text-muted-foreground font-black uppercase tracking-[0.2em] text-xs">
             <MessageSquare className="w-4 h-4 text-secondary" />
-            Still have questions? Chat with our support expert.
+            {t('faq.stillHaveQuestions')}
           </div>
         </motion.div>
 
@@ -136,14 +136,14 @@ export function FaqSection() {
           <div className="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 group-hover:opacity-10 transition-opacity blur-3xl" />
           <HelpCircle className="w-10 h-10 text-secondary mb-6 animate-pulse-premium" />
           <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground mb-4">
-            Cant find what you need?
+            {t('faq.cantFind')}
           </h3>
           <p className="text-muted-foreground font-medium mb-8 max-w-lg">
-            Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.
+            {t('faq.supportTeam')}
           </p>
           <Magnetic strength={0.2}>
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-xl transition-all active:scale-95">
-              Request VIP Support
+              {t('faq.requestSupport')}
             </Button>
           </Magnetic>
         </motion.div>

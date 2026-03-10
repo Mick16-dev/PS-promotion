@@ -185,13 +185,13 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
               <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6 text-success" />
               </div>
-              <span className="text-sm font-bold uppercase tracking-wider text-foreground">Verified Experts</span>
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">{t('hero.verifiedExperts')}</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-secondary" />
               </div>
-              <span className="text-sm font-bold uppercase tracking-wider text-foreground">15m Response</span>
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">{t('hero.response')}</span>
             </div>
           </div>
         </motion.div>
@@ -246,7 +246,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                         transition={{ delay: 0.3 }}
                         className="bg-card/40 backdrop-blur-md rounded-3xl p-8 mb-8 border border-white/20"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">Master Estimate</p>
+                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">{t('hero.masterEstimate')}</p>
                         <p className="text-5xl font-black text-foreground italic">
                           {estimate.min}-{estimate.max}€
                         </p>
@@ -373,7 +373,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                               onClick={handleSeverityContinue}
                               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-widest py-8 rounded-2xl text-lg shadow-2xl shadow-primary/20"
                             >
-                              Calculate Assessment
+                              {t('hero.calculate')}
                             </Button>
                           </Magnetic>
                         </div>
@@ -410,8 +410,8 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Master Diagnostic</h3>
-                                  <p className="text-white/60 text-sm font-bold uppercase tracking-[0.2em] animate-pulse">Analyzing Blueprint & Pressure Points...</p>
+                                  <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">{t('hero.masterDiagnostic')}</h3>
+                                  <p className="text-white/60 text-sm font-bold uppercase tracking-[0.2em] animate-pulse">{t('hero.analyzing')}</p>
                                 </div>
 
                                 <div className="flex gap-2 justify-center">
@@ -472,11 +472,11 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
           <div className="mt-8 flex items-center justify-center gap-8 text-muted-foreground/60">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest">{t('hero.encrypted')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">GDPR Ready</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest">{t('hero.gdpr')}</span>
             </div>
           </div>
         </motion.div>

@@ -96,9 +96,9 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
   return (
     <section className="py-32 px-4 relative overflow-hidden bg-background">
       <div className="absolute inset-0 mesh-gradient opacity-10" />
-      
+
       <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -106,7 +106,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
             <ShieldCheck className="w-4 h-4" />
-            Pricing & Protection Plans
+            {t('pricing.badge')}
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
             {t('pricing.title')}
@@ -116,7 +116,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           </p>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
@@ -124,14 +124,14 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           className="grid md:grid-cols-3 gap-8 items-center"
         >
           {plans.map((plan) => (
-            <motion.div 
-              key={plan.id} 
+            <motion.div
+              key={plan.id}
               variants={item as any}
               whileHover={{ y: -10 }}
               className={cn(
                 "relative group p-8 lg:p-10 rounded-[3.5rem] transition-all duration-500",
-                plan.popular 
-                  ? "bg-primary border-4 border-secondary text-primary-foreground shadow-2xl shadow-primary/40 scale-105 z-20" 
+                plan.popular
+                  ? "bg-primary border-4 border-secondary text-primary-foreground shadow-2xl shadow-primary/40 scale-105 z-20"
                   : "bg-white/50 backdrop-blur-xl border border-white/60 text-foreground"
               )}
             >
@@ -141,26 +141,26 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                   {t('pricing.popular')}
                 </div>
               )}
-              
+
               <div className="mb-10 text-center">
-                 <div className={cn(
-                   "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6",
-                   plan.popular ? "bg-white/10" : "bg-primary/10"
-                 )}>
-                   <plan.icon className={cn("w-7 h-7", plan.popular ? "text-secondary" : "text-primary")} />
-                 </div>
-                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">
-                    {t(plan.nameKey)}
-                 </h3>
-                 <div className="flex items-baseline justify-center gap-1">
-                   <span className="text-xs font-black uppercase tracking-widest opacity-50">EUR</span>
-                   <span className="text-5xl font-black italic tracking-tighter">{plan.price}</span>
-                   <span className={cn(
-                     "text-xs font-black uppercase tracking-widest",
-                     plan.popular ? "text-white/60" : "text-muted-foreground"
-                   )}>/
-                   {t('pricing.month')}</span>
-                 </div>
+                <div className={cn(
+                  "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6",
+                  plan.popular ? "bg-white/10" : "bg-primary/10"
+                )}>
+                  <plan.icon className={cn("w-7 h-7", plan.popular ? "text-secondary" : "text-primary")} />
+                </div>
+                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">
+                  {t(plan.nameKey)}
+                </h3>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-xs font-black uppercase tracking-widest opacity-50">EUR</span>
+                  <span className="text-5xl font-black italic tracking-tighter">{plan.price}</span>
+                  <span className={cn(
+                    "text-xs font-black uppercase tracking-widest",
+                    plan.popular ? "text-white/60" : "text-muted-foreground"
+                  )}>/
+                    {t('pricing.month')}</span>
+                </div>
               </div>
 
               <div className={cn(
@@ -181,14 +181,14 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                   </li>
                 ))}
               </ul>
-              
+
               <Magnetic strength={0.2} className="w-full">
-                <Button 
+                <Button
                   onClick={onCtaClick}
                   className={cn(
                     "w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 group relative overflow-hidden",
-                    plan.popular 
-                      ? "bg-secondary text-white hover:bg-secondary/90 shadow-secondary/20" 
+                    plan.popular
+                      ? "bg-secondary text-white hover:bg-secondary/90 shadow-secondary/20"
                       : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/10"
                   )}
                 >

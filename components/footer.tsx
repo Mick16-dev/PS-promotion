@@ -31,10 +31,10 @@ export function Footer({ onCtaClick }: FooterProps) {
 
           <ShieldCheck className="w-12 h-12 text-secondary mx-auto mb-8 animate-pulse-premium" />
           <h2 className="text-4xl sm:text-6xl font-black mb-8 tracking-tighter italic uppercase leading-none">
-            Ready for a <span className="text-secondary">Gold Standard</span> Fix?
+            {t('footer.readyFor')}<span className="text-secondary">{t('footer.goldStandard')}</span>{t('footer.fix')}
           </h2>
           <p className="text-white/60 text-xl font-medium mb-12 max-w-2xl mx-auto italic">
-            Experience the future of plumbing with expert master diagnostics and 24/7 elite response.
+            {t('footer.experience')}
           </p>
 
           <Magnetic strength={0.2}>
@@ -64,11 +64,11 @@ export function Footer({ onCtaClick }: FooterProps) {
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black italic uppercase tracking-tighter leading-none">{t('header.logo')}</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary">Premium Plumbing</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary">{t('footer.premiumPlumbing')}</span>
               </div>
             </div>
             <p className="text-white/50 font-medium leading-relaxed max-w-sm italic">
-              Redefining residential restoration through expert diagnostic tools and elite craftsmanship. Available 24/7 across every major German hub.
+              {t('footer.redefining')}
             </p>
 
             <div className="space-y-4">
@@ -103,15 +103,15 @@ export function Footer({ onCtaClick }: FooterProps) {
 
           {/* Authority */}
           <div className="space-y-8">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Accreditations</h3>
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t('footer.accreditations')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
                 <ShieldCheck className="w-6 h-6 text-success" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-center">Certified Meister</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-center">{t('footer.certifiedMeister')}</span>
               </div>
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col items-center gap-2">
                 <Phone className="w-6 h-6 text-secondary" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-center">24/7 Emergency</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-center">{t('footer.emergency')}</span>
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@ export function Footer({ onCtaClick }: FooterProps) {
       {/* Bottom Bar */}
       <div className="py-12 px-4 border-t border-white/5 bg-black/20 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:row items-center justify-between gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-          <p>© 2026 Rohr-Blitz. Crafted for Master Excellence.</p>
+          <p>{t('footer.copyright')}</p>
           <div className="flex gap-8">
             <a href="#" className="hover:text-white transition-colors flex items-center gap-2">
               <Twitter className="w-4 h-4" /> Twitter

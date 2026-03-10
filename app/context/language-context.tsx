@@ -137,6 +137,32 @@ const translations: Record<Language, Record<string, string>> = {
 
     // FAQ
     'faq.title': 'Frequently Asked Questions',
+    'faq.badge': 'Clear Answers',
+    'faq.stillHaveQuestions': 'Still have questions? Chat with our support expert.',
+    'faq.cantFind': 'Cant find what you need?',
+    'faq.supportTeam': 'Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.',
+    'faq.requestSupport': 'Request VIP Support',
+
+    // Testimonials Additional
+    'testimonials.verifiedTitle': 'Verified Elite Reviews',
+    'testimonials.globalScore': 'Global Satisfaction Score',
+    'testimonials.casesResolved': 'Verified Cases Resolved',
+    'testimonials.verifiedIntervention': 'Verified Professional Intervention',
+    'testimonials.videoTitle': 'Case #892: Professional Restoration',
+    'testimonials.videoLoading': 'Cinematic Testimonial Loading...',
+
+    // Hero Additional
+    'hero.verifiedExperts': 'Verified Experts',
+    'hero.response': '15m Response',
+    'hero.calculate': 'Calculate Assessment',
+    'hero.masterDiagnostic': 'Master Diagnostic',
+    'hero.analyzing': 'Analyzing Blueprint & Pressure Points...',
+    'hero.encrypted': 'Encrypted',
+    'hero.gdpr': 'GDPR Ready',
+    'hero.masterEstimate': 'Master Estimate',
+
+    // Pricing
+    'pricing.badge': 'Pricing & Protection Plans',
 
     // Footer
     'footer.cta': 'Get Started Now',
@@ -145,6 +171,16 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.privacy': 'Privacy Policy',
     'footer.terms': 'Terms of Service',
     'footer.imprint': 'Imprint',
+    'footer.readyFor': 'Ready for a ',
+    'footer.goldStandard': 'Gold Standard',
+    'footer.fix': ' Fix?',
+    'footer.experience': 'Experience the future of plumbing with expert master diagnostics and 24/7 elite response.',
+    'footer.premiumPlumbing': 'Premium Plumbing',
+    'footer.redefining': 'Redefining residential restoration through expert diagnostic tools and elite craftsmanship. Available 24/7 across every major German hub.',
+    'footer.accreditations': 'Accreditations',
+    'footer.certifiedMeister': 'Certified Meister',
+    'footer.emergency': '24/7 Emergency',
+    'footer.copyright': '© 2026 Rohr-Blitz. Crafted for Master Excellence.',
   },
   de: {
     // Header
@@ -272,6 +308,32 @@ const translations: Record<Language, Record<string, string>> = {
 
     // FAQ
     'faq.title': 'Häufig gestellte Fragen',
+    'faq.badge': 'Klare Antworten',
+    'faq.stillHaveQuestions': 'Noch Fragen? Chatten Sie mit unserem Support-Experten.',
+    'faq.cantFind': 'Nicht gefunden, was Sie suchen?',
+    'faq.supportTeam': 'Unser Support-Team steht Ihnen 24/7 für JEDEN Sanitärnotfall oder jede technische Anfrage zur Verfügung.',
+    'faq.requestSupport': 'VIP-Support anfordern',
+
+    // Testimonials Additional
+    'testimonials.verifiedTitle': 'Verifizierte Elite-Bewertungen',
+    'testimonials.globalScore': 'Globale Zufriedenheitsbewertung',
+    'testimonials.casesResolved': 'Verifizierte gelöste Fälle',
+    'testimonials.verifiedIntervention': 'Verifizierter professioneller Einsatz',
+    'testimonials.videoTitle': 'Fall #892: Professionelle Reparatur',
+    'testimonials.videoLoading': 'Kino-Testimonial lädt...',
+
+    // Hero Additional
+    'hero.verifiedExperts': 'Verifizierte Experten',
+    'hero.response': '15 Min. Reaktionszeit',
+    'hero.calculate': 'Einschätzung berechnen',
+    'hero.masterDiagnostic': 'Meister-Diagnose',
+    'hero.analyzing': 'Analysiere Bauplan & Druckpunkte...',
+    'hero.encrypted': 'Verschlüsselt',
+    'hero.gdpr': 'DSGVO-konform',
+    'hero.masterEstimate': 'Meister-Schätzung',
+
+    // Pricing
+    'pricing.badge': 'Preise & Schutzpläne',
 
     // Footer
     'footer.cta': 'Jetzt starten',
@@ -280,6 +342,16 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.privacy': 'Datenschutz',
     'footer.terms': 'AGB',
     'footer.imprint': 'Impressum',
+    'footer.readyFor': 'Bereit für eine ',
+    'footer.goldStandard': 'Goldstandard',
+    'footer.fix': '-Reparatur?',
+    'footer.experience': 'Erleben Sie die Zukunft der Sanitärtechnik mit professioneller Meisterdiagnostik und 24/7 Elite-Reaktion.',
+    'footer.premiumPlumbing': 'Premium-Sanitär',
+    'footer.redefining': 'Neudefinition der Wohnhaussanierung durch fachkundige Diagnosewerkzeuge und elitäre Handwerkskunst. 24/7 in jedem großen deutschen Zentrum verfügbar.',
+    'footer.accreditations': 'Akkreditierungen',
+    'footer.certifiedMeister': 'Zertifizierter Meister',
+    'footer.emergency': '24/7 Notfall',
+    'footer.copyright': '© 2026 Rohr-Blitz. Für meisterhafte Exzellenz gefertigt.',
   }
 }
 
