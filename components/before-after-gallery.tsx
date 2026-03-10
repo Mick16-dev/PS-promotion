@@ -183,12 +183,11 @@ export function BeforeAfterGallery({ onCtaClick }: BeforeAfterGalleryProps) {
           <Button
             onClick={onCtaClick}
             size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-20 px-12 rounded-2xl shadow-2xl shadow-primary/20 group relative overflow-hidden"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-12 px-8 rounded-xl"
           >
-            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <span className="relative z-10 flex items-center gap-3">
+            <span className="flex items-center gap-2">
               {t('gallery.cta')}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="w-5 h-5" />
             </span>
           </Button>
         </motion.div>

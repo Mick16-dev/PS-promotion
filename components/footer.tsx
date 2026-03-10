@@ -36,19 +36,14 @@ export function Footer({ onCtaClick }: FooterProps) {
             Experience the future of plumbing with expert master diagnostics and 24/7 elite response.
           </p>
 
-          <Magnetic strength={0.2}>
-            <Button
-              onClick={onCtaClick}
-              size="lg"
-              className="bg-secondary text-white hover:bg-secondary/90 font-black uppercase tracking-[0.2em] h-20 px-12 rounded-2xl shadow-2xl shadow-secondary/20 group relative overflow-hidden active:scale-95 transition-all"
-            >
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              <span className="relative z-10 flex items-center gap-3">
-                {t('footer.cta')}
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </span>
-            </Button>
-          </Magnetic>
+          <Button
+            onClick={onCtaClick}
+            size="lg"
+            className="bg-secondary text-white hover:bg-secondary/90 font-semibold h-12 px-8 rounded-xl flex items-center gap-2 mx-auto"
+          >
+            {t('footer.cta')}
+            <ArrowRight className="w-5 h-5" />
+          </Button>
         </motion.div>
       </div>
 

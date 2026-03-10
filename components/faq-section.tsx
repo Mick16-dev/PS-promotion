@@ -135,17 +135,15 @@ export function FaqSection() {
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 group-hover:opacity-10 transition-opacity blur-3xl" />
           <HelpCircle className="w-10 h-10 text-secondary mb-6 animate-pulse-premium" />
-          <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground mb-4">
-            Cant find what you need?
+          <h3 className="text-2xl font-bold tracking-tight text-foreground mb-4">
+            {t('faq.moreHelpTitle') || "Can't find what you need?"}
           </h3>
           <p className="text-muted-foreground font-medium mb-8 max-w-lg">
             Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.
           </p>
-          <Magnetic strength={0.2}>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-xl transition-all active:scale-95">
-              Request VIP Support
-            </Button>
-          </Magnetic>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-11 px-6 rounded-xl">
+            {t('faq.cta') || 'Ask a question'}
+          </Button>
         </motion.div>
       </div>
     </section>

@@ -95,8 +95,6 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
 
   return (
     <section className="py-32 px-4 relative overflow-hidden bg-background">
-      <div className="absolute inset-0 mesh-gradient opacity-10" />
-      
       <div className="max-w-7xl mx-auto relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -104,14 +102,14 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-semibold rounded-xl uppercase tracking-[0.15em] mb-6">
             <ShieldCheck className="w-4 h-4" />
-            Pricing & Protection Plans
+            {t('pricing.badge') || 'Prices you can understand'}
           </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4 tracking-tight">
             {t('pricing.title')}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed italic">
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t('pricing.subtitle')}
           </p>
         </motion.div>
@@ -182,20 +180,17 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                 ))}
               </ul>
               
-              <Magnetic strength={0.2} className="w-full">
-                <Button 
-                  onClick={onCtaClick}
-                  className={cn(
-                    "w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 group relative overflow-hidden",
-                    plan.popular 
-                      ? "bg-secondary text-white hover:bg-secondary/90 shadow-secondary/20" 
-                      : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/10"
-                  )}
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  <span className="relative z-10">{t('pricing.cta')}</span>
-                </Button>
-              </Magnetic>
+              <Button 
+                onClick={onCtaClick}
+                className={cn(
+                  "w-full h-12 rounded-xl font-semibold text-sm",
+                  plan.popular 
+                    ? "bg-secondary text-white hover:bg-secondary/90" 
+                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                )}
+              >
+                {t('pricing.cta')}
+              </Button>
             </motion.div>
           ))}
         </motion.div>
