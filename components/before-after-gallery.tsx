@@ -83,8 +83,8 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
 const projects = [
   {
     id: 1,
-    beforeImage: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1585128903994-9788298932a4?w=800&h=600&fit=crop',
+    beforeImage: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1600959907703-1251884b08a3?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Leaking Pipe Repair',
     titleDe: 'Undichte Rohrreparatur',
     descEn: 'Fixed burst water pipe under kitchen sink',
@@ -92,8 +92,8 @@ const projects = [
   },
   {
     id: 2,
-    beforeImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+    beforeImage: 'https://images.unsplash.com/photo-1563897539633-7374c276c212?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Drain Unclogging',
     titleDe: 'Abfluss-Entstopfung',
     descEn: 'Cleared severe bathroom drain blockage',
@@ -101,8 +101,8 @@ const projects = [
   },
   {
     id: 3,
-    beforeImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop',
+    beforeImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1620626011754-6e4c1f5c36b3?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Faucet Replacement',
     titleDe: 'Armatur-Austausch',
     descEn: 'Installed modern fixtures in master bath',
