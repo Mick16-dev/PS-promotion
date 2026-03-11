@@ -44,7 +44,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
   const { language, t } = useLanguage()
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
+    <section id="pricing" className="py-32 px-4 relative overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

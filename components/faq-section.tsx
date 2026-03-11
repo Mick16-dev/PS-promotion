@@ -75,7 +75,7 @@ export function FaqSection() {
   }
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
+    <section id="faq" className="py-32 px-4 relative overflow-hidden bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

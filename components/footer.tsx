@@ -15,7 +15,7 @@ export function Footer({ onCtaClick }: FooterProps) {
   const { t } = useLanguage()
 
   return (
-    <footer className="bg-primary text-white relative overflow-hidden">
+    <footer id="contact" className="bg-primary text-white relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* Final Conversion Anchor */}

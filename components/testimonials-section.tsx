@@ -85,7 +85,7 @@ export function TestimonialsSection() {
   } as any
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
+    <section id="reviews" className="py-32 px-4 relative overflow-hidden bg-background">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
       
       <div className="max-w-7xl mx-auto relative z-10">

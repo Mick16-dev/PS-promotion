@@ -6,7 +6,7 @@ export function AboutSection() {
   const { language } = useLanguage()
 
   return (
-    <section className="py-24 px-4 bg-background">
+    <section id="about" className="py-24 px-4 bg-background">
       <div className="max-w-4xl mx-auto space-y-4">
         <h2 className="text-2xl sm:text-3xl font-semibold text-foreground">
           {language === 'de'
