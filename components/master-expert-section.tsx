@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
-import { Award, ShieldCheck, GraduationCap, Microscope } from 'lucide-react'
 import Image from 'next/image'
 
 const experts = [
@@ -41,8 +40,7 @@ export function MasterExpertSection() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary text-xs font-semibold rounded-xl uppercase tracking-[0.15em]">
-                <ShieldCheck className="w-4 h-4" />
+              <span className="inline-flex px-5 py-2 bg-secondary/10 text-secondary text-xs font-semibold rounded-full uppercase tracking-[0.2em]">
                 {language === 'de' ? 'Das Team hinter Rohr-Blitz' : 'The team behind Rohr-Blitz'}
               </span>
               <h2 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight leading-[1.1]">
@@ -59,15 +57,16 @@ export function MasterExpertSection() {
             </p>
 
             <div className="grid sm:grid-cols-2 gap-6">
-                {[
-                  { icon: Award, labelDe: 'Seit vielen Jahren als Sanitärbetrieb in der Region unterwegs', labelEn: 'Many years of plumbing experience in this region' },
-                  { icon: GraduationCap, labelDe: 'Ausbildung im Handwerk statt anonymer Plattform', labelEn: 'Trained craftsmen, not anonymous platform workers' },
-                  { icon: Microscope, labelDe: 'Wir erklären Probleme so, dass Sie sie wirklich verstehen', labelEn: 'We explain problems so you really understand them' },
-                  { icon: ShieldCheck, labelDe: 'Wir verlassen Bad und Küche sauber und aufgeräumt', labelEn: 'We leave bathrooms and kitchens clean and tidy' },
-                ].map((item, i) => (
+              {[
+                { labelDe: 'Seit vielen Jahren als Sanitärbetrieb in der Region unterwegs', labelEn: 'Many years of plumbing experience in this region' },
+                { labelDe: 'Ausbildung im Handwerk statt anonymer Plattform', labelEn: 'Trained craftsmen, not anonymous platform workers' },
+                { labelDe: 'Wir erklären Probleme so, dass Sie sie wirklich verstehen', labelEn: 'We explain problems so you really understand them' },
+                { labelDe: 'Wir verlassen Bad und Küche sauber und aufgeräumt', labelEn: 'We leave bathrooms and kitchens clean and tidy' },
+              ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 bg-card/30 p-4 rounded-2xl border border-white/40">
-                  <item.icon className="w-5 h-5 text-secondary" />
-                  <span className="text-xs font-black uppercase tracking-wider">{language === 'de' ? item.labelDe : item.labelEn}</span>
+                  <span className="text-xs font-black uppercase tracking-wider">
+                    {language === 'de' ? item.labelDe : item.labelEn}
+                  </span>
                 </div>
               ))}
             </div>
