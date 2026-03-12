@@ -96,8 +96,8 @@ const projects = [
   {
     id: 2,
     slug: 'drain-cleaning',
-    beforeImage: 'https://images.unsplash.com/photo-1618228298959-0198d476d2ba?auto=format&fit=crop&w=900&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1650246363606-a2402ec42b08?auto=format&fit=crop&w=900&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1654440122140-f1fc995ddb34?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1763100351670-756f71d57c9f?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Drain Unblocking',
     titleDe: 'Abfluss-Entstopfung',
     descEn: 'Cleared drain blockage, clean pipes',

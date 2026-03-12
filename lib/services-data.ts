@@ -37,8 +37,8 @@ export const services: ServiceContent[] = [
     shortDescEn: 'Blocked toilet, shower or kitchen drain? We clear blockages quickly and reliably.',
     shortDescDe: 'Verstopfte Toilette, Dusche oder Spüle? Wir beheben Verstopfungen schnell und zuverlässig.',
     fromPrice: 89,
-    beforeImage: 'https://images.unsplash.com/photo-1618228298959-0198d476d2ba?auto=format&fit=crop&w=900&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1650246363606-a2402ec42b08?auto=format&fit=crop&w=900&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1654440122140-f1fc995ddb34?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1763100351670-756f71d57c9f?auto=format&fit=crop&w=900&q=80',
     introEn: 'A blocked toilet or slow-draining sink is more than an inconvenience – it can lead to overflows, odours and, in the worst case, sewage backup. Our team uses professional drain snakes, high-pressure jetting where appropriate, and camera inspections to find and clear blockages without damaging your pipes.',
     introDe: 'Eine verstopfte Toilette oder langsam ablaufendes Waschbecken ist mehr als lästig – es kann zu Überläufen, Gerüchen und im schlimmsten Fall zu Rückstau führen. Wir setzen professionelle Rohrreinigungsspiralen, Hochdruck-Spülungen und Kamera-Inspektionen ein, um Verstopfungen zu finden und zu beseitigen, ohne Ihre Rohre zu beschädigen.',
     whatWeDoEn: [
