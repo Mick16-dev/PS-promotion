@@ -57,6 +57,7 @@ const translations: Record<Language, Record<string, string>> = {
     'gallery.title': 'Before & After Transformations',
     'gallery.subtitle': 'See the quality of our master plumbing work',
     'gallery.cta': 'Start Your Diagnosis',
+    'gallery.badge': 'Visual Excellence',
 
     // Testimonials
     'testimonials.title': 'What Our Customers Say',
@@ -68,6 +69,7 @@ const translations: Record<Language, Record<string, string>> = {
     'trust.certified': 'Certified Technicians',
     'trust.guarantee': 'Satisfaction Guarantee',
     'trust.insurance': 'Fully Insured',
+    'trust.badge': 'The Gold Standard',
 
     // Features Section
     'features.badge': 'Why Choose Us',
@@ -106,6 +108,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Master Deep Dive
     'features.howItWorks': 'How It Works',
     'features.learnMore': 'Learn more',
+    'features.step': 'Step',
     'features.masterDeepDive.title': 'From Photo to Fixed in 4 Simple Steps',
     'features.masterDeepDive.step1.title': 'Visual Capture',
     'features.masterDeepDive.step1.desc': 'Capture a high-fidelity image of the disruption. Our expert technicians process the details of the issue instantly.',
@@ -228,6 +231,7 @@ const translations: Record<Language, Record<string, string>> = {
     'gallery.title': 'Vorher & Nachher',
     'gallery.subtitle': 'Sehen Sie die Qualität unserer Meisterarbeit',
     'gallery.cta': 'Diagnose starten',
+    'gallery.badge': 'Visuelle Exzellenz',
 
     // Testimonials
     'testimonials.title': 'Kundenstimmen',
@@ -239,6 +243,7 @@ const translations: Record<Language, Record<string, string>> = {
     'trust.certified': 'Zertifizierte Techniker',
     'trust.guarantee': 'Zufriedenheitsgarantie',
     'trust.insurance': 'Vollversichert',
+    'trust.badge': 'Der Goldstandard',
 
     // Features Section
     'features.badge': 'Warum wir',
@@ -277,6 +282,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Master Deep Dive
     'features.howItWorks': 'So funktioniert\'s',
     'features.learnMore': 'Mehr erfahren',
+    'features.step': 'Schritt',
     'features.masterDeepDive.title': 'Vom Foto zur Reparatur in 4 Schritten',
     'features.masterDeepDive.step1.title': 'Foto machen',
     'features.masterDeepDive.step1.desc': 'Fotografieren Sie das Leck, die Verstopfung oder die beschädigte Armatur. Funktioniert mit jedem Smartphone.',

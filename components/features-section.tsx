@@ -209,7 +209,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                         <step.icon className="w-5 h-5 text-secondary" />
                       </div>
                       <div>
-                        <p className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-1">Step {step.step}</p>
+                        <p className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-1">{t('features.step')} {step.step}</p>
                         <h5 className="text-lg font-bold text-white mb-1 tracking-tight">{t(`features.masterDeepDive.step${step.step}.title`)}</h5>
                         <p className="text-sm text-white/60 font-medium leading-relaxed">{t(`features.masterDeepDive.step${step.step}.desc`)}</p>
                       </div>

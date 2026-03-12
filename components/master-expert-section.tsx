@@ -43,7 +43,7 @@ export function MasterExpertSection() {
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary text-xs font-black rounded-xl uppercase tracking-[0.2em]">
                 <ShieldCheck className="w-4 h-4" />
-                Verified E-E-A-T Excellence
+                {language === 'de' ? 'Verifizierte E-E-A-T Exzellenz' : 'Verified E-E-A-T Excellence'}
               </span>
               <h2 className="text-4xl sm:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-[1.1]">
                 {language === 'de' ? 'Meisterhafte Präzision.' : 'Master Level Precision.'} <br />
