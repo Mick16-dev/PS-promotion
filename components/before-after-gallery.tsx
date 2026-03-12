@@ -81,37 +81,37 @@ function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: 
   )
 }
 
-/** Real plumbing imagery (Unsplash – free commercial use, real photos) */
+/** Real plumbing imagery (Unsplash – free use, actual plumbing photos) */
 const projects = [
   {
     id: 1,
     slug: 'leak-repair',
     beforeImage: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1600959907703-1251884b08a3?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1542632867-261e4be41c7c?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Leaking Pipe Repair',
     titleDe: 'Undichte Rohrreparatur',
-    descEn: 'Fixed burst water pipe under kitchen sink',
-    descDe: 'Geplatzte Wasserleitung unter Spüle repariert'
+    descEn: 'Fixed pipes under kitchen sink',
+    descDe: 'Undichte Leitungen unter der Spüle repariert'
   },
   {
     id: 2,
     slug: 'drain-cleaning',
-    beforeImage: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=900&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=900&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1618228298959-0198d476d2ba?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1650246363606-a2402ec42b08?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Drain Unblocking',
     titleDe: 'Abfluss-Entstopfung',
-    descEn: 'Cleared severe bathroom drain blockage',
-    descDe: 'Starke Badezimmer-Verstopfung beseitigt'
+    descEn: 'Cleared drain blockage, clean pipes',
+    descDe: 'Verstopfung beseitigt, saubere Rohre'
   },
   {
     id: 3,
     slug: 'bathroom-plumbing',
-    beforeImage: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=900&q=80',
-    afterImage: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=900&q=80',
+    beforeImage: 'https://images.unsplash.com/photo-1596180744691-d19a1b90b53c?auto=format&fit=crop&w=900&q=80',
+    afterImage: 'https://images.unsplash.com/photo-1595515770330-ceeea7d82cfd?auto=format&fit=crop&w=900&q=80',
     titleEn: 'Bathroom Fittings',
     titleDe: 'Bad und Armaturen',
-    descEn: 'New taps, shower and basin installation',
-    descDe: 'Neue Armaturen, Dusche und Waschbecken installiert'
+    descEn: 'New faucet and basin installation',
+    descDe: 'Neue Armatur und Waschbecken installiert'
   }
 ]
 
