@@ -150,7 +150,7 @@ export function TestimonialsSection() {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setVideoModal(testimonial.id)}
-                      className="absolute -bottom-2 -right-2 w-10 h-10 bg-secondary rounded-2xl flex items-center justify-center shadow-lg hover:shadow-secondary/30 transition-shadow animate-pulse-premium"
+                      className="absolute -bottom-2 -right-2 w-10 h-10 bg-secondary rounded-2xl flex items-center justify-center shadow-lg hover:shadow-secondary/30 transition-shadow"
                     >
                       <Play className="w-4 h-4 text-white fill-current" />
                     </motion.button>

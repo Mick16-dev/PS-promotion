@@ -98,10 +98,7 @@ export function Header({ onEmergencyClick }: HeaderProps) {
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold px-4 py-4 sm:px-6 sm:py-6 rounded-2xl shadow-xl shadow-destructive/20 relative group overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  <span className="relative flex h-3 w-3 mr-2 sm:mr-3">
-                    <span className="animate-pulse-premium absolute inline-flex h-full w-full rounded-full bg-red-400/50"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-                  </span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-white mr-2 sm:mr-3"></span>
                   <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                   <span className="hidden lg:inline uppercase tracking-wider text-sm sm:text-base">{t('header.emergency')}</span>
                   <span className="lg:hidden text-xs sm:text-sm">24/7</span>
