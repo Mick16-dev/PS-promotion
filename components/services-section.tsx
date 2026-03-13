@@ -17,103 +17,47 @@ import {
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-interface ComparisonSliderProps {
-  beforeImage: string
-  afterImage: string
-  beforeLabel: string
-  afterLabel: string
-}
-
-function ComparisonSlider({ beforeImage, afterImage, beforeLabel, afterLabel }: ComparisonSliderProps) {
-  const [sliderPosition, setSliderPosition] = useState(50)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const handleMove = (clientX: number) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = clientX - rect.left
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
-    setSliderPosition(percentage)
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (e.buttons !== 1) return
-    handleMove(e.clientX)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX)
-  }
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative w-full aspect-[4/3] overflow-hidden rounded-[2.5rem] cursor-ew-resize select-none border border-white/20 shadow-xl group"
-      onMouseMove={handleMouseMove}
-      onMouseDown={(e) => handleMove(e.clientX)}
-      onTouchMove={handleTouchMove}
-      onTouchStart={(e) => handleMove(e.touches[0].clientX)}
-    >
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-        style={{ backgroundImage: `url(${afterImage})` }}
-      />
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-        style={{
-          backgroundImage: `url(${beforeImage})`,
-          clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`
-        }}
-      />
-      <div
-        className="absolute top-0 bottom-0 w-1 bg-white/50 backdrop-blur-md shadow-[0_0_20px_rgba(255,255,255,0.5)]"
-        style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-      >
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ repeat: Infinity, duration: 3 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white backdrop-blur-xl rounded-full shadow-2xl flex items-center justify-center border border-white/50"
-        >
-          <MoveHorizontal className="w-5 h-5 text-primary" />
-        </motion.div>
-      </div>
-      <div className="absolute top-6 left-6 px-4 py-2 bg-black/40 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl border border-white/10">
-        {beforeLabel}
-      </div>
-      <div className="absolute top-6 right-6 px-4 py-2 bg-success/80 backdrop-blur-md text-success-foreground text-[10px] font-black uppercase tracking-[0.2em] rounded-xl border border-white/10">
-        {afterLabel}
-      </div>
-    </div>
-  )
-}
 
 const services = [
   {
     id: 'leaking-pipe-repair',
-    beforeImage: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1585128903994-9788298932a4?w=800&h=600&fit=crop',
+    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&h=600&fit=crop',
     titleEn: 'Leaking Pipe Repair',
     titleDe: 'Undichte Rohrreparatur',
-    descEn: 'Fixed burst water pipe under kitchen sink with precision.',
-    descDe: 'Geplatzte Wasserleitung unter Spüle mit Präzision repariert.'
+    descEn: 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
+    descDe: 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.'
   },
   {
     id: 'clogged-drain-unclogging',
-    beforeImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop',
     titleEn: 'Drain Unclogging',
     titleDe: 'Abfluss-Entstopfung',
-    descEn: 'Cleared severe bathroom drain blockage permanently.',
-    descDe: 'Starke Badezimmer-Verstopfung dauerhaft beseitigt.'
+    descEn: 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
+    descDe: 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.'
   },
   {
     id: 'broken-fixture-replacement',
-    beforeImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
-    afterImage: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop',
-    titleEn: 'Faucet Replacement',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+    titleEn: 'Fixture Replacement',
     titleDe: 'Armatur-Austausch',
-    descEn: 'Installed modern fixtures in master bath seamlessly.',
-    descDe: 'Moderne Armaturen im Hauptbad nahtlos installiert.'
+    descEn: 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
+    descDe: 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.'
+  },
+  {
+    id: 'water-heater-repair',
+    image: 'https://images.unsplash.com/photo-1585128903994-9788298932a4?w=800&h=600&fit=crop',
+    titleEn: 'Water Heater Services',
+    titleDe: 'Warmwasserbereiter Reparatur',
+    descEn: 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
+    descDe: 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.'
+  },
+  {
+    id: 'camera-pipe-inspection',
+    image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+    titleEn: 'Camera Pipe Inspection',
+    titleDe: 'Kamera-Rohrinspektion',
+    descEn: 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.',
+    descDe: 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.'
   }
 ]
 
@@ -160,13 +104,8 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
                 className="group"
               >
                 <div className="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-6 rounded-2xl border border-slate-100 transition-all hover:shadow-md">
-                  <div className="w-full">
-                    <ComparisonSlider
-                      beforeImage={service.beforeImage}
-                      afterImage={service.afterImage}
-                      beforeLabel={language === 'de' ? 'Vorher' : 'Before'}
-                      afterLabel={language === 'de' ? 'Nachher' : 'After'}
-                    />
+                  <div className="w-full relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
+                    <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
                   <div className="space-y-4">
                     <h3 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">
