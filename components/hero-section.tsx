@@ -70,8 +70,8 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     address: ''
   })
 
-  // We add a virtual step 4 for the form
-  const isFinalForm = step === 4 && !isSuccess && !isSubmitting
+  // We add a virtual step 5 for the form
+  const isFinalForm = step === 5 && !isSuccess && !isSubmitting
 
   const handleImageDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -115,18 +115,20 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
     setFormData(prev => ({ ...prev, severity: value[0] }))
   }
 
-  const handleSeverityContinue = () => {
-    setStep(4) // Move to form
+  const handleSeverityContinue = async () => {
+    setIsSubmitting(true)
+    await new Promise(resolve => setTimeout(resolve, 3500))
+    if (formData.issueType) {
+      setEstimate(calculateEstimate(formData.issueType, formData.severity))
+    }
+    setIsSubmitting(false)
+    setStep(4) // Move to diagnosis report
   }
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Master Digital Diagnosis Animation
-    await new Promise(resolve => setTimeout(resolve, 3500))
-    if (formData.issueType) {
-      setEstimate(calculateEstimate(formData.issueType, formData.severity))
-    }
+    await new Promise(resolve => setTimeout(resolve, 1000))
     setIsSubmitting(false)
     setIsSuccess(true)
   }
@@ -250,7 +252,19 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                     exit="exit"
                     className="space-y-8"
                   >
-                    <h2 className="text-3xl font-black uppercase italic text-center mb-8">{t('funnel.step4.title')}</h2>
+                    <div className="flex items-center justify-between gap-3 mb-8">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <div key={s} className="flex-1 relative h-2">
+                          <div className="absolute inset-0 bg-slate-100 rounded-full" />
+                          <motion.div
+                            initial={false}
+                            animate={{ width: s <= 5 ? '100%' : '0%' }}
+                            className="absolute inset-0 rounded-full bg-slate-900 transition-all duration-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-8 text-slate-900">{t('funnel.step4.title')}</h2>
                     <form onSubmit={handleFormSubmit} className="space-y-6">
                       {[
                         { id: 'name', label: t('form.name'), type: 'text' },
@@ -270,10 +284,10 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                           />
                         </div>
                       ))}
-                      <Button type="submit" className="w-full bg-secondary text-white font-black uppercase tracking-[0.2em] h-20 rounded-2xl mt-8 shadow-xl shadow-secondary/20 text-lg">
+                      <Button type="submit" className="w-full bg-slate-900 text-white font-bold uppercase tracking-widest h-16 rounded-xl mt-8 shadow-lg text-lg hover:bg-slate-800 transition-all">
                         <span className="relative z-10 flex items-center gap-2">
                           {t('funnel.cta')}
-                          <ArrowRight className="w-6 h-6" />
+                          <ArrowRight className="w-5 h-5" />
                         </span>
                       </Button>
                     </form>
@@ -288,15 +302,15 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                   >
                     {/* Progress */}
                     <div className="flex items-center justify-between gap-3 mb-12">
-                      {[1, 2, 3, 4].map((s) => (
+                      {[1, 2, 3, 4, 5].map((s) => (
                         <div key={s} className="flex-1 relative h-2">
-                          <div className="absolute inset-0 bg-muted/30 rounded-full" />
+                          <div className="absolute inset-0 bg-slate-100 rounded-full" />
                           <motion.div
                             initial={false}
                             animate={{ width: s <= step ? '100%' : '0%' }}
                             className={cn(
                               "absolute inset-0 rounded-full transition-all duration-500",
-                              s < step ? "bg-success" : "bg-secondary"
+                              s < step ? "bg-green-500" : "bg-slate-900"
                             )}
                           />
                         </div>
@@ -365,11 +379,48 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                               formData.severity >= 3 ? "bg-amber-500/10 text-amber-600" : "bg-success/10 text-success"
                             )}
                           >
-                            <p className="font-black text-5xl uppercase italic tracking-tighter">{severityLabels[formData.severity - 1]}</p>
+                            <p className="font-bold text-4xl uppercase tracking-tight text-slate-900">{severityLabels[formData.severity - 1]}</p>
                           </motion.div>
-                          <Button onClick={handleSeverityContinue} className="w-full h-20 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl text-lg">
+                          <Button onClick={handleSeverityContinue} className="w-full h-16 bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-widest rounded-xl shadow-lg text-lg">
                             {t('hero.calculate')}
                           </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {step === 4 && estimate && (
+                      <div className="space-y-8 text-left">
+                        <div className="text-center mb-8">
+                          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                          <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-slate-900">{t('diagnosis.title')}</h2>
+                        </div>
+                        
+                        <div className="space-y-4 sm:space-y-6">
+                          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                              <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">{t('diagnosis.problem')}</h3>
+                              <p className="text-sm sm:text-base font-bold text-slate-900">{t(`diagnosis.${formData.issueType}.problem`)}</p>
+                            </div>
+                            
+                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                              <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">{t('diagnosis.tools')}</h3>
+                              <p className="text-sm border-slate-200 font-medium text-slate-700">{t(`diagnosis.${formData.issueType}.tools`)}</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-red-500 mb-2">{t('diagnosis.action')}</h3>
+                            <p className="text-sm sm:text-base font-bold text-red-900">{t(`diagnosis.${formData.issueType}.action`)}</p>
+                          </div>
+                          
+                          <div className="bg-slate-900 p-8 rounded-xl text-center relative overflow-hidden">
+                            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 relative z-10">{t('diagnosis.price')}</h3>
+                            <p className="text-4xl sm:text-5xl font-bold text-white mb-6 relative z-10">{estimate.min}€ - {estimate.max}€</p>
+                            <Button onClick={() => setStep(5)} className="w-full h-14 bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-widest rounded-lg transition-transform hover:scale-[1.02] active:scale-95 relative z-10">
+                              {t('diagnosis.book')}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
