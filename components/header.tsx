@@ -36,6 +36,29 @@ export function Header({ onEmergencyClick }: HeaderProps) {
               <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-secondary">Premium Plumbing</span>
             </div>
           </motion.div>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 mx-4">
+            {[
+              { key: 'nav.overview', href: '#' },
+              { key: 'nav.services', href: '#' },
+              { key: 'nav.pricing', href: '#' },
+              { key: 'nav.about', href: '#' },
+              { key: 'nav.reviews', href: '#' },
+              { key: 'nav.howItWorks', href: '#' },
+              { key: 'nav.questions', href: '#' },
+              { key: 'nav.contact', href: '#' }
+            ].map((item) => (
+              <motion.a
+                key={item.key}
+                href={item.href}
+                whileHover={{ scale: 1.05, y: -2 }}
+                className="px-2 xl:px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
+              >
+                {t(item.key)}
+              </motion.a>
+            ))}
+          </nav>
 
           {/* Language Toggle + Emergency CTA */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">

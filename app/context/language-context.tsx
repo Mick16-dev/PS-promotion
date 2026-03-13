@@ -15,6 +15,14 @@ const translations: Record<Language, Record<string, string>> = {
     // Header
     'header.emergency': 'Emergency 24/7',
     'header.logo': 'Rohr-Blitz',
+    'nav.overview': 'Overview',
+    'nav.services': 'Services',
+    'nav.pricing': 'Pricing',
+    'nav.about': 'About',
+    'nav.reviews': 'Reviews',
+    'nav.howItWorks': 'How It Works',
+    'nav.questions': 'Questions',
+    'nav.contact': 'Contact',
 
     // Hero
     'hero.badge': 'Master Expert Diagnosis',
@@ -189,6 +197,14 @@ const translations: Record<Language, Record<string, string>> = {
     // Header
     'header.emergency': 'Notdienst 24/7',
     'header.logo': 'Rohr-Blitz',
+    'nav.overview': 'Übersicht',
+    'nav.services': 'Leistungen',
+    'nav.pricing': 'Preise',
+    'nav.about': 'Über uns',
+    'nav.reviews': 'Bewertungen',
+    'nav.howItWorks': 'Ablauf',
+    'nav.questions': 'Fragen',
+    'nav.contact': 'Kontakt',
 
     // Hero
     'hero.badge': 'Meister-Diagnose',
