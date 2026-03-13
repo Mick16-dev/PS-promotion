@@ -110,11 +110,8 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
-            <ShieldCheck className="w-4 h-4" />
-            {t('pricing.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase">
             {t('pricing.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed italic">

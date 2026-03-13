@@ -146,11 +146,8 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
           viewport={{ once: true }}
           className="text-center mb-16 sm:mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6 shadow-sm">
-            <BadgeCheck className="w-4 h-4" />
-            {language === 'de' ? 'Unsere Dienstleistungen' : 'Our Services'}
-          </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-primary decoration-8 underline-offset-8">
+
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase">
             {language === 'de' ? 'Was wir für Sie tun & Transformationen' : 'What we help you with & Transformations'}
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">

@@ -85,11 +85,8 @@ export function FaqSection() {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
-            <HelpCircle className="w-4 h-4" />
-            {t('faq.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-muted decoration-8 underline-offset-8">
+
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase">
             {t('faq.title')}
           </h2>
           <div className="flex items-center justify-center gap-3 text-muted-foreground font-black uppercase tracking-[0.2em] text-xs">

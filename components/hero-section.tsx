@@ -162,17 +162,9 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex-1 text-left lg:max-w-xl"
         >
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-xs font-black bg-primary text-primary-foreground rounded-xl uppercase tracking-[0.2em] shadow-lg shadow-primary/20"
-          >
-            <ShieldCheck className="w-4 h-4 text-secondary" />
-            {t('hero.badge')}
-          </motion.span>
 
-          <h1 className="text-5xl sm:text-6xl font-black text-foreground mb-6 leading-[1.05] tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+
+          <h1 className="text-5xl sm:text-6xl font-black text-foreground mb-6 leading-[1.05] tracking-tighter italic uppercase">
             {t('hero.title')}
           </h1>
 
@@ -180,20 +172,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
             {t('hero.subtitle')}
           </p>
 
-          <div className="flex flex-wrap gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6 text-success" />
-              </div>
-              <span className="text-sm font-bold uppercase tracking-wider text-foreground">{t('hero.verifiedExperts')}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-secondary" />
-              </div>
-              <span className="text-sm font-bold uppercase tracking-wider text-foreground">{t('hero.response')}</span>
-            </div>
-          </div>
+
         </motion.div>
 
         {/* Funnel Card */}
@@ -246,7 +225,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                         transition={{ delay: 0.3 }}
                         className="bg-card/40 backdrop-blur-md rounded-3xl p-8 mb-8 border border-white/20"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-3">{t('hero.masterEstimate')}</p>
+
                         <p className="text-5xl font-black text-foreground italic">
                           {estimate.min}-{estimate.max}€
                         </p>
@@ -412,11 +391,9 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
 
           <div className="mt-8 flex items-center justify-center gap-8 text-muted-foreground/60">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">{t('hero.encrypted')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">{t('hero.gdpr')}</span>
             </div>
           </div>
