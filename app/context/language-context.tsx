@@ -25,9 +25,9 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.contact': 'Contact',
 
     // Hero
-    'hero.badge': 'Master Expert Diagnosis',
-    'hero.title': 'Bespoke Plumbing Diagnosis & Expert Engineering',
-    'hero.subtitle': 'Experience the future of home maintenance. Instant visual diagnostic analysis by certified German Master Technicians. Transparent, elite, and available 24/7.',
+    'hero.badge': 'Master Plumber Assessment',
+    'hero.title': 'Professional Plumbing Assessment & Emergency Repairs',
+    'hero.subtitle': 'Get an instant preliminary estimate and schedule a certified German Master Technician. Direct, transparent, and available 24/7 across major hubs.',
 
     // Diagnostic Funnel
     'funnel.step1.title': 'Upload Photo',
@@ -166,8 +166,8 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.verifiedExperts': 'Verified Experts',
     'hero.response': '15m Response',
     'hero.calculate': 'Calculate Assessment',
-    'hero.masterDiagnostic': 'Master Diagnostic',
-    'hero.analyzing': 'Analyzing Blueprint & Pressure Points...',
+    'hero.masterDiagnostic': 'Technical Assessment',
+    'hero.analyzing': 'Calculating requirements...',
     'hero.encrypted': 'Encrypted',
     'hero.gdpr': 'GDPR Ready',
     'hero.masterEstimate': 'Master Estimate',
@@ -207,9 +207,9 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.contact': 'Kontakt',
 
     // Hero
-    'hero.badge': 'Meister-Diagnose',
-    'hero.title': 'Meisterhafte Präzision & Digitale Sanitär-Diagnostik',
-    'hero.subtitle': 'Erleben Sie die Zukunft der Haustechnik. Visuelle Sofort-Analyse durch zertifizierte deutsche Handwerksmeister. Transparent, exzellent und 24/7 verfügbar.',
+    'hero.badge': 'Meister-Einschätzung',
+    'hero.title': 'Professionelle Sanitär-Analyse & Notfall-Reparatur',
+    'hero.subtitle': 'Erhalten Sie eine sofortige Kostenschätzung und buchen Sie einen zertifizierten deutschen Handwerksmeister. Direkt, transparent und 24/7 verfügbar.',
 
     // Diagnostic Funnel
     'funnel.step1.title': 'Foto hochladen',
@@ -348,8 +348,8 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.verifiedExperts': 'Verifizierte Experten',
     'hero.response': '15 Min. Reaktionszeit',
     'hero.calculate': 'Einschätzung berechnen',
-    'hero.masterDiagnostic': 'Meister-Diagnose',
-    'hero.analyzing': 'Analysiere Bauplan & Druckpunkte...',
+    'hero.masterDiagnostic': 'Technische Analyse',
+    'hero.analyzing': 'Berechne Anforderungen...',
     'hero.encrypted': 'Verschlüsselt',
     'hero.gdpr': 'DSGVO-konform',
     'hero.masterEstimate': 'Meister-Schätzung',

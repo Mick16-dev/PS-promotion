@@ -153,54 +153,52 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   } as any
 
   return (
-    <section className="relative pt-40 pb-32 px-4 min-h-[85vh] mesh-gradient overflow-hidden flex items-center justify-center">
-      <div className="absolute inset-0 grain-overlay opacity-50" />
+    <section className="relative pt-24 pb-16 px-4 min-h-[60vh] flex items-center justify-center bg-slate-50 border-b border-slate-200">
+      <div className="absolute inset-0 opacity-5 pointer-events-none blueprint-grid" />
 
       <div className="max-w-6xl mx-auto relative z-10 text-center space-y-12">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="space-y-8"
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
         >
-          <h1 className="text-6xl sm:text-9xl font-black text-foreground leading-[0.9] tracking-tighter italic uppercase max-w-5xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight tracking-tight max-w-4xl mx-auto uppercase">
             {t('hero.title')}
           </h1>
 
-          <p className="text-xl sm:text-3xl text-muted-foreground max-w-3xl mx-auto font-medium leading-relaxed italic">
+          <p className="text-lg sm:text-2xl text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
             {t('hero.subtitle')}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
-            <Magnetic strength={0.2}>
-              <Button
-                onClick={() => setIsFunnelOpen(true)}
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-20 px-12 rounded-3xl text-lg sm:text-xl shadow-2xl shadow-primary/20 group relative overflow-hidden active:scale-95 transition-all"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative z-10 flex items-center gap-3">
-                  {t('funnel.cta')}
-                  <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-                </span>
-              </Button>
-            </Magnetic>
-            
-            <a 
-              href="#services" 
-              className="text-sm sm:text-base font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors py-4 px-8"
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <Button
+              onClick={() => setIsFunnelOpen(true)}
+              size="lg"
+              className="bg-slate-900 text-white hover:bg-slate-800 font-bold uppercase tracking-wider h-14 px-8 rounded-lg text-base shadow-lg transition-all"
             >
-              {t('nav.services')}
-            </a>
+              <span className="flex items-center gap-2">
+                {t('funnel.cta')}
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              asChild
+              className="h-14 px-8 rounded-lg font-bold uppercase tracking-wider border-slate-200"
+            >
+              <a href="#services">{t('nav.services')}</a>
+            </Button>
           </div>
         </motion.div>
       </div>
 
       {/* Unified Funnel & Form Dialog */}
       <Dialog open={isFunnelOpen} onOpenChange={setIsFunnelOpen}>
-        <DialogContent className="max-w-xl p-0 bg-transparent border-0 shadow-none overflow-visible">
-          <Card className="glass-card overflow-hidden rounded-[3rem] border-white/40 shadow-2xl">
-            <CardContent className="p-8 sm:p-12 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <DialogContent className="max-w-xl p-0 bg-white border-0 shadow-2xl overflow-visible">
+          <Card className="border-0 shadow-none">
+            <CardContent className="p-8 sm:p-10 relative max-h-[90vh] overflow-y-auto">
               <AnimatePresence mode="wait">
                 {isSuccess ? (
                   <motion.div
@@ -210,28 +208,23 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                     animate="animate"
                     className="text-center py-8"
                   >
-                    <div className="w-24 h-24 mx-auto mb-8 bg-success rounded-[2rem] flex items-center justify-center shadow-xl shadow-success/20 animate-float">
-                      <CheckCircle className="w-12 h-12 text-success-foreground" />
+                    <div className="w-20 h-20 mx-auto mb-6 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+                      <CheckCircle className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-black text-foreground mb-4 italic uppercase">{t('funnel.success.title')}</h2>
-                    <p className="text-muted-foreground mb-10 font-medium text-lg italic">{t('funnel.success.desc')}</p>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2 uppercase">{t('funnel.success.title')}</h2>
+                    <p className="text-slate-500 mb-8 font-medium">{t('funnel.success.desc')}</p>
 
                     {estimate && (
-                      <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-card/40 backdrop-blur-md rounded-3xl p-8 mb-10 border border-white/20"
-                      >
-                        <p className="text-5xl font-black text-foreground italic">
+                      <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
+                        <p className="text-4xl font-bold text-slate-900">
                           {estimate.min}-{estimate.max}€
                         </p>
-                      </motion.div>
+                      </div>
                     )}
 
-                    <div className="flex items-center justify-center gap-3 py-4 px-6 bg-primary rounded-2xl text-primary-foreground shadow-lg shadow-primary/20">
-                      <MapPin className="w-5 h-5 text-secondary" />
-                      <span className="font-bold uppercase tracking-wider text-sm">
+                    <div className="flex items-center justify-center gap-2 py-3 px-5 bg-slate-100 rounded-lg text-slate-700 border border-slate-200">
+                      <MapPin className="w-4 h-4" />
+                      <span className="font-bold uppercase tracking-wider text-xs">
                         {t('funnel.success.eta')}: 15-30 min
                       </span>
                     </div>
@@ -244,18 +237,9 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                     exit={{ opacity: 0 }}
                     className="py-12 flex flex-col items-center justify-center text-center"
                   >
-                    <div className="relative w-32 h-32 mx-auto mb-8">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 border-2 border-dashed border-secondary/30 rounded-full"
-                      />
-                      <div className="absolute inset-4 border-2 border-secondary rounded-full flex items-center justify-center">
-                        <Wrench className="w-10 h-10 text-secondary animate-pulse" />
-                      </div>
-                    </div>
-                    <h3 className="text-2xl font-black text-foreground italic uppercase tracking-tighter mb-2">{t('hero.masterDiagnostic')}</h3>
-                    <p className="text-secondary text-sm font-bold uppercase tracking-[0.2em] animate-pulse">{t('hero.analyzing')}</p>
+                    <div className="w-16 h-16 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-6" />
+                    <h3 className="text-xl font-bold text-slate-900 uppercase tracking-tight mb-1">{t('hero.masterDiagnostic')}</h3>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('hero.analyzing')}</p>
                   </motion.div>
                 ) : isFinalForm ? (
                   <motion.div
