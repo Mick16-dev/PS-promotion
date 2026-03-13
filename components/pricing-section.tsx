@@ -140,7 +140,6 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
             >
               {plan.popular && (
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl shadow-2xl flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 fill-current" />
                   {t('pricing.popular')}
                 </div>
               )}

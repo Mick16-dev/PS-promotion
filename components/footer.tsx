@@ -29,7 +29,7 @@ export function Footer({ onCtaClick }: FooterProps) {
         >
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-secondary/20 rounded-full blur-[100px] group-hover:bg-secondary/30 transition-colors" />
 
-          <ShieldCheck className="w-12 h-12 text-secondary mx-auto mb-8 animate-pulse-premium" />
+
           <h2 className="text-4xl sm:text-6xl font-black mb-8 tracking-tighter italic uppercase leading-none">
             {t('footer.readyFor')}<span className="text-secondary">{t('footer.goldStandard')}</span>{t('footer.fix')}
           </h2>

@@ -84,13 +84,7 @@ export function TrustBadges() {
                 <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-colors duration-500">
                   <trust.icon className={`w-8 h-8 ${trust.color} group-hover:scale-110 transition-transform duration-500`} />
                 </div>
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                  transition={{ repeat: Infinity, duration: 4 }}
-                  className="absolute -top-2 -right-2"
-                >
-                  <Award className="w-4 h-4 text-white/30" />
-                </motion.div>
+
               </div>
 
               <div className="flex items-baseline gap-1 mb-2">

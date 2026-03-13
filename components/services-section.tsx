@@ -196,7 +196,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
               <div className="absolute -top-6 -right-6 w-32 h-32 bg-secondary rounded-full blur-3xl opacity-30 group-hover:opacity-60 transition-opacity" />
 
               <h4 className="text-xl sm:text-2xl font-black text-white italic uppercase tracking-widest mb-10 flex items-center gap-3">
-                <Timer className="w-6 h-6 text-secondary animate-pulse" />
+                <Timer className="w-6 h-6 text-secondary" />
                 {t('features.howItWorks')}
               </h4>
 
