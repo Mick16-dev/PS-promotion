@@ -98,11 +98,8 @@ export function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 text-success text-xs font-black rounded-xl uppercase tracking-[0.2em] mb-6">
-            <UserCheck className="w-4 h-4" />
-            {t('testimonials.verifiedTitle')}
-          </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase underline decoration-success decoration-8 underline-offset-8">
+
+          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase">
             {t('testimonials.title')}
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 text-muted-foreground bg-muted/30 p-8 rounded-[2rem] border border-border/50 max-w-3xl mx-auto backdrop-blur-sm">
