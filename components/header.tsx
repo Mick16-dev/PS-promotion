@@ -16,95 +16,71 @@ export function Header({ onEmergencyClick }: HeaderProps) {
 
   return (
     <motion.header 
-      initial={{ y: -100, opacity: 0 }}
+      initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="glass-header"
+      transition={{ duration: 0.5 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-2 sm:gap-4 group cursor-pointer shrink-0"
-          >
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl shadow-secondary/20 group-hover:rotate-6 transition-transform p-2 sm:p-3">
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105 p-2">
               <img src="/logo-custom.svg" alt="Rohr-Blitz Logo" className="w-full h-full object-contain brightness-0 invert" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl sm:text-2xl font-black italic uppercase tracking-tighter leading-none">{t('header.logo')}</span>
-              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-secondary">Premium Plumbing</span>
+              <span className="text-xl font-bold uppercase tracking-tight leading-none text-slate-900">{t('header.logo')}</span>
+              <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-500">Premium Plumbing</span>
             </div>
-          </motion.div>
+          </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 mx-4">
+          <nav className="hidden lg:flex items-center gap-1 mx-4">
             {[
-              { key: 'nav.overview', href: '#' },
-              { key: 'nav.services', href: '#' },
-              { key: 'nav.pricing', href: '#' },
-              { key: 'nav.about', href: '#' },
-              { key: 'nav.reviews', href: '#' },
-              { key: 'nav.howItWorks', href: '#' },
-              { key: 'nav.questions', href: '#' },
-              { key: 'nav.contact', href: '#' }
+              { key: 'nav.overview', href: '/' },
+              { key: 'nav.services', href: '/#services' },
+              { key: 'nav.pricing', href: '/#pricing' },
+              { key: 'nav.contact', href: '/#footer' }
             ].map((item) => (
-              <motion.a
+              <a
                 key={item.key}
                 href={item.href}
-                whileHover={{ scale: 1.05, y: -2 }}
-                className="px-2 xl:px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
+                className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap"
               >
                 {t(item.key)}
-              </motion.a>
+              </a>
             ))}
           </nav>
 
           {/* Language Toggle + Emergency CTA */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             {/* Language Toggle */}
-            <div className="hidden md:flex items-center bg-muted/50 backdrop-blur-sm rounded-2xl p-1.5 border border-border/50">
+            <div className="hidden sm:flex items-center border border-slate-200 rounded-lg p-1 bg-slate-50/50">
               {(['en', 'de'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
                   className={cn(
-                    "relative px-4 py-2 text-xs font-bold rounded-xl transition-all duration-300",
+                    "px-3 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase",
                     language === lang 
-                      ? "text-primary-foreground" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
+                      : "text-slate-500 hover:text-slate-900"
                   )}
                 >
-                  <span className="relative z-10 uppercase">{lang}</span>
-                  {language === lang && (
-                    <motion.div 
-                      layoutId="activeLang"
-                      className="absolute inset-0 bg-primary rounded-xl shadow-sm"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
+                  {lang}
                 </button>
               ))}
             </div>
 
-            {/* Emergency CTA - CTA #2 */}
-            <Magnetic strength={0.3}>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button 
-                  onClick={onEmergencyClick}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold px-4 py-4 sm:px-6 sm:py-6 rounded-2xl shadow-xl shadow-destructive/20 relative group overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-white mr-2 sm:mr-3"></span>
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                  <span className="hidden lg:inline uppercase tracking-wider text-sm sm:text-base">{t('header.emergency')}</span>
-                  <span className="lg:hidden text-xs sm:text-sm">24/7</span>
-                </Button>
-              </motion.div>
-            </Magnetic>
+            {/* Emergency CTA */}
+            <Button 
+              onClick={onEmergencyClick}
+              className="bg-red-600 text-white hover:bg-red-700 font-bold px-4 h-10 sm:h-12 rounded-lg shadow-sm border-0 flex items-center gap-2"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="hidden lg:inline uppercase tracking-wider text-xs">{t('header.emergency')}</span>
+              <span className="lg:hidden text-xs">24/7</span>
+            </Button>
           </div>
         </div>
       </div>
