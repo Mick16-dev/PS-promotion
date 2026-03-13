@@ -379,10 +379,6 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
                         </div>
                       </div>
                     )}
-
-                      </div>
-                    )}
-
                     {isSubmitting && (
                       <motion.div
                         initial={{ opacity: 0 }}
