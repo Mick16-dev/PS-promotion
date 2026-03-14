@@ -132,7 +132,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <Footer />
+      <Footer onCtaClick={() => window.location.href = '/#hero'} />
     </main>
   )
 }

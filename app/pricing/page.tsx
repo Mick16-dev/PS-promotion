@@ -126,7 +126,7 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <Footer />
+      <Footer onCtaClick={() => window.location.href = '/#hero'} />
     </main>
   )
 }
