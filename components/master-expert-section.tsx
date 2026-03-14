@@ -40,17 +40,14 @@ export function MasterExpertSection() {
           >
             <div className="space-y-2">
               <h2 className="text-3xl sm:text-5xl font-bold text-slate-900 tracking-tight uppercase leading-tight">
-                {language === 'de' ? 'Meisterhafte Präzision.' : 'Professional Level Precision.'} <br />
-                <span className="text-slate-500">
-                  {language === 'de' ? 'Echte Experten.' : 'Real Human Experts.'}
-                </span>
+                {language === 'de' ? 'Meisterhafte Präzision.' : 'Professional Level Precision.'}
               </h2>
             </div>
 
             <p className="text-lg text-slate-600 font-medium leading-relaxed">
               {language === 'de'
-                ? 'Hinter unseren technischen Werkzeugen stehen echte deutsche Handwerksmeister. Jede Einschätzung wird von zertifizierten Experten validiert, um höchste Sicherheit und Qualität zu garantieren.'
-                : 'Behind our technical tools stand real German Master Craftsmen. Every assessment is validated by certified experts to guarantee the highest safety and quality standards.'}
+                ? 'Hinter unseren technischen Werkzeugen stehen deutsche Handwerksmeister. Jede Einschätzung wird von zertifizierten Experten validiert, um höchste Sicherheit und Qualität zu garantieren.'
+                : 'Behind our technical tools stand German Master Craftsmen. Every assessment is validated by certified experts to guarantee the highest safety and quality standards.'}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">

@@ -175,12 +175,10 @@ export default function TeamPage() {
       </section>
 
       {/* 4 Pillars of Mastery (The requested Expertise Lists) */}
-      <section className="py-24 px-4 bg-slate-900 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-red-600/5 skew-x-12 translate-x-1/2 pointer-events-none" />
-        
+      <section className="py-24 px-4 bg-white overflow-hidden relative border-t border-slate-100">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-20 space-y-4">
-            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter italic">
+            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter italic text-slate-900">
               {t('team.expertise.title')}
             </h2>
             <div className="h-2 w-24 bg-red-600 mx-auto" />
@@ -194,15 +192,15 @@ export default function TeamPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: pillar.id * 0.1 }}
-                className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-[3rem] hover:bg-white/10 transition-colors group"
+                className="bg-white border border-slate-200 p-10 rounded-[3rem] hover:shadow-lg transition-all group"
               >
-                <div className={`w-14 h-14 ${pillar.bg} rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform`}>
-                  <pillar.icon className={`w-7 h-7 ${pillar.color}`} />
+                <div className={`w-12 h-12 flex items-center justify-start mb-8`}>
+                  <pillar.icon className={`w-8 h-8 ${pillar.color}`} />
                 </div>
                 <h3 className="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-red-500 transition-colors">
                    {t(`team.expertise.${pillar.id}`)}
                 </h3>
-                <p className="text-white/60 text-sm font-medium leading-relaxed">
+                <p className="text-slate-500 text-sm font-medium leading-relaxed">
                    {t(`team.expertise.${pillar.id}.desc`)}
                 </p>
               </motion.div>
