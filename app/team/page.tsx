@@ -76,10 +76,6 @@ export default function TeamPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/10 text-red-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
-              <Users className="w-3 h-3" />
-              {language === 'de' ? 'Unsere Mannschaft' : 'Our Squad'}
-            </div>
             <h1 className="text-5xl sm:text-7xl font-black uppercase tracking-tighter mb-8 text-slate-900">
               {t('team.title')}
             </h1>
@@ -135,7 +131,6 @@ export default function TeamPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-red-600">
-                  <History className="w-6 h-6" />
                   <span className="text-xs font-black uppercase tracking-[0.3em]">{t('team.story.tagline')}</span>
                 </div>
                 <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-slate-900">
@@ -146,8 +141,11 @@ export default function TeamPage() {
                 {t('team.story.desc')}
               </p>
               <div className="pt-4">
-                <Button className="bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-widest px-8 h-14 rounded-2xl">
-                  {language === 'de' ? 'Unsere Werte ansehen' : 'See Our Values'}
+                <Button 
+                  onClick={() => window.location.href = '/services'}
+                  className="bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-widest px-8 h-14 rounded-2xl"
+                >
+                  {language === 'de' ? 'Unsere Leistungen ansehen' : 'See Our Services'}
                 </Button>
               </div>
             </motion.div>
@@ -159,7 +157,7 @@ export default function TeamPage() {
               className="relative aspect-square bg-slate-100 rounded-[4rem] overflow-hidden border-8 border-slate-50 shadow-2xl"
             >
               <div className="absolute inset-0 flex items-center justify-center">
-                 <History className="w-32 h-32 text-slate-200" />
+                 <Wrench className="w-32 h-32 text-slate-200" />
               </div>
               <Image 
                 src="/team_member_stefan_1773475374290.png"
@@ -225,7 +223,6 @@ export default function TeamPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-red-600">
-                  <MapPin className="w-6 h-6" />
                   <span className="text-xs font-black uppercase tracking-[0.3em]">{language === 'de' ? 'Einsatzgebiete' : 'Coverage'}</span>
                 </div>
                 <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-slate-900">
@@ -262,7 +259,11 @@ export default function TeamPage() {
                   <Image src="/team_member_elena_diagnostic_1773475405841.png" fill className="object-cover opacity-20 grayscale" alt="Location background" />
                   <div className="relative z-10">
                     <p className="text-3xl font-black uppercase tracking-tighter mb-4 italic">{language === 'de' ? 'Bereit für den Einsatz.' : 'Ready for deployment.'}</p>
-                    <Button variant="outline" className="border-slate-300 text-slate-900 hover:bg-slate-900 hover:text-white font-black uppercase tracking-widest px-8 rounded-xl h-12">
+                    <Button 
+                      onClick={() => window.location.href = 'tel:+498001234567'}
+                      variant="outline" 
+                      className="border-slate-300 text-slate-900 hover:bg-slate-900 hover:text-white font-black uppercase tracking-widest px-8 rounded-xl h-12"
+                    >
                       {language === 'de' ? 'Jetzt Techniker rufen' : 'Call Master Now'}
                     </Button>
                   </div>
@@ -279,17 +280,24 @@ export default function TeamPage() {
             {language === 'de' ? 'Haben Sie eine Frage an unsere Experten?' : 'Have a Question for Our Experts?'}
           </h2>
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <Button className="bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-widest px-10 h-16 rounded-2xl shadow-xl shadow-red-500/20">
+            <Button 
+              onClick={() => window.location.href = '/contact'}
+              className="bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-widest px-10 h-16 rounded-2xl shadow-xl shadow-red-500/20"
+            >
               <span className="flex items-center gap-2">
                 {language === 'de' ? 'Expertise anfordern' : 'Request Expertise'}
                 <ArrowRight className="w-5 h-5" />
               </span>
             </Button>
-            <Button variant="outline" className="border-slate-200 text-slate-900 hover:bg-slate-100 font-black uppercase tracking-widest px-10 h-16 rounded-2xl">
-              <span className="flex items-center gap-2">
+            <Button 
+              asChild
+              variant="outline" 
+              className="border-slate-200 text-slate-900 hover:bg-slate-100 font-black uppercase tracking-widest px-10 h-16 rounded-2xl"
+            >
+              <a href="tel:+498001234567" className="flex items-center gap-2">
                 <Phone className="w-5 h-5" />
                 +49 800 123 4567
-              </span>
+              </a>
             </Button>
           </div>
         </div>

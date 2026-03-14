@@ -216,8 +216,8 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.copyright': '© 2026 Rohr-Blitz. Crafted for Master Excellence.',
 
     // Team Page
-    'team.title': 'Human Expertise Behind the Tech',
-    'team.subtitle': 'Our Master Technicians are the heartbeat of Rohr-Blitz. Certified, disciplined, and ready to solve your plumbing disruption.',
+    'team.title': 'The Masters of Rohr-Blitz',
+    'team.subtitle': 'Our precision-driven technicians are the heartbeat of our operation. Certified, disciplined, and ready to resolve any plumbing disruption.',
     'team.story.title': 'The Rohr-Blitz Story',
     'team.story.tagline': 'From a Local Workshop to a Master-Led Network',
     'team.story.desc': 'Founded in 2008 by Master Plumber Stefan Krause, Rohr-Blitz was born from a simple observation: plumbing is missing precision and transparency. Stefan envisioned a service where engineering-grade diagnostics meet traditional craftsmanship. Today, we are a network of 50+ hand-picked Master Technicians across Germany.',
@@ -442,8 +442,8 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.copyright': '© 2026 Rohr-Blitz. Für meisterhafte Exzellenz gefertigt.',
 
     // Team Page
-    'team.title': 'Menschliche Expertise hinter der Technik',
-    'team.subtitle': 'Unsere Handwerksmeister sind das Herzstück von Rohr-Blitz. Zertifiziert, diszipliniert und bereit, Ihre Probleme zu lösen.',
+    'team.title': 'Die Meister von Rohr-Blitz',
+    'team.subtitle': 'Unsere präzisen Techniker sind das Herzstück unseres Betriebs. Zertifiziert, diszipliniert und bereit für jede Herausforderung.',
     'team.story.title': 'Die Rohr-Blitz Geschichte',
     'team.story.tagline': 'Vom lokalen Betrieb zum meistergeführten Netzwerk',
     'team.story.desc': 'Gegründet 2008 von Sanitärmeister Stefan Krause, entstand Rohr-Blitz aus einer einfachen Beobachtung: Dem Handwerk fehlte es an Präzision und Transparenz. Stefan visionierte einen Service, bei dem Ingenieursdiagnostik auf traditionelles Handwerk trifft. Heute sind wir ein Netzwerk von über 50 Handwerksmeistern in ganz Deutschland.',
