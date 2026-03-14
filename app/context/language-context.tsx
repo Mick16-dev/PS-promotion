@@ -32,7 +32,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Precision Quote Engine (Replacement for Diagnosis)
     'funnel.step1.title': 'Digital Site Survey',
-    'funnel.step1.desc': 'Upload a photo for AI-powered part identification & fixed-price quoting.',
+    'funnel.step1.desc': 'Upload a photo for Master Vision identification & fixed-price quoting.',
     'funnel.step1.formats': 'High-resolution JPG or PNG preferred',
     'funnel.step2.title': 'System Optimization',
     'funnel.step3.title': 'Access & Complexity',
@@ -114,7 +114,7 @@ const translations: Record<Language, Record<string, string>> = {
     'features.expert-diagnosis.title': 'Precision Site Survey',
     'features.expert-diagnosis.tagline': 'Digital hardware identification & labor path calculation',
     'features.expert-diagnosis.pain': 'Most plumbers give "estimates" over the phone that double in price once they see the actual job complexity.',
-    'features.expert-diagnosis.solution': 'Our Vision Engine identifies the exact part and environmental constraints (access, piping material) to lock in a fixed price before arrival.',
+    'features.expert-diagnosis.solution': 'Our Master Vision Engine identifies the exact part and environmental constraints (access, piping material) to lock in a fixed price before arrival.',
     'features.expert-diagnosis.benefit1': 'Identifies exact model numbers from visual data',
     'features.expert-diagnosis.benefit2': 'Calculates precise 15-minute labor increments',
     'features.expert-diagnosis.benefit3': 'Eliminated "Part Trips" - Technician arrives 100% prepared',
@@ -260,7 +260,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Precision Quote Engine (Ersatz für Diagnose)
     'funnel.step1.title': 'Digitaler Standort-Check',
-    'funnel.step1.desc': 'Laden Sie ein Foto hoch für die KI-Teileidentifikation & Festpreis-Angebot.',
+    'funnel.step1.desc': 'Laden Sie ein Foto hoch für die präzise Teileidentifikation & Festpreis-Angebot.',
     'funnel.step1.formats': 'Hochauflösende JPG oder PNG bevorzugt',
     'funnel.step2.title': 'System-Optimierung',
     'funnel.step3.title': 'Zugang & Komplexität',
@@ -342,7 +342,7 @@ const translations: Record<Language, Record<string, string>> = {
     'features.expert-diagnosis.title': 'Präzisions-Standort-Check',
     'features.expert-diagnosis.tagline': 'Digitale Hardware-Erkennung & Arbeitsweg-Berechnung',
     'features.expert-diagnosis.pain': 'Die meisten Klempner geben am Telefon Schätzungen ab, die sich verdoppeln, sobald sie die tatsächliche Komplexität sehen.',
-    'features.expert-diagnosis.solution': 'Unsere Vision-Engine identifiziert das exakte Teil und die Umgebungsvorgaben (Zugang, Material), um einen Festpreis vor der Ankunft zu garantieren.',
+    'features.expert-diagnosis.solution': 'Unsere Master Vision-Engine identifiziert das exakte Teil und die Umgebungsvorgaben (Zugang, Material), um einen Festpreis vor der Ankunft zu garantieren.',
     'features.expert-diagnosis.benefit1': 'Identifiziert exakte Modellnummern aus Bilddaten',
     'features.expert-diagnosis.benefit2': 'Berechnet präzise 15-Minuten-Arbeitsintervalle',
     'features.expert-diagnosis.benefit3': 'Keine Zweitanfahrten - Techniker kommt 100% vorbereitet',

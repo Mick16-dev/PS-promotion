@@ -50,17 +50,17 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
     quote: null
   })
 
-  // Simulated Vision AI Logic
+  // Simulated Vision Engine Logic
   const runVisionAnalysis = async (img: string) => {
     setIsSubmitting(true)
-    // Simulate API delay with "Thinking" states
+    // Simulate delay with "Thinking" states
     await new Promise(resolve => setTimeout(resolve, 3500))
 
     // CONFIGURATION: Adjust these for the specific plumbing company
     const HOURLY_RATE = 120 // €/hour
     const BASE_PART_COST = 69 // €
     
-    // Prototype Mock Data - This would come from an AI API in production
+    // Prototype Mock Data - This would come from the Vision Engine in production
     const laborHours = 1.5
     const mockQuote: PrecisionQuote = {
       partName: "Master-Spec Replacement Valve (Tier 1)",
@@ -113,7 +113,7 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
   } as any
 
   return (
-    <section className="relative pt-24 pb-16 px-4 min-h-[60vh] flex items-center justify-center bg-slate-50 border-b border-slate-200">
+    <section className="relative pt-24 pb-12 px-4 min-h-[50vh] flex items-center justify-center bg-slate-50 border-b border-slate-200 overflow-hidden">
       <div className="absolute inset-0 opacity-5 pointer-events-none blueprint-grid" />
 
       <div className="max-w-6xl mx-auto relative z-10 text-center space-y-12">
@@ -173,11 +173,11 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
                       <div className="absolute inset-0 bg-slate-100 rounded-full animate-ping opacity-20" />
                       <div className="absolute inset-0 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Cpu className="w-10 h-10 text-slate-900" />
+                        <Wrench className="w-10 h-10 text-slate-900" />
                       </div>
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{t('hero.masterDiagnostic')}</h3>
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] animate-pulse">{t('hero.analyzing')}</p>
+                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{t('hero.diagnosisInProgress')}</h3>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] animate-pulse">{t('hero.diagnosing')}</p>
                     <div className="mt-8 space-y-2 w-full max-w-[200px]">
                        <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
                           <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }} className="h-full w-1/3 bg-slate-900" />
