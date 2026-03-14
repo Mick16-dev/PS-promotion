@@ -4,20 +4,18 @@ import { motion } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
+import Image from 'next/image'
 import { 
   Droplet, 
   Wrench, 
   CircleOff, 
-  Plus, 
-  Camera, 
   Thermometer, 
   Trash2, 
-  Hammer, 
-  Shield, 
   Clock, 
   Zap,
-  HardHat,
-  Construction
+  Construction,
+  ArrowRight,
+  HardHat
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -42,10 +40,12 @@ const allServices = [
   {
     id: 'water-heater',
     icon: Thermometer,
+    image: '/service_water_heater_1773478341863.png',
     titleEn: 'Water Heater Services',
     titleDe: 'Warmwasserservice',
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
-    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.'
+    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
+    featured: true
   },
   {
     id: 'fixture-replacement',
@@ -94,7 +94,7 @@ export default function ServicesPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <Header onEmergencyClick={() => {}} />
+      <Header onEmergencyClick={() => window.location.href = '/contact'} />
       
       <div className="pt-32 pb-24 px-4">
         <div className="max-w-7xl mx-auto">
@@ -113,37 +113,56 @@ export default function ServicesPage() {
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {allServices.map((service, idx) => (
               <motion.div
                 key={service.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.05 }}
-                className="group bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1"
+                className={`group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col ${service.featured ? 'lg:col-span-2 lg:row-span-1' : ''}`}
               >
-                <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
-                  <service.icon className="w-7 h-7 text-white" />
+                {service.image && (
+                  <div className="relative h-64 w-full overflow-hidden">
+                    <Image 
+                      src={service.image}
+                      alt={language === 'de' ? service.titleDe : service.titleEn}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 grayscale hover:grayscale-0"
+                    />
+                    <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                  </div>
+                )}
+                <div className="p-8 flex-1 flex flex-col">
+                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
+                    <service.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 mb-3 group-hover:text-red-600 transition-colors">
+                    {language === 'de' ? service.titleDe : service.titleEn}
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed font-medium mb-8">
+                    {language === 'de' ? service.descDe : service.descEn}
+                  </p>
+                  <div className="mt-auto flex items-center justify-between">
+                    <Button variant="ghost" className="p-0 text-slate-900 font-black uppercase tracking-widest text-[10px] hover:bg-transparent hover:text-red-600 h-auto">
+                      <Link href={`/contact`} className="flex items-center gap-2">
+                        {language === 'de' ? 'Angebot anfordern' : 'Get Quote'}
+                        <ArrowRight className="w-3 h-3 text-red-600" />
+                      </Link>
+                    </Button>
+                    <div className="flex items-center gap-1">
+                       <HardHat className="w-3 h-3 text-slate-400" />
+                       <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400">Master Certified</span>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold uppercase tracking-tight text-slate-900 mb-3 group-hover:text-red-600 transition-colors">
-                  {language === 'de' ? service.titleDe : service.titleEn}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed font-medium mb-6">
-                  {language === 'de' ? service.descDe : service.descEn}
-                </p>
-                <Button variant="ghost" className="p-0 text-slate-900 font-bold uppercase tracking-widest text-[10px] hover:bg-transparent hover:text-red-600">
-                  <Link href={`/services/${service.id}`} className="flex items-center gap-2">
-                    {language === 'de' ? 'Details ansehen' : 'View Details'}
-                    <HardHat className="w-3 h-3 text-red-600" />
-                  </Link>
-                </Button>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
 
-      <Footer onCtaClick={() => window.location.href = '/#hero'} />
+      <Footer onCtaClick={() => window.location.href = '/contact'} />
     </main>
   )
 }
