@@ -47,7 +47,7 @@ export function Header({ onEmergencyClick }: HeaderProps) {
               <a
                 key={item.key}
                 href={item.href}
-                className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap"
+                className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap"
               >
                 {t(item.key)}
               </a>
@@ -63,7 +63,7 @@ export function Header({ onEmergencyClick }: HeaderProps) {
                   key={lang}
                   onClick={() => setLanguage(lang)}
                   className={cn(
-                    "px-3 py-1.5 text-[10px] font-bold rounded-md transition-all uppercase",
+                    "px-3 py-1.5 text-xs font-bold rounded-md transition-all uppercase",
                     language === lang 
                       ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
                       : "text-slate-500 hover:text-slate-900"
