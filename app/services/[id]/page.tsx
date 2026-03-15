@@ -10,50 +10,77 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const serviceDetails: Record<string, any> = {
-  'leaking-pipe-repair': {
-    titleEn: 'Leaking Pipe Repair',
-    titleDe: 'Undichte Rohrreparatur',
-    descEn: 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
-    descDe: 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.',
-    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1600&h=900&fit=crop',
-    featuresEn: ['Emergency 30min response', 'Materials included', '2-year warranty', 'Certified technicians'],
-    featuresDe: ['Notfall-Reaktion in 30 Min', 'Materialien inklusive', '2 Jahre Garantie', 'Zertifizierte Techniker']
+  'drain-cleaning': {
+    titleEn: 'Expert Drain Cleaning',
+    titleDe: 'Abflussreinigung',
+    descEn: 'Removal of stubborn clogs and blockages from sinks, showers, and toilets using specialized equipment.',
+    descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.',
+    image: 'https://images.unsplash.com/photo-1621905255823-750c7666b6c0?w=1600&q=80',
+    featuresEn: ['Power-jet cleaning', 'Camera inspection included', 'Deep-clean guarantee', 'No-mess promise'],
+    featuresDe: ['Hochdruckreinigung', 'Inklusive Kamera-Inspektion', 'Tiefenreinigungsgarantie', 'Sauberkeitsversprechen']
   },
-  'clogged-drain-unclogging': {
-    titleEn: 'Drain Unclogging',
-    titleDe: 'Abfluss-Entstopfung',
-    descEn: 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
-    descDe: 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.',
-    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1600&h=900&fit=crop',
-    featuresEn: ['Power-jet cleaning', 'Camera inspection', 'Deep-clean guarantee', 'No-mess promise'],
-    featuresDe: ['Hochdruckreinigung', 'Kamera-Inspektion', 'Tiefenreinigungsgarantie', 'Sauberkeitsversprechen']
+  'leak-detection': {
+    titleEn: 'Leak Detection & Repair',
+    titleDe: 'Leckortung & Reparatur',
+    descEn: 'Pinpoint accuracy in finding hidden leaks to prevent water damage and high utility bills.',
+    descDe: 'Präzise Ortung verborgener Lecks zur Vermeidung von Wasserschäden und hohen Kosten.',
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1600&q=80',
+    featuresEn: ['Acoustic detection', 'Thermal imaging', 'Non-invasive methods', 'Repair plan provided'],
+    featuresDe: ['Akustische Ortung', 'Thermografie-Analyse', 'Zerstörungsfreie Methoden', 'Detaillierter Reparaturplan']
   },
-  'broken-fixture-replacement': {
-    titleEn: 'Fixture Replacement',
-    titleDe: 'Armatur-Austausch',
-    descEn: 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
-    descDe: 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&h=900&fit=crop',
-    featuresEn: ['Premium brands available', 'Leak-proof seal', 'Same-day service', 'Disposal of old fixtures'],
-    featuresDe: ['Premium-Marken verfügbar', 'Auslaufsichere Versiegelung', 'Service am selben Tag', 'Entsorgung alter Armaturen']
-  },
-  'water-heater-repair': {
+  'water-heater': {
     titleEn: 'Water Heater Services',
-    titleDe: 'Warmwasserbereiter Reparatur',
-    descEn: 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
-    descDe: 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.',
-    image: 'https://images.unsplash.com/photo-1585128903994-9788298932a4?w=1600&h=900&fit=crop',
+    titleDe: 'Warmwasserservice',
+    descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
+    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
+    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=1600&q=80',
     featuresEn: ['All brands serviced', 'Same-day hot water', 'Efficiency check', 'Parts warranty'],
     featuresDe: ['Service für alle Marken', 'Warmwasser am selben Tag', 'Effizienzprüfung', 'Teilegarantie']
   },
-  'camera-pipe-inspection': {
-    titleEn: 'Camera Pipe Inspection',
-    titleDe: 'Kamera-Rohrinspektion',
-    descEn: 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.',
-    descDe: 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.',
-    image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1600&h=900&fit=crop',
-    featuresEn: ['High-res video recording', 'Exact depth location', 'Detailed report provided', 'Zero digging required'],
-    featuresDe: ['Hochauflösende Videoaufnahme', 'Genaue Tiefenortung', 'Detaillierter Bericht geliefert', 'Kein Graben erforderlich']
+  'fixture-replacement': {
+    titleEn: 'Fixture Replacement',
+    titleDe: 'Armaturentausch',
+    descEn: 'Upgrading faucets, showerheads, and toilets with premium, water-efficient models.',
+    descDe: 'Modernisierung von Armaturen und Toiletten mit effizienten Premium-Modellen.',
+    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca1f987?w=1600&q=80',
+    featuresEn: ['Premium brands available', 'Leak-proof seal', 'Same-day service', 'Disposal of old fixtures'],
+    featuresDe: ['Premium-Marken verfügbar', 'Auslaufsichere Versiegelung', 'Service am selben Tag', 'Altelemente-Entsorgung']
+  },
+  'sewer-line': {
+    titleEn: 'Sewer Line Repair',
+    titleDe: 'Kanalreparatur',
+    descEn: 'Major sewer line diagnostics and restoration including root removal and pipe lining.',
+    descDe: 'Kanaldiagnose und -sanierung, einschließlich Wurzelentfernung und Rohrreinigung.',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80',
+    featuresEn: ['Root removal technology', 'Pipe lining available', 'Visual diagnostics', 'Workmanship guarantee'],
+    featuresDe: ['Wurzelentfernung', 'Rohrainzug-Verfahren', 'Visuelle Diagnose', 'Meister-Gewährleistung']
+  },
+  'garbage-disposal': {
+    titleEn: 'Garbage Disposal Repair',
+    titleDe: 'Küchenabfallzerkleinerer',
+    descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
+    descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
+    image: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=1600&q=80',
+    featuresEn: ['Jam clearance', 'Motor replacement', 'Leak sealing', 'Brand-specific parts'],
+    featuresDe: ['Blockadenlösung', 'Motor-Austausch', 'Abdichtungsservice', 'Original-Ersatzteile']
+  },
+  'appliance-install': {
+    titleEn: 'Appliance Installation',
+    titleDe: 'Geräteinstallation',
+    descEn: 'Professional hook-up for dishwashers, washing machines, and refrigerators.',
+    descDe: 'Fachgerechter Anschluss von Spülmaschinen, Waschmaschinen und Kühlschränken.',
+    image: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=1600&q=80',
+    featuresEn: ['Secure connections', 'Water line routing', 'Leveling & testing', 'Warranty protected'],
+    featuresDe: ['Sichere Anschlüsse', 'Wasserleitungsausbau', 'Ausrichtung & Testlauf', 'Herstellergarantie']
+  },
+  'emergency-service': {
+    titleEn: '24/7 Emergency Repairs',
+    titleDe: '24/7 Notfallservice',
+    descEn: 'Rapid response for burst pipes, major floods, and urgent plumbing crises.',
+    descDe: 'Schnelle Hilfe bei Rohrbruche, Überschwemmungen und dringenden Sanitärkrisen.',
+    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1600&q=80',
+    featuresEn: ['30min response time', 'Master lead dispatch', 'Crisis management', 'Immediate containment'],
+    featuresDe: ['30 Min. Reaktionszeit', 'Meister-Einsatzleitung', 'Krisenmanagement', 'Sofort-Eingrenzung']
   }
 }
 

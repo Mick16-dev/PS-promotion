@@ -20,42 +20,42 @@ import Link from 'next/link'
 
 const services = [
   {
-    id: 'leaking-pipe-repair',
-    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&h=600&fit=crop',
-    titleEn: 'Leaking Pipe Repair',
-    titleDe: 'Undichte Rohrreparatur',
+    id: 'leak-detection',
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80',
+    titleEn: 'Leak Detection & Repair',
+    titleDe: 'Leckortung & Reparatur',
     descEn: 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
     descDe: 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.'
   },
   {
-    id: 'clogged-drain-unclogging',
-    image: '/drain-cleaning-overview.png',
+    id: 'drain-cleaning',
+    image: 'https://images.unsplash.com/photo-1621905255823-750c7666b6c0?w=800&q=80',
     titleEn: 'Drain Unclogging',
     titleDe: 'Abfluss-Entstopfung',
     descEn: 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
     descDe: 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.'
   },
   {
-    id: 'broken-fixture-replacement',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+    id: 'fixture-replacement',
+    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca1f987?w=800&q=80',
     titleEn: 'Fixture Replacement',
     titleDe: 'Armatur-Austausch',
     descEn: 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
     descDe: 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.'
   },
   {
-    id: 'water-heater-repair',
-    image: '/water-heater-overview.png',
+    id: 'water-heater',
+    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=800&q=80',
     titleEn: 'Water Heater Services',
     titleDe: 'Warmwasserbereiter Reparatur',
     descEn: 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
     descDe: 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.'
   },
   {
-    id: 'camera-pipe-inspection',
-    image: '/camera-inspection-overview.png',
-    titleEn: 'Camera Pipe Inspection',
-    titleDe: 'Kamera-Rohrinspektion',
+    id: 'sewer-line',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+    titleEn: 'Sewer Line Repair',
+    titleDe: 'Kanalreparatur',
     descEn: 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.',
     descDe: 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.'
   }
