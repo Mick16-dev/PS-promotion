@@ -29,7 +29,7 @@ const services = [
   },
   {
     id: 'clogged-drain-unclogging',
-    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop',
+    image: '/drain-cleaning-overview.png',
     titleEn: 'Drain Unclogging',
     titleDe: 'Abfluss-Entstopfung',
     descEn: 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
