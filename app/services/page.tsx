@@ -27,7 +27,9 @@ const allServices = [
     titleEn: 'Expert Drain Cleaning',
     titleDe: 'Abflussreinigung',
     descEn: 'Removal of stubborn clogs and blockages from sinks, showers, and toilets using specialized equipment.',
-    descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.'
+    descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.',
+    featured: false,
+    image: '/services/drain.jpg'
   },
   {
     id: 'leak-detection',
@@ -35,7 +37,9 @@ const allServices = [
     titleEn: 'Leak Detection & Repair',
     titleDe: 'Leckortung & Reparatur',
     descEn: 'Pinpoint accuracy in finding hidden leaks to prevent water damage and high utility bills.',
-    descDe: 'Präzise Ortung verborgener Lecks zur Vermeidung von Wasserschäden und hohen Kosten.'
+    descDe: 'Präzise Ortung verborgener Lecks zur Vermeidung von Wasserschäden und hohen Kosten.',
+    featured: true,
+    image: '/services/leak.jpg'
   },
   {
     id: 'water-heater',
@@ -43,7 +47,9 @@ const allServices = [
     titleEn: 'Water Heater Services',
     titleDe: 'Warmwasserservice',
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
-    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.'
+    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
+    featured: false,
+    image: '/services/water-heater.jpg'
   },
   {
     id: 'fixture-replacement',
@@ -51,7 +57,9 @@ const allServices = [
     titleEn: 'Fixture Replacement',
     titleDe: 'Armaturentausch',
     descEn: 'Upgrading faucets, showerheads, and toilets with premium, water-efficient models.',
-    descDe: 'Modernisierung von Armaturen und Toiletten mit effizienten Premium-Modellen.'
+    descDe: 'Modernisierung von Armaturen und Toiletten mit effizienten Premium-Modellen.',
+    featured: false,
+    image: '/services/fixture.jpg'
   },
   {
     id: 'sewer-line',
@@ -59,7 +67,9 @@ const allServices = [
     titleEn: 'Sewer Line Repair',
     titleDe: 'Kanalreparatur',
     descEn: 'Major sewer line diagnostics and restoration including root removal and pipe lining.',
-    descDe: 'Kanaldiagnose und -sanierung, einschließlich Wurzelentfernung und Rohrreinigung.'
+    descDe: 'Kanaldiagnose und -sanierung, einschließlich Wurzelentfernung und Rohrreinigung.',
+    featured: false,
+    image: '/services/sewer.jpg'
   },
   {
     id: 'garbage-disposal',
@@ -67,7 +77,9 @@ const allServices = [
     titleEn: 'Garbage Disposal Repair',
     titleDe: 'Küchenabfallzerkleinerer',
     descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
-    descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.'
+    descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
+    featured: false,
+    image: '/services/disposal.jpg'
   },
   {
     id: 'appliance-install',
@@ -75,7 +87,9 @@ const allServices = [
     titleEn: 'Appliance Installation',
     titleDe: 'Geräteinstallation',
     descEn: 'Professional hook-up for dishwashers, washing machines, and refrigerators.',
-    descDe: 'Fachgerechter Anschluss von Spülmaschinen, Waschmaschinen und Kühlschränken.'
+    descDe: 'Fachgerechter Anschluss von Spülmaschinen, Waschmaschinen und Kühlschränken.',
+    featured: false,
+    image: '/services/appliance.jpg'
   },
   {
     id: 'emergency-service',
@@ -83,7 +97,9 @@ const allServices = [
     titleEn: '24/7 Emergency Repairs',
     titleDe: '24/7 Notfallservice',
     descEn: 'Rapid response for burst pipes, major floods, and urgent plumbing crises.',
-    descDe: 'Schnelle Hilfe bei Rohrbruche, Überschwemmungen und dringenden Sanitärkrisen.'
+    descDe: 'Schnelle Hilfe bei Rohrbruche, Überschwemmungen und dringenden Sanitärkrisen.',
+    featured: true,
+    image: '/services/emergency.jpg'
   }
 ]
 
