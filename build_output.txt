@@ -12,3 +12,18 @@
 Γû▓ Next.js 16.1.6 (Turbopack)
 
   Creating an optimized production build ...
+Γ£ô Compiled successfully in 25.0s
+  Running TypeScript ...
+Failed to compile.
+
+./app/services/page.tsx:121:187
+Type error: Property 'featured' does not exist on type '{ id: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; titleEn: string; titleDe: string; descEn: string; descDe: string; }'.
+
+  119 |                 animate={{ opacity: 1, scale: 1 }}
+  120 |                 transition={{ delay: idx * 0.05 }}
+> 121 |                 className={`group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col ${service.featured ? 'lg:col-span-2 lg:row-span-1' : ''}`}
+      |                                                                                                                                                                                           ^
+  122 |               >
+  123 |                 {service.image && (
+  124 |                   <div className="relative h-64 w-full overflow-hidden">
+Next.js build worker exited with code: 1 and signal: null
