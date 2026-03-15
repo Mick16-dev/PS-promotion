@@ -14,6 +14,39 @@ import { Slider } from '@/components/ui/slider'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
+function TrustPulse() {
+  const { language } = useLanguage()
+  const [pulse, setPulse] = useState({ city: 'Berlin', action: 'Fixed-Price Quote Locked' })
+  const cities = ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf']
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulse({
+        city: cities[Math.floor(Math.random() * cities.length)],
+        action: Math.random() > 0.5 
+          ? (language === 'de' ? 'Festpreis gesichert' : 'Fixed-Price Quote Locked')
+          : (language === 'de' ? 'Techniker entsandt' : 'Technician Dispatched')
+      })
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [language])
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      key={pulse.city}
+      className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black uppercase tracking-widest text-white shadow-2xl"
+    >
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      </span>
+      <span>{pulse.city}: {pulse.action}</span>
+    </motion.div>
+  )
+}
+
 interface PrecisionQuote {
   partName: string
   partNumber: string
@@ -132,13 +165,16 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="space-y-6"
+          className="space-y-8"
         >
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight max-w-4xl mx-auto uppercase">
-            {t('hero.title')}
-          </h1>
+          <div className="flex flex-col items-center gap-6">
+            <TrustPulse />
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight max-w-4xl mx-auto uppercase">
+              {t('hero.title')}
+            </h1>
+          </div>
 
-          <p className="text-lg sm:text-2xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg sm:text-2xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed italic">
             {t('hero.subtitle')}
           </p>
 
@@ -146,13 +182,26 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
             <Button
               onClick={() => setIsFunnelOpen(true)}
               size="lg"
-              className="bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-wider h-14 px-8 rounded-lg text-base shadow-2xl transition-all hover:scale-105 active:scale-95"
+              className="bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-lg"
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-3">
                 {t('hero.calculate')}
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-6 h-6" />
               </span>
             </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-8 pt-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+             {[
+               { icon: ShieldCheck, label: 'Master Certified' },
+               { icon: Clock, label: '24/7 Priority' },
+               { icon: MapPin, label: 'Nationwide' }
+             ].map((b, i) => (
+               <div key={i} className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-[10px]">
+                 <b.icon className="w-4 h-4 text-white" />
+                 {b.label}
+               </div>
+             ))}
           </div>
         </motion.div>
       </div>

@@ -140,6 +140,8 @@ const jsonLd = {
   }
 }
 
+import { AeoSchema } from '@/components/aeo-schema'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -148,10 +150,7 @@ export default function RootLayout({
   return (
     <html lang="de" className={`${bricolage.variable} ${outfit.variable} scroll-smooth`}>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <AeoSchema />
       </head>
       <body className="font-body antialiased selection:bg-secondary/30 selection:text-secondary-foreground overflow-x-hidden text-base sm:text-lg">
         <LanguageProvider>

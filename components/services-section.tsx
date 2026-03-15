@@ -101,25 +101,47 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="group"
+                className="group relative"
               >
-                <div className="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-6 rounded-2xl border border-slate-100 transition-all hover:shadow-md">
-                  <div className="w-full relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
-                    <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 transition-all hover:shadow-2xl hover:bg-white overflow-hidden relative">
+                  <div className="absolute top-6 right-6 z-20">
+                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 backdrop-blur-md border border-secondary/20 rounded-full">
+                        <CheckCircle className="w-3 h-3 text-secondary" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-secondary">Expert Certified</span>
+                     </div>
                   </div>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">
-                      {language === 'de' ? service.titleDe : service.titleEn}
-                    </h3>
-                    <p className="text-slate-600 font-medium">
+                  
+                  <div className="w-full relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
+                    <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                       <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
+                         {language === 'de' ? service.titleDe : service.titleEn}
+                       </h3>
+                       <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Starting from</span>
+                          <span className="text-xl font-black text-secondary">€{(89 + idx * 20)}*</span>
+                       </div>
+                    </div>
+
+                    <p className="text-slate-600 font-medium leading-relaxed italic border-l-2 border-secondary/20 pl-4">
                       {language === 'de' ? service.descDe : service.descEn}
                     </p>
-                    <Button variant="link" asChild className="p-0 h-auto text-slate-900 font-bold uppercase tracking-widest text-[10px] hover:no-underline hover:translate-x-1 transition-transform">
-                      <Link href={`/services/${service.id}`}>
-                        {language === 'de' ? 'Mehr erfahren' : 'Learn More'}
-                        <ArrowRight className="ml-2 w-3 h-3" />
-                      </Link>
-                    </Button>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                      <Button asChild className="bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-widest h-12 px-6 rounded-xl shadow-lg transition-all active:scale-95">
+                        <Link href={`/services/${service.id}`}>
+                          {language === 'de' ? 'Details ansehen' : 'View Details'}
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="outline" onClick={onCtaClick} className="border-2 border-slate-200 hover:border-slate-900 hover:bg-transparent font-black uppercase tracking-widest h-12 px-6 rounded-xl transition-all">
+                        {language === 'de' ? 'Angebot anfordern' : 'Get Quote'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
