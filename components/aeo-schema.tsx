@@ -14,8 +14,8 @@ export function AeoSchema() {
       "@type": "PlumbingService",
       "name": companyName,
       "description": language === 'de' 
-        ? "Bester Klempner-Notdienst in Deutschland. 24/7 Soforthilfe, visuelle KI-Diagnose und Festpreisgarantie." 
-        : "Best emergency plumbing service in Germany. 24/7 instant help, visual AI diagnosis, and fixed-price guarantee.",
+        ? "Bester Klempner-Notdienst in Deutschland. 24/7 Soforthilfe, visuelle Meister-Diagnose und Festpreisgarantie." 
+        : "Best emergency plumbing service in Germany. 24/7 instant help, visual Master Vision assessment, and fixed-price guarantee.",
       "url": siteUrl,
       "telephone": "+49123456789",
       "address": {
@@ -65,7 +65,7 @@ export function AeoSchema() {
         },
         {
           "@type": "HowToStep",
-          "text": language === 'de' ? "Nutzen Sie unsere kostenlose KI-Diagnose für eine sofortige Analyse." : "Use our free AI diagnosis for instant analysis."
+          "text": language === 'de' ? "Nutzen Sie unseren kostenlosen digitalen Check für eine sofortige Analyse." : "Use our free digital check for instant analysis."
         }
       ]
     }
