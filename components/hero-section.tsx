@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, MapPin, ArrowRight, HardHat, Cpu, ShieldCheck, Box } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
+import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, MapPin, ArrowRight, HardHat, Cpu, ShieldCheck, Box, MoveHorizontal, Camera, Search, FileText, Timer } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
