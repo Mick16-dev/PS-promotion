@@ -149,11 +149,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${bricolage.variable} ${outfit.variable} scroll-smooth`}>
-      <head>
-        <AeoSchema />
-      </head>
+      <head />
       <body className="font-body antialiased selection:bg-secondary/30 selection:text-secondary-foreground overflow-x-hidden text-base sm:text-lg">
         <LanguageProvider>
+          <AeoSchema />
           {children}
         </LanguageProvider>
         <Analytics />

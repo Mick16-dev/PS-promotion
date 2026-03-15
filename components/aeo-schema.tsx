@@ -1,3 +1,5 @@
+'use client'
+
 import { useLanguage } from '@/app/context/language-context'
 
 export function AeoSchema() {
