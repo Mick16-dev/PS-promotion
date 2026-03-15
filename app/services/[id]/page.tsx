@@ -15,7 +15,7 @@ const serviceDetails: Record<string, any> = {
     titleDe: 'Abflussreinigung',
     descEn: 'Removal of stubborn clogs and blockages from sinks, showers, and toilets using specialized equipment.',
     descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.',
-    image: 'https://images.unsplash.com/photo-1621905255823-750c7666b6c0?w=1600&q=80',
+    image: '/services/drain-cleaning.png',
     featuresEn: ['Power-jet cleaning', 'Camera inspection included', 'Deep-clean guarantee', 'No-mess promise'],
     featuresDe: ['Hochdruckreinigung', 'Inklusive Kamera-Inspektion', 'Tiefenreinigungsgarantie', 'Sauberkeitsversprechen']
   },
