@@ -48,7 +48,7 @@ const allServices = [
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
     descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
     featured: false,
-    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=800&q=80'
+    image: '/water-heater-overview.png'
   },
   {
     id: 'fixture-replacement',

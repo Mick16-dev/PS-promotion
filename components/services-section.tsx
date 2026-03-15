@@ -45,7 +45,7 @@ const services = [
   },
   {
     id: 'water-heater',
-    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=800&q=80',
+    image: '/water-heater-overview.png',
     titleEn: 'Water Heater Services',
     titleDe: 'Warmwasserbereiter Reparatur',
     descEn: 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',

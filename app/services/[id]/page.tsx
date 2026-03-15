@@ -33,7 +33,7 @@ const serviceDetails: Record<string, any> = {
     titleDe: 'Warmwasserservice',
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
     descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
-    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=1600&q=80',
+    image: '/water-heater-overview.png',
     featuresEn: ['All brands serviced', 'Same-day hot water', 'Efficiency check', 'Parts warranty'],
     featuresDe: ['Service für alle Marken', 'Warmwasser am selben Tag', 'Effizienzprüfung', 'Teilegarantie']
   },
