@@ -117,8 +117,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
                          {language === 'de' ? service.titleDe : service.titleEn}
                        </h3>
                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Starting from</span>
-                          <span className="text-xl font-black text-secondary">€{(89 + idx * 20)}*</span>
+                          <span className="text-xl font-black text-secondary">€{(89 + idx * 20)}</span>
                        </div>
                     </div>
 

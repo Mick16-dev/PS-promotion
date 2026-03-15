@@ -156,13 +156,9 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">
                   {t(plan.nameKey)}
                 </h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xs font-black uppercase tracking-widest opacity-50">EUR</span>
-                  <span className="text-6xl font-black italic tracking-tighter leading-none">{plan.price}</span>
-                  <span className={cn(
-                    "text-xs font-black uppercase tracking-widest",
-                    plan.popular ? "text-white/60" : "text-muted-foreground"
-                  )}>/ {t('pricing.month')}</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-black italic tracking-tighter opacity-50 uppercase">EUR</span>
+                  <span className="text-7xl font-black italic tracking-tighter leading-none">{plan.price}</span>
                 </div>
                 <p className={cn(
                   "text-sm font-medium italic mt-6 text-center leading-relaxed",
