@@ -12,7 +12,7 @@ import {
   Thermometer, 
   Trash2, 
   Clock, 
-  Zap,
+  Plug,
   Construction,
   ArrowRight
 } from 'lucide-react'
@@ -82,7 +82,7 @@ const allServices = [
   },
   {
     id: 'appliance-install',
-    icon: Zap,
+    icon: Plug,
     titleEn: 'Appliance Installation',
     titleDe: 'Geräteinstallation',
     descEn: 'Professional hook-up for dishwashers, washing machines, and refrigerators.',
@@ -144,6 +144,14 @@ export default function ServicesPage() {
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
+                    {service.id === 'appliance-install' && (
+                      <div className="absolute top-4 right-4 bg-slate-900/90 backdrop-blur-sm text-white px-3 py-1 rounded-full flex items-center gap-2 shadow-xl border border-white/10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                          {language === 'de' ? 'Fachgerechter Anschluss' : 'Professional Hookup'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="p-8 flex-1 flex flex-col">

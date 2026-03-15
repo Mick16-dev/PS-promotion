@@ -154,6 +154,14 @@ export default function ServicePage() {
               className="relative aspect-video lg:aspect-square rounded-2xl overflow-hidden shadow-xl"
             >
               <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover" />
+              {id === 'appliance-install' && (
+                <div className="absolute top-6 right-6 bg-slate-900/90 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-2xl border border-white/10">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                    {language === 'de' ? 'Fachgerechter Anschluss' : 'Professional Hookup'}
+                  </span>
+                </div>
+              )}
             </motion.div>
           </div>
         </div>
