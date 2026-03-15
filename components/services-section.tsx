@@ -12,8 +12,7 @@ import {
   Search,
   FileText,
   Wrench,
-  Timer,
-  CheckCircle
+  Timer
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
@@ -105,12 +104,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
                 className="group relative"
               >
                 <div className="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 transition-all hover:shadow-2xl hover:bg-white overflow-hidden relative">
-                  <div className="absolute top-6 right-6 z-20">
-                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 backdrop-blur-md border border-secondary/20 rounded-full">
-                        <CheckCircle className="w-3 h-3 text-secondary" />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-secondary">Expert Certified</span>
-                     </div>
-                  </div>
+
                   
                   <div className="w-full relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
                     <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />

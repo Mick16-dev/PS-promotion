@@ -14,8 +14,7 @@ import {
   Clock, 
   Zap,
   Construction,
-  ArrowRight,
-  HardHat
+  ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -164,10 +163,7 @@ export default function ServicesPage() {
                         <ArrowRight className="w-3 h-3 text-red-600" />
                       </Link>
                     </Button>
-                    <div className="flex items-center gap-1">
-                       <HardHat className="w-3 h-3 text-slate-400" />
-                       <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400">Master Certified</span>
-                    </div>
+
                   </div>
                 </div>
               </motion.div>
