@@ -210,6 +210,56 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
             </motion.div>
           ))}
         </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mt-32 p-12 glass-card rounded-[4rem] border-secondary/20 relative overflow-hidden"
+        >
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-black italic uppercase tracking-tighter text-foreground mb-4">
+              {language === 'de' ? 'Warum Rohr-Blitz?' : 'Why Rohr-Blitz?'}
+            </h3>
+            <p className="text-muted-foreground font-medium uppercase tracking-widest text-xs">
+              {language === 'de' ? 'Der Vergleich zum traditionellen Notdienst' : 'Comparison vs. Traditional Emergency Services'}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            <div className="space-y-6 opacity-60">
+               <h4 className="text-lg font-black uppercase tracking-widest text-slate-500 mb-8 border-b border-slate-200 pb-4">Traditional Services</h4>
+               {[
+                 'Hidden diagnostic fees',
+                 'Multiple trips for parts',
+                 'Surprise labor markups',
+                 'Unverified technicians',
+                 'Weak or no warranty'
+               ].map((f, i) => (
+                 <div key={i} className="flex items-center gap-4 text-sm font-bold text-slate-400">
+                    <div className="w-1.5 h-1.5 bg-slate-300 rounded-full" />
+                    {f}
+                 </div>
+               ))}
+            </div>
+
+            <div className="space-y-6 relative">
+               <div className="absolute -inset-6 bg-secondary/5 rounded-3xl -z-10 border border-secondary/20" />
+               <h4 className="text-lg font-black uppercase tracking-widest text-secondary mb-8 border-b border-secondary/20 pb-4">Rohr-Blitz Elite</h4>
+               {[
+                 'Fixed-Price Price Protection',
+                 'Single-Visit Resolution',
+                 'Verified Master Technicians',
+                 '24/7 Digital Site Survey',
+                 '2-Year Workmanship Guarantee'
+               ].map((f, i) => (
+                 <div key={i} className="flex items-center gap-4 text-sm font-bold text-foreground">
+                    <Check className="w-4 h-4 text-secondary" />
+                    {f}
+                 </div>
+               ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

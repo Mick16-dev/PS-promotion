@@ -12,6 +12,8 @@ import { FaqSection } from '@/components/faq-section'
 import { Footer } from '@/components/footer'
 import { JoinModal } from '@/components/join-modal'
 import { StackingSection } from '@/components/ui/stacking-section'
+import { StickyConversion } from '@/components/sticky-conversion'
+import { ProblemSolution } from '@/components/problem-solution'
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -30,27 +32,32 @@ export default function Home() {
       </StackingSection>
 
       <StackingSection index={2}>
+        <ProblemSolution onCtaClick={openModal} />
+      </StackingSection>
+
+      <StackingSection index={3}>
         <MasterExpertSection />
       </StackingSection>
       
-      <StackingSection index={3}>
+      <StackingSection index={4}>
         <ServicesSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={4}>
+      <StackingSection index={5}>
         <TestimonialsSection />
       </StackingSection>
       
-      <StackingSection index={5}>
+      <StackingSection index={6}>
         <PricingSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={6}>
+      <StackingSection index={7}>
         <FaqSection />
       </StackingSection>
       
       <Footer onCtaClick={openModal} />
       <JoinModal isOpen={isModalOpen} onClose={closeModal} />
+      <StickyConversion onCtaClick={openModal} />
     </main>
   )
 }
