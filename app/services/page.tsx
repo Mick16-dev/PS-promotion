@@ -28,7 +28,7 @@ const allServices = [
     descEn: 'Removal of stubborn clogs and blockages from sinks, showers, and toilets using specialized equipment.',
     descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.',
     featured: false,
-    image: '/services/drain.jpg'
+    image: 'https://images.unsplash.com/photo-1621905255823-750c7666b6c0?w=800&q=80'
   },
   {
     id: 'leak-detection',
@@ -38,7 +38,7 @@ const allServices = [
     descEn: 'Pinpoint accuracy in finding hidden leaks to prevent water damage and high utility bills.',
     descDe: 'Präzise Ortung verborgener Lecks zur Vermeidung von Wasserschäden und hohen Kosten.',
     featured: true,
-    image: '/services/leak.jpg'
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1200&q=80'
   },
   {
     id: 'water-heater',
@@ -48,7 +48,7 @@ const allServices = [
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
     descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
     featured: false,
-    image: '/services/water-heater.jpg'
+    image: 'https://images.unsplash.com/photo-1542013976693-dbb528a1c87e?w=800&q=80'
   },
   {
     id: 'fixture-replacement',
@@ -58,7 +58,7 @@ const allServices = [
     descEn: 'Upgrading faucets, showerheads, and toilets with premium, water-efficient models.',
     descDe: 'Modernisierung von Armaturen und Toiletten mit effizienten Premium-Modellen.',
     featured: false,
-    image: '/services/fixture.jpg'
+    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca1f987?w=800&q=80'
   },
   {
     id: 'sewer-line',
@@ -68,7 +68,7 @@ const allServices = [
     descEn: 'Major sewer line diagnostics and restoration including root removal and pipe lining.',
     descDe: 'Kanaldiagnose und -sanierung, einschließlich Wurzelentfernung und Rohrreinigung.',
     featured: false,
-    image: '/services/sewer.jpg'
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80'
   },
   {
     id: 'garbage-disposal',
@@ -78,7 +78,7 @@ const allServices = [
     descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
     descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
     featured: false,
-    image: '/services/disposal.jpg'
+    image: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=800&q=80'
   },
   {
     id: 'appliance-install',
@@ -88,7 +88,7 @@ const allServices = [
     descEn: 'Professional hook-up for dishwashers, washing machines, and refrigerators.',
     descDe: 'Fachgerechter Anschluss von Spülmaschinen, Waschmaschinen und Kühlschränken.',
     featured: false,
-    image: '/services/appliance.jpg'
+    image: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=800&q=80'
   },
   {
     id: 'emergency-service',
@@ -98,7 +98,7 @@ const allServices = [
     descEn: 'Rapid response for burst pipes, major floods, and urgent plumbing crises.',
     descDe: 'Schnelle Hilfe bei Rohrbruche, Überschwemmungen und dringenden Sanitärkrisen.',
     featured: true,
-    image: '/services/emergency.jpg'
+    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=80'
   }
 ]
 
@@ -133,15 +133,15 @@ export default function ServicesPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.05 }}
-                className={`group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col ${service.featured ? 'lg:col-span-2 lg:row-span-1' : ''}`}
+                className="group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col"
               >
                 {service.image && (
-                  <div className="relative h-64 w-full overflow-hidden">
+                  <div className="relative h-64 w-full overflow-hidden bg-slate-100">
                     <Image 
                       src={service.image}
                       alt={language === 'de' ? service.titleDe : service.titleEn}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700 grayscale hover:grayscale-0"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
                   </div>
