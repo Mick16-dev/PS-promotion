@@ -40,12 +40,10 @@ const allServices = [
   {
     id: 'water-heater',
     icon: Thermometer,
-    image: '/service_water_heater_1773478341863.png',
     titleEn: 'Water Heater Services',
     titleDe: 'Warmwasserservice',
     descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
-    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
-    featured: true
+    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.'
   },
   {
     id: 'fixture-replacement',
