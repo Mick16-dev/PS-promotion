@@ -78,7 +78,7 @@ const allServices = [
     descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
     descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
     featured: false,
-    image: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=800&q=80'
+    image: '/services/garbage-disposal.png'
   },
   {
     id: 'appliance-install',

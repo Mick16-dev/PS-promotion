@@ -60,7 +60,7 @@ const serviceDetails: Record<string, any> = {
     titleDe: 'Küchenabfallzerkleinerer',
     descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
     descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
-    image: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=1600&q=80',
+    image: '/services/garbage-disposal.png',
     featuresEn: ['Jam clearance', 'Motor replacement', 'Leak sealing', 'Brand-specific parts'],
     featuresDe: ['Blockadenlösung', 'Motor-Austausch', 'Abdichtungsservice', 'Original-Ersatzteile']
   },
