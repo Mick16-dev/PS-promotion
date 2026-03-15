@@ -53,7 +53,7 @@ const services = [
   },
   {
     id: 'camera-pipe-inspection',
-    image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+    image: '/camera-inspection-overview.png',
     titleEn: 'Camera Pipe Inspection',
     titleDe: 'Kamera-Rohrinspektion',
     descEn: 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.',
