@@ -6,7 +6,7 @@ import { useLanguage } from '@/app/context/language-context'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Button } from '@/components/ui/button'
-import { Brain, CheckCircle2, Shield, Clock, ArrowRight, Phone, ChevronRight } from 'lucide-react'
+import { CheckCircle2, Shield, Clock, ArrowRight, Phone, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -33,43 +33,66 @@ export default function ServicePage() {
       <Header onEmergencyClick={handleCTA} />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-slate-900 -z-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-900 -z-10" />
+      <section className="relative pt-32 pb-24 overflow-hidden bg-slate-900">
+        {/* Background Image */}
         <img 
           src={service.image} 
-          alt={t(service.titleKey)} 
-          className="absolute inset-0 w-full h-full object-cover opacity-30 -z-20 grayscale"
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale"
         />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/80 to-slate-900" />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Breadcrumb */}
+          <motion.nav
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-10"
+          >
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/services" className="hover:text-white transition-colors">{language === 'de' ? 'Leistungen' : 'Services'}</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-white">{t(service.titleKey)}</span>
+          </motion.nav>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            transition={{ delay: 0.2 }}
+            className="max-w-4xl"
           >
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
-                <Brain className="w-4 h-4 text-white" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Master Certified Service</span>
+             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
+                <Shield className="w-4 h-4 text-white" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">
+                  {language === 'de' ? 'Meister-zertifizierter Service' : 'Master Certified Service'}
+                </span>
              </div>
-             <h1 className="text-4xl sm:text-7xl font-black text-white uppercase tracking-tighter mb-6 italic">
+
+             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter mb-8 leading-[0.9]">
                {t(service.titleKey)}
              </h1>
-             <p className="text-xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed italic border-l-2 border-white/20 pl-6 mb-12">
+
+             <p className="text-lg sm:text-xl text-slate-300 max-w-2xl font-medium leading-relaxed mb-12">
                {t(service.descKey)}
              </p>
              
-             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+             <div className="flex flex-col sm:flex-row items-start gap-4">
                 <Button 
                   onClick={handleCTA}
-                  className="bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-widest h-14 px-8 rounded-xl shadow-2xl transition-all active:scale-95 text-lg"
+                  className="bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-widest h-14 px-8 rounded-xl shadow-2xl transition-all active:scale-95 text-sm"
                 >
-                  {language === 'de' ? 'Angebot anfordern' : 'Request Quote'}
+                  {language === 'de' ? 'Angebot anfordern' : 'Request a Quote'}
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
                 <div className="flex items-center gap-6 px-8 h-14 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
                    <div className="flex flex-col items-start leading-none">
-                      <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Price starting at</span>
-                      <span className="text-2xl font-black text-white italic">€{service.price}</span>
+                      <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">
+                        {language === 'de' ? 'Ab Preis' : 'Starting from'}
+                      </span>
+                      <span className="text-2xl font-black text-white">€{service.price}</span>
                    </div>
                 </div>
              </div>
