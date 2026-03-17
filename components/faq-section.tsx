@@ -69,7 +69,7 @@ export function FaqSection() {
   }
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
+    <section className="py-16 sm:py-20 px-4 relative overflow-hidden bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -83,19 +83,19 @@ export function FaqSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-24"
+          className="text-center mb-10"
         >
 
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-8 tracking-tighter italic uppercase">
+          <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight uppercase">
             {t('faq.title')}
           </h2>
-          <div className="flex items-center justify-center gap-3 text-muted-foreground font-black uppercase tracking-[0.2em] text-xs">
-            <MessageSquare className="w-4 h-4 text-secondary" />
+          <div className="flex items-center justify-center gap-2 text-muted-foreground font-medium text-xs">
+            <MessageSquare className="w-3.5 h-3.5 text-secondary" />
             {t('faq.stillHaveQuestions')}
           </div>
         </motion.div>
 
-        <Accordion type="single" collapsible className="space-y-6">
+        <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
@@ -106,14 +106,14 @@ export function FaqSection() {
             >
               <AccordionItem
                 value={`item-${index}`}
-                className="group border border-border/50 rounded-[2.5rem] px-8 bg-white/40 backdrop-blur-xl shadow-xl transition-all duration-500 hover:bg-white hover:border-primary/20 overflow-hidden"
+                className="group border border-border/50 rounded-xl px-5 bg-white shadow-sm transition-all duration-300 hover:shadow-md overflow-hidden"
               >
-                <AccordionTrigger className="text-left hover:no-underline py-8">
-                  <span className="text-xl sm:text-2xl font-black text-foreground italic uppercase tracking-tighter group-hover:text-primary transition-colors pr-6">
+                <AccordionTrigger className="text-left hover:no-underline py-4">
+                  <span className="text-sm font-bold text-foreground uppercase tracking-tight group-hover:text-primary transition-colors pr-4">
                     {language === 'de' ? faq.questionDe : faq.questionEn}
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-8 text-lg font-medium text-muted-foreground leading-relaxed italic pr-12">
+                <AccordionContent className="pb-4 text-sm text-muted-foreground leading-relaxed pr-8">
                   <div className="flex gap-4">
                     <div className="w-1 h-auto bg-secondary/30 rounded-full shrink-0" />
                     <div>{language === 'de' ? faq.answerDe : faq.answerEn}</div>
@@ -128,21 +128,18 @@ export function FaqSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-24 p-12 glass-card rounded-[3rem] border-secondary/20 flex flex-col items-center text-center relative overflow-hidden group"
+          className="mt-12 p-8 bg-white rounded-xl border border-slate-200 flex flex-col items-center text-center"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 group-hover:opacity-10 transition-opacity blur-3xl" />
-          <HelpCircle className="w-10 h-10 text-secondary mb-6 animate-pulse-premium" />
-          <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground mb-4">
+          <HelpCircle className="w-7 h-7 text-secondary mb-4" />
+          <h3 className="text-lg font-bold uppercase tracking-tight text-foreground mb-2">
             {t('faq.cantFind')}
           </h3>
-          <p className="text-muted-foreground font-medium mb-8 max-w-lg">
+          <p className="text-sm text-muted-foreground font-medium mb-6 max-w-md">
             {t('faq.supportTeam')}
           </p>
-          <Magnetic strength={0.2}>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-xl transition-all active:scale-95">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-wider h-10 px-6 rounded-lg text-xs transition-all active:scale-95">
               {t('faq.requestSupport')}
             </Button>
-          </Magnetic>
         </motion.div>
       </div>
     </section>

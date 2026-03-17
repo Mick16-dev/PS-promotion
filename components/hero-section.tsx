@@ -146,7 +146,7 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
   } as any
 
   return (
-    <section className="relative pt-24 pb-12 px-4 min-h-[50vh] flex items-center justify-center bg-slate-900 border-b border-slate-200 overflow-hidden">
+    <section className="relative pt-20 pb-10 px-4 min-h-[40vh] flex items-center justify-center bg-slate-900 border-b border-slate-200 overflow-hidden">
       {/* Background Image with Overlay for Visual Context */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -160,7 +160,7 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
 
       <div className="absolute inset-0 opacity-10 pointer-events-none blueprint-grid z-0" />
 
-      <div className="max-w-6xl mx-auto relative z-10 text-center space-y-12">
+      <div className="max-w-5xl mx-auto relative z-10 text-center space-y-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -169,12 +169,12 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
         >
           <div className="flex flex-col items-center gap-6">
             <TrustPulse />
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight max-w-4xl mx-auto uppercase">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight max-w-3xl mx-auto uppercase">
               {t('hero.title')}
             </h1>
           </div>
 
-          <p className="text-lg sm:text-2xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed italic">
+          <p className="text-base sm:text-lg text-slate-300 max-w-xl mx-auto font-medium leading-relaxed">
             {t('hero.subtitle')}
           </p>
 
@@ -182,16 +182,16 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
             <Button
               onClick={() => setIsFunnelOpen(true)}
               size="lg"
-              className="bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-[0.2em] h-16 px-10 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-lg"
+              className="bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-widest h-12 px-8 rounded-xl shadow-xl transition-all hover:scale-105 active:scale-95 text-sm"
             >
               <span className="flex items-center gap-3">
                 {t('hero.calculate')}
-                <ArrowRight className="w-6 h-6" />
+                <ArrowRight className="w-5 h-5" />
               </span>
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-8 pt-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+          <div className="flex flex-wrap items-center justify-center gap-6 pt-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
              {[
                { icon: ShieldCheck, label: 'Master Certified' },
                { icon: Clock, label: '24/7 Priority' },

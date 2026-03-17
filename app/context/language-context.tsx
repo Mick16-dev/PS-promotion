@@ -241,15 +241,15 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Services
     'services.leak-detection.title': 'Leak Detection & Repair',
-    'services.leak-detection.desc': 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
+    'services.leak-detection.desc': 'Fast leak pinpointing with advanced diagnostics. Protect your property from costly water damage.',
     'services.drain-cleaning.title': 'Drain Unclogging',
-    'services.drain-cleaning.desc': 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
+    'services.drain-cleaning.desc': 'Motorized snaking and hydro-jetting to clear deep blockages safely and effectively.',
     'services.fixture-replacement.title': 'Fixture Replacement',
-    'services.fixture-replacement.desc': 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
+    'services.fixture-replacement.desc': 'Expert faucet, toilet, and showerhead installation with perfect seals guaranteed.',
     'services.water-heater.title': 'Water Heater Services',
-    'services.water-heater.desc': 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
+    'services.water-heater.desc': 'Diagnosis and repair for conventional and tankless heaters. Hot water restored fast.',
     'services.sewer-line.title': 'Sewer Line Repair',
-    'services.sewer-line.desc': 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.'
+    'services.sewer-line.desc': 'Non-invasive camera inspection of underground pipes to locate damage without digging.'
   },
   de: {
     // Header
@@ -481,15 +481,15 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Services
     'services.leak-detection.title': 'Leckortung & Reparatur',
-    'services.leak-detection.desc': 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.',
+    'services.leak-detection.desc': 'Schnelle Leckortung mit modernster Diagnostik. Schutz vor teuren Wasserschäden.',
     'services.drain-cleaning.title': 'Abfluss-Entstopfung',
-    'services.drain-cleaning.desc': 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.',
+    'services.drain-cleaning.desc': 'Motorisierte Spiralen und Hochdruckreinigung für tiefe Verstopfungen.',
     'services.fixture-replacement.title': 'Armatur-Austausch',
-    'services.fixture-replacement.desc': 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.',
+    'services.fixture-replacement.desc': 'Fachgerechter Einbau von Armaturen, Toiletten und Duschköpfen mit Dichtgarantie.',
     'services.water-heater.title': 'Warmwasserbereiter Reparatur',
-    'services.water-heater.desc': 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.',
+    'services.water-heater.desc': 'Diagnose und Reparatur für Durchlauferhitzer und Boiler. Schnelle Wiederherstellung.',
     'services.sewer-line.title': 'Kanalreparatur',
-    'services.sewer-line.desc': 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.'
+    'services.sewer-line.desc': 'Kamerainspektion unterirdischer Rohre zur Schadensortung ohne Grabarbeiten.'
   }
 }
 

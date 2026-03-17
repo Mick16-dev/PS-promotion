@@ -19,24 +19,23 @@ export function Footer({ onCtaClick }: FooterProps) {
       <div className="absolute top-0 left-0 w-full h-[1px] bg-white/10" />
 
       {/* Final Conversion Anchor */}
-      <div className="py-20 px-4 relative z-10">
+      <div className="py-12 px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto border border-white/10 p-12 lg:p-16 rounded-2xl text-center bg-white/5 backdrop-blur-sm shadow-2xl"
+          className="max-w-3xl mx-auto border border-white/10 p-8 lg:p-10 rounded-xl text-center bg-white/5"
         >
-          <h2 className="text-3xl sm:text-5xl font-bold mb-6 tracking-tight uppercase leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight uppercase">
             {t('footer.readyFor')}<span className="text-slate-400">{t('footer.goldStandard')}</span>{t('footer.fix')}
           </h2>
-          <p className="text-white/60 text-lg font-medium mb-10 max-w-xl mx-auto">
+          <p className="text-white/60 text-sm font-medium mb-6 max-w-md mx-auto">
             {t('footer.experience')}
           </p>
 
           <Button
             onClick={onCtaClick}
-            size="lg"
-            className="bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-widest h-14 px-10 rounded-lg shadow-xl"
+            className="bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-wider h-10 px-6 rounded-lg text-xs"
           >
             <span className="flex items-center gap-2">
               {t('footer.cta')}
@@ -47,7 +46,7 @@ export function Footer({ onCtaClick }: FooterProps) {
       </div>
 
       {/* Footer Content */}
-      <div className="py-20 px-4 border-t border-white/5 relative z-10">
+      <div className="py-12 px-4 border-t border-white/5 relative z-10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-2 space-y-6">

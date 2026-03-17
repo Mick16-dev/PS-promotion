@@ -71,7 +71,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
   } as any
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
+    <section className="py-16 sm:py-20 px-4 relative overflow-hidden bg-background">
       <div className="absolute inset-0 mesh-gradient opacity-30" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -80,13 +80,13 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-24"
+          className="text-center mb-12"
         >
           {/* Badge removed to avoid AI/Badge vibe */}
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase underline decoration-secondary decoration-8 underline-offset-8">
+          <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight uppercase">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-sm text-muted-foreground max-w-lg mx-auto font-medium leading-relaxed">
             {t('features.subtitle')}
           </p>
         </motion.div>
@@ -97,7 +97,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-8 mb-24"
+          className="grid md:grid-cols-3 gap-5 mb-12"
         >
           {pillars.map((pillar) => (
             <motion.div
@@ -106,24 +106,24 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
               whileHover={{ y: -10 }}
               onClick={() => setActivePillar(pillar.id)}
               className={cn(
-                "group cursor-pointer p-8 rounded-[2.5rem] border-2 transition-all duration-500",
+                "group cursor-pointer p-5 rounded-xl border transition-all duration-300",
                 activePillar === pillar.id
-                  ? cn("bg-white shadow-2xl scale-[1.02]", pillar.border)
+                  ? cn("bg-white shadow-md", pillar.border)
                   : "bg-card/30 border-border/50 hover:bg-white/50"
               )}
             >
               <div className={cn(
-                "w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-xl",
+                "w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-all",
                 activePillar === pillar.id ? pillar.bg : "bg-muted/50"
               )}>
-                <pillar.icon className={cn("w-8 h-8", activePillar === pillar.id ? pillar.color : "text-muted-foreground")} />
+                <pillar.icon className={cn("w-5 h-5", activePillar === pillar.id ? pillar.color : "text-muted-foreground")} />
               </div>
 
-              <h3 className="text-2xl font-black text-foreground mb-4 italic uppercase tracking-tighter">
+              <h3 className="text-base font-bold text-foreground mb-2 uppercase tracking-tight">
                 {t(`features.${pillar.id}.title`)}
               </h3>
 
-              <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+              <p className="text-xs text-muted-foreground font-medium mb-4 leading-relaxed">
                 {t(`features.${pillar.id}.tagline`)}
               </p>
 
@@ -142,11 +142,11 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="glass-card rounded-[3rem] p-8 lg:p-20 border-white/40 shadow-2xl relative overflow-hidden"
+            className="bg-white rounded-2xl p-6 lg:p-10 border border-slate-200 shadow-sm relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
 
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 items-center">
               {/* Left Side: Detail & Timeline */}
               <div className="space-y-12">
                 <div className="space-y-6">
@@ -158,7 +158,7 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                       {t(`features.${activePillar}.title`)}
                     </h3>
                   </div>
-                  <p className="text-xl text-muted-foreground font-medium leading-relaxed italic">
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                     {t(`features.${activePillar}.solution`)}
                   </p>
                 </div>
@@ -170,28 +170,28 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className="flex items-center gap-4 bg-white/40 backdrop-blur-md p-5 rounded-2xl border border-white/20 shadow-sm"
+                      className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100"
                     >
-                      <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-5 h-5 text-success" />
+                      <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                       </div>
-                      <span className="font-bold text-foreground tracking-tight">{t(`features.${activePillar}.benefit${i}`)}</span>
+                      <span className="text-sm font-medium text-foreground">{t(`features.${activePillar}.benefit${i}`)}</span>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
               {/* Right Side: Timeline/Steps */}
-              <div className="bg-primary rounded-[2.5rem] p-10 lg:p-14 shadow-2xl shadow-primary/20 relative group">
+              <div className="bg-primary rounded-xl p-6 lg:p-8 shadow-lg relative">
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary rounded-full blur-3xl opacity-30 group-hover:opacity-60 transition-opacity" />
 
-                <h4 className="text-xl font-black text-white italic uppercase tracking-widest mb-12 flex items-center gap-3">
-                  <Timer className="w-6 h-6 text-secondary animate-pulse" />
+                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
+                  <Timer className="w-4 h-4 text-secondary" />
                   {t('features.howItWorks')}
                 </h4>
 
-                <div className="space-y-10 relative">
-                  <div className="absolute left-6 top-10 bottom-10 w-px bg-white/20" />
+                <div className="space-y-5 relative">
+                  <div className="absolute left-4 top-6 bottom-6 w-px bg-white/20" />
 
                   {diagnosisSteps.map((step, idx) => (
                     <motion.div
@@ -199,28 +199,26 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.15 }}
-                      className="flex gap-8 relative z-10"
+                      className="flex gap-4 relative z-10"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0 ring-4 ring-primary border border-white/20 group-hover:scale-110 transition-transform">
-                        <step.icon className="w-5 h-5 text-secondary" />
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                        <step.icon className="w-3.5 h-3.5 text-secondary" />
                       </div>
                       <div>
-                        <p className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-1">{t('features.step')} {step.step}</p>
-                        <h5 className="text-lg font-bold text-white mb-1 tracking-tight">{t(`features.masterDeepDive.step${step.step}.title`)}</h5>
-                        <p className="text-sm text-white/60 font-medium leading-relaxed">{t(`features.masterDeepDive.step${step.step}.desc`)}</p>
+                        <p className="text-[9px] font-bold text-secondary uppercase tracking-widest mb-0.5">{t('features.step')} {step.step}</p>
+                        <h5 className="text-sm font-bold text-white mb-0.5">{t(`features.masterDeepDive.step${step.step}.title`)}</h5>
+                        <p className="text-[11px] text-white/60 leading-relaxed">{t(`features.masterDeepDive.step${step.step}.desc`)}</p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
 
-                <Magnetic strength={0.2} className="w-full">
                   <Button
                     onClick={onCtaClick}
-                    className="w-full mt-12 bg-secondary text-white hover:bg-secondary/90 font-black uppercase tracking-[0.2em] py-8 rounded-2xl text-lg shadow-xl shadow-secondary/20 transition-all active:scale-95"
+                    className="w-full mt-6 bg-secondary text-white hover:bg-secondary/90 font-bold uppercase tracking-wider py-5 rounded-lg text-xs transition-all active:scale-95"
                   >
                     {t('features.cta')}
                   </Button>
-                </Magnetic>
               </div>
             </div>
           </motion.div>

@@ -65,37 +65,29 @@ export function Header({ onEmergencyClick }: HeaderProps) {
                   <AnimatePresence>
                     {isServicesOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 w-64 bg-white border border-slate-200 shadow-xl rounded-xl py-2 z-50 overflow-hidden"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full left-0 w-52 bg-white border border-slate-200 shadow-lg rounded-lg py-1 z-50"
                       >
-                        <div className="px-4 py-2 border-b border-slate-100 bg-slate-50">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Our Expertise</span>
-                        </div>
                         {services.map((service) => (
                           <Link
                             key={service.id}
                             href={`/services/${service.id}`}
-                            className="block px-4 py-3 hover:bg-slate-50 transition-colors group/item"
+                            className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                           >
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-slate-900 uppercase group-hover/item:text-slate-900 transition-colors italic">
-                                {t(service.titleKey)}
-                              </span>
-                              <span className="text-[9px] text-slate-500 font-medium truncate italic">
-                                {t(service.descKey)}
-                              </span>
-                            </div>
+                            {t(service.titleKey)}
                           </Link>
                         ))}
-                        <Link 
-                          href="/services" 
-                          className="block px-4 py-3 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em] text-center hover:bg-slate-800 transition-colors"
-                        >
-                           {language === 'de' ? 'Alle Leistungen ansehen' : 'View All Services'}
-                        </Link>
+                        <div className="border-t border-slate-100 mt-1 pt-1">
+                          <Link 
+                            href="/services" 
+                            className="block px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-900 transition-colors"
+                          >
+                             {language === 'de' ? 'Alle ansehen →' : 'View all →'}
+                          </Link>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
