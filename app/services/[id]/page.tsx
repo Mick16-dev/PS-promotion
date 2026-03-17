@@ -1,173 +1,181 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { services } from '@/lib/services-data'
+import { useLanguage } from '@/app/context/language-context'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { useLanguage } from '@/app/context/language-context'
-import { motion } from 'framer-motion'
-import { ArrowLeft, CheckCircle, Clock, ShieldCheck } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-
-const serviceDetails: Record<string, any> = {
-  'drain-cleaning': {
-    titleEn: 'Expert Drain Cleaning',
-    titleDe: 'Abflussreinigung',
-    descEn: 'Removal of stubborn clogs and blockages from sinks, showers, and toilets using specialized equipment.',
-    descDe: 'Beseitigung hartnäckiger Verstopfungen in Spülbecken, Duschen und Toiletten mit Spezialgeräten.',
-    image: '/services/drain-cleaning.png',
-    featuresEn: ['Power-jet cleaning', 'Camera inspection included', 'Deep-clean guarantee', 'No-mess promise'],
-    featuresDe: ['Hochdruckreinigung', 'Inklusive Kamera-Inspektion', 'Tiefenreinigungsgarantie', 'Sauberkeitsversprechen']
-  },
-  'leak-detection': {
-    titleEn: 'Leak Detection & Repair',
-    titleDe: 'Leckortung & Reparatur',
-    descEn: 'Pinpoint accuracy in finding hidden leaks to prevent water damage and high utility bills.',
-    descDe: 'Präzise Ortung verborgener Lecks zur Vermeidung von Wasserschäden und hohen Kosten.',
-    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=1600&q=80',
-    featuresEn: ['Acoustic detection', 'Thermal imaging', 'Non-invasive methods', 'Repair plan provided'],
-    featuresDe: ['Akustische Ortung', 'Thermografie-Analyse', 'Zerstörungsfreie Methoden', 'Detaillierter Reparaturplan']
-  },
-  'water-heater': {
-    titleEn: 'Water Heater Services',
-    titleDe: 'Warmwasserservice',
-    descEn: 'Repair and installation of tankless and traditional water heaters for consistent hot water.',
-    descDe: 'Reparatur und Installation von Durchlauferhitzern und Speichern für konstantes Warmwasser.',
-    image: '/water-heater-overview.png',
-    featuresEn: ['All brands serviced', 'Same-day hot water', 'Efficiency check', 'Parts warranty'],
-    featuresDe: ['Service für alle Marken', 'Warmwasser am selben Tag', 'Effizienzprüfung', 'Teilegarantie']
-  },
-  'fixture-replacement': {
-    titleEn: 'Fixture Replacement',
-    titleDe: 'Armaturentausch',
-    descEn: 'Upgrading faucets, showerheads, and toilets with premium, water-efficient models.',
-    descDe: 'Modernisierung von Armaturen und Toiletten mit effizienten Premium-Modellen.',
-    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca1f987?w=1600&q=80',
-    featuresEn: ['Premium brands available', 'Leak-proof seal', 'Same-day service', 'Disposal of old fixtures'],
-    featuresDe: ['Premium-Marken verfügbar', 'Auslaufsichere Versiegelung', 'Service am selben Tag', 'Altelemente-Entsorgung']
-  },
-  'sewer-line': {
-    titleEn: 'Sewer Line Repair',
-    titleDe: 'Kanalreparatur',
-    descEn: 'Major sewer line diagnostics and restoration including root removal and pipe lining.',
-    descDe: 'Kanaldiagnose und -sanierung, einschließlich Wurzelentfernung und Rohrreinigung.',
-    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80',
-    featuresEn: ['Root removal technology', 'Pipe lining available', 'Visual diagnostics', 'Workmanship guarantee'],
-    featuresDe: ['Wurzelentfernung', 'Rohrainzug-Verfahren', 'Visuelle Diagnose', 'Meister-Gewährleistung']
-  },
-  'garbage-disposal': {
-    titleEn: 'Garbage Disposal Repair',
-    titleDe: 'Küchenabfallzerkleinerer',
-    descEn: 'Fixing jammed or broken kitchen disposals to keep your kitchen running smoothly.',
-    descDe: 'Reparatur von Küchenabfallzerkleinerern für einen reibungslosen Küchenbetrieb.',
-    image: '/services/garbage-disposal.png',
-    featuresEn: ['Jam clearance', 'Motor replacement', 'Leak sealing', 'Brand-specific parts'],
-    featuresDe: ['Blockadenlösung', 'Motor-Austausch', 'Abdichtungsservice', 'Original-Ersatzteile']
-  },
-  'appliance-install': {
-    titleEn: 'Appliance Installation',
-    titleDe: 'Geräteinstallation',
-    descEn: 'Professional hook-up for dishwashers, washing machines, and refrigerators.',
-    descDe: 'Fachgerechter Anschluss von Spülmaschinen, Waschmaschinen und Kühlschränken.',
-    image: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?w=1600&q=80',
-    featuresEn: ['Secure connections', 'Water line routing', 'Leveling & testing', 'Warranty protected'],
-    featuresDe: ['Sichere Anschlüsse', 'Wasserleitungsausbau', 'Ausrichtung & Testlauf', 'Herstellergarantie']
-  },
-  'emergency-service': {
-    titleEn: '24/7 Emergency Repairs',
-    titleDe: '24/7 Notfallservice',
-    descEn: 'Rapid response for burst pipes, major floods, and urgent plumbing crises.',
-    descDe: 'Schnelle Hilfe bei Rohrbruche, Überschwemmungen und dringenden Sanitärkrisen.',
-    image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1600&q=80',
-    featuresEn: ['30min response time', 'Master lead dispatch', 'Crisis management', 'Immediate containment'],
-    featuresDe: ['30 Min. Reaktionszeit', 'Meister-Einsatzleitung', 'Krisenmanagement', 'Sofort-Eingrenzung']
-  }
-}
+import { Brain, CheckCircle2, Shield, Clock, ArrowRight, Phone, ChevronRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 export default function ServicePage() {
   const { id } = useParams()
-  const { language, t } = useLanguage()
-  const service = serviceDetails[id as string] || serviceDetails['leaking-pipe-repair']
+  const { t, language } = useLanguage()
+  const service = services.find((s) => s.id === id)
+
+  if (!service) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-bold">Service not found</h1>
+      </div>
+    )
+  }
+
+  const handleCTA = () => {
+    // Scroll to contact or open modal if needed
+    window.location.href = '/contact'
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <Header onEmergencyClick={() => {}} />
+      <Header onEmergencyClick={handleCTA} />
+      
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-900 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-900 -z-10" />
+        <img 
+          src={service.image} 
+          alt={t(service.titleKey)} 
+          className="absolute inset-0 w-full h-full object-cover opacity-30 -z-20 grayscale"
+        />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
+                <Brain className="w-4 h-4 text-white" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Master Certified Service</span>
+             </div>
+             <h1 className="text-4xl sm:text-7xl font-black text-white uppercase tracking-tighter mb-6 italic">
+               {t(service.titleKey)}
+             </h1>
+             <p className="text-xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed italic border-l-2 border-white/20 pl-6 mb-12">
+               {t(service.descKey)}
+             </p>
+             
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button 
+                  onClick={handleCTA}
+                  className="bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-widest h-14 px-8 rounded-xl shadow-2xl transition-all active:scale-95 text-lg"
+                >
+                  {language === 'de' ? 'Angebot anfordern' : 'Request Quote'}
+                </Button>
+                <div className="flex items-center gap-6 px-8 h-14 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                   <div className="flex flex-col items-start leading-none">
+                      <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Price starting at</span>
+                      <span className="text-2xl font-black text-white italic">€{service.price}</span>
+                   </div>
+                </div>
+             </div>
+          </motion.div>
+        </div>
+      </section>
 
-      <div className="pt-32 pb-24 px-4 bg-white border-b border-slate-200">
+      {/* Details Grid */}
+      <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <Link href="/#services" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors mb-12 font-bold uppercase tracking-widest text-xs">
-            <ArrowLeft className="w-4 h-4" />
-            {language === 'de' ? 'Zurück zu den Leistungen' : 'Back to Services'}
-          </Link>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-8"
+          <div className="grid lg:grid-cols-3 gap-8">
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm"
             >
-              <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 uppercase tracking-tight leading-none">
-                {language === 'de' ? service.titleDe : service.titleEn}
-              </h1>
-              <p className="text-lg sm:text-xl text-slate-600 font-medium leading-relaxed">
-                {language === 'de' ? service.descDe : service.descEn}
-              </p>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                {(language === 'de' ? service.featuresDe : service.featuresEn).map((f: string, i: number) => (
-                  <div key={i} className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">{f}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="pt-6 flex flex-wrap gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-slate-700" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">{t('hero.response')}</p>
-                    <p className="text-sm font-bold text-slate-900">15-30 Min</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
-                    <ShieldCheck className="w-6 h-6 text-slate-700" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">{t('footer.certifiedMeister')}</p>
-                    <p className="text-sm font-bold text-slate-900">Verified Expert</p>
-                  </div>
-                </div>
-              </div>
-
-              <Button size="lg" className="w-full sm:w-auto h-14 px-10 bg-slate-900 text-white hover:bg-slate-800 font-bold uppercase tracking-widest rounded-lg text-sm shadow-md transition-all">
-                {t('funnel.cta')}
-              </Button>
+               <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                  <Shield className="w-6 h-6 text-white" />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 uppercase mb-4 italic">Guaranteed Quality</h3>
+               <p className="text-slate-600 font-medium leading-relaxed italic">
+                 Every repair is performed by a certified German Master Plumber, backed by a 2-year workmanship guarantee and full insurance coverage.
+               </p>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-video lg:aspect-square rounded-2xl overflow-hidden shadow-xl"
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.1 }}
+               className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm"
             >
-              <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover" />
-              {id === 'appliance-install' && (
-                <div className="absolute top-6 right-6 bg-slate-900/90 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-2xl border border-white/10">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                    {language === 'de' ? 'Fachgerechter Anschluss' : 'Professional Hookup'}
-                  </span>
-                </div>
-              )}
+               <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                  <Clock className="w-6 h-6 text-white" />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 uppercase mb-4 italic">Rapid Response</h3>
+               <p className="text-slate-600 font-medium leading-relaxed italic">
+                 Available 24/7 across major German hubs. 30-minute average response time for emergencies, ensuring your property is protected immediately.
+               </p>
+            </motion.div>
+
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.2 }}
+               className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm"
+            >
+               <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                  <CheckCircle2 className="w-6 h-6 text-white" />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 uppercase mb-4 italic">Fixed Price Lock</h3>
+               <p className="text-slate-600 font-medium leading-relaxed italic">
+                  No hidden fees or surprise invoices. Our Master Vision Engine identifies the parts and labor path to give you a locked-in price before we arrive.
+               </p>
             </motion.div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <Footer onCtaClick={() => {}} />
+      {/* Content Section */}
+      <section className="py-24 bg-slate-900 text-white overflow-hidden relative">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+             <div>
+                <span className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 block">The Master Approach</span>
+                <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter mb-8 italic">
+                  Precision Engineering for {t(service.titleKey)}
+                </h2>
+                <div className="space-y-6">
+                   {[
+                     "Certified Master-level diagnostics",
+                     "Premium parts with longevity guarantee",
+                     "Full digital documentation of the repair",
+                     "Transparent billing and automated processing"
+                   ].map((item, i) => (
+                     <div key={i} className="flex items-center gap-4 border-b border-white/10 pb-4">
+                        <div className="w-2 h-2 rounded-full bg-white" />
+                        <span className="text-lg font-medium italic text-slate-300">{item}</span>
+                     </div>
+                   ))}
+                </div>
+                <Button 
+                  onClick={handleCTA}
+                  className="mt-12 group bg-white text-slate-900 hover:bg-white/90 font-black uppercase tracking-widest h-14 px-8 rounded-xl transition-all"
+                >
+                  Schedule Expert Visit
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+             </div>
+             <div className="relative">
+                <div className="aspect-square rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-2xl skew-y-3">
+                   <img src={service.image} className="w-full h-full object-cover grayscale brightness-50" alt="Process" />
+                   <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/60 to-transparent" />
+                   <div className="absolute bottom-12 left-12 right-12 p-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem]">
+                      <h4 className="text-2xl font-black uppercase italic mb-2">Technician ID #772</h4>
+                      <p className="text-slate-300 text-sm font-medium">Ready for deployment in Berlin, Hamburg, Munich & Frankfurt.</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer onCtaClick={handleCTA} />
     </main>
   )
 }

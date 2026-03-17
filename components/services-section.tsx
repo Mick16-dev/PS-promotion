@@ -17,49 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-
-const services = [
-  {
-    id: 'leak-detection',
-    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80',
-    titleEn: 'Leak Detection & Repair',
-    titleDe: 'Leckortung & Reparatur',
-    descEn: 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
-    descDe: 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.'
-  },
-  {
-    id: 'drain-cleaning',
-    image: '/services/drain-cleaning.png',
-    titleEn: 'Drain Unclogging',
-    titleDe: 'Abfluss-Entstopfung',
-    descEn: 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
-    descDe: 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.'
-  },
-  {
-    id: 'fixture-replacement',
-    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca1f987?w=800&q=80',
-    titleEn: 'Fixture Replacement',
-    titleDe: 'Armatur-Austausch',
-    descEn: 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
-    descDe: 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.'
-  },
-  {
-    id: 'water-heater',
-    image: '/water-heater-overview.png',
-    titleEn: 'Water Heater Services',
-    titleDe: 'Warmwasserbereiter Reparatur',
-    descEn: 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
-    descDe: 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.'
-  },
-  {
-    id: 'sewer-line',
-    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
-    titleEn: 'Sewer Line Repair',
-    titleDe: 'Kanalreparatur',
-    descEn: 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.',
-    descDe: 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.'
-  }
-]
+import { services } from '@/lib/services-data'
 
 const diagnosisSteps = [
   { icon: Camera, step: 1 },
@@ -107,22 +65,22 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
 
                   
                   <div className="w-full relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
-                    <img src={service.image} alt={service.titleEn} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                    <img src={service.image} alt={t(service.titleKey)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   
                   <div className="space-y-6">
                     <div className="space-y-2">
                        <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
-                         {language === 'de' ? service.titleDe : service.titleEn}
+                         {t(service.titleKey)}
                        </h3>
                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-black text-secondary">€{(89 + idx * 20)}</span>
+                          <span className="text-xl font-black text-secondary">€{service.price}</span>
                        </div>
                     </div>
 
                     <p className="text-slate-600 font-medium leading-relaxed italic border-l-2 border-secondary/20 pl-4">
-                      {language === 'de' ? service.descDe : service.descEn}
+                      {t(service.descKey)}
                     </p>
                     
                     <div className="flex flex-col sm:flex-row gap-4 pt-2">

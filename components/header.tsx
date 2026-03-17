@@ -1,12 +1,14 @@
 'use client'
 
-import { Phone } from 'lucide-react'
+import { Phone, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { Magnetic } from '@/components/ui/magnetic'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import { services } from '@/lib/services-data'
 
 interface HeaderProps {
   onEmergencyClick: () => void
@@ -14,6 +16,7 @@ interface HeaderProps {
 
 export function Header({ onEmergencyClick }: HeaderProps) {
   const { language, setLanguage, t } = useLanguage()
+  const [isServicesOpen, setIsServicesOpen] = useState(false)
 
   return (
     <motion.header 
@@ -39,18 +42,65 @@ export function Header({ onEmergencyClick }: HeaderProps) {
           <nav className="hidden lg:flex items-center gap-1 mx-4">
             {[
               { key: 'nav.overview', name: t('nav.overview'), href: '/' },
-              { key: 'nav.services', name: t('nav.services'), href: '/services' },
+              { key: 'nav.services', name: t('nav.services'), href: '/services', hasDropdown: true },
               { key: 'nav.pricing', name: t('nav.pricing'), href: '/pricing' },
               { key: 'nav.team', name: t('nav.team'), href: '/team' },
               { key: 'nav.contact', name: t('nav.contact'), href: '/contact' }
             ].map((item) => (
-              <a
-                key={item.key}
-                href={item.href}
-                className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap"
+              <div 
+                key={item.key} 
+                className="relative group"
+                onMouseEnter={() => item.hasDropdown && setIsServicesOpen(true)}
+                onMouseLeave={() => item.hasDropdown && setIsServicesOpen(false)}
               >
-                {t(item.key)}
-              </a>
+                <Link
+                  href={item.href}
+                  className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap flex items-center gap-1"
+                >
+                  {t(item.key)}
+                  {item.hasDropdown && <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", isServicesOpen && "rotate-180")} />}
+                </Link>
+
+                {item.hasDropdown && (
+                  <AnimatePresence>
+                    {isServicesOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 w-64 bg-white border border-slate-200 shadow-xl rounded-xl py-2 z-50 overflow-hidden"
+                      >
+                        <div className="px-4 py-2 border-b border-slate-100 bg-slate-50">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Our Expertise</span>
+                        </div>
+                        {services.map((service) => (
+                          <Link
+                            key={service.id}
+                            href={`/services/${service.id}`}
+                            className="block px-4 py-3 hover:bg-slate-50 transition-colors group/item"
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-slate-900 uppercase group-hover/item:text-slate-900 transition-colors italic">
+                                {t(service.titleKey)}
+                              </span>
+                              <span className="text-[9px] text-slate-500 font-medium truncate italic">
+                                {t(service.descKey)}
+                              </span>
+                            </div>
+                          </Link>
+                        ))}
+                        <Link 
+                          href="/services" 
+                          className="block px-4 py-3 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em] text-center hover:bg-slate-800 transition-colors"
+                        >
+                           {language === 'de' ? 'Alle Leistungen ansehen' : 'View All Services'}
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
+              </div>
             ))}
           </nav>
 

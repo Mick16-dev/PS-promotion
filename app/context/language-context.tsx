@@ -238,6 +238,18 @@ const translations: Record<Language, Record<string, string>> = {
     'team.member.role.diagnostic': 'Diagnostic Specialist',
     'team.member.role.emergency': 'Emergency Lead',
     'team.member.role.install': 'Installation Expert',
+
+    // Services
+    'services.leak-detection.title': 'Leak Detection & Repair',
+    'services.leak-detection.desc': 'Professional repair of leaking pipes, protecting your property from water damage. We use advanced diagnostic tools to pinpoint the exact location of the leak rapidly.',
+    'services.drain-cleaning.title': 'Drain Unclogging',
+    'services.drain-cleaning.desc': 'Comprehensive drain cleaning services using safe, effective motorized snakes and hydro-jetting to remove blockages deep within your plumbing system.',
+    'services.fixture-replacement.title': 'Fixture Replacement',
+    'services.fixture-replacement.desc': 'Expert installation and replacement of faucets, toilets, showerheads, and other household fixtures. Ensuring perfect seals and optimal water flow.',
+    'services.water-heater.title': 'Water Heater Services',
+    'services.water-heater.desc': 'Diagnostic and repair services for all conventional and tankless water heaters. We restore hot water supply efficiently and conduct safety checks.',
+    'services.sewer-line.title': 'Sewer Line Repair',
+    'services.sewer-line.desc': 'Non-invasive visual inspection of underground sewer lines and pipes to determine condition, locate roots, or find collapsed sections without digging.'
   },
   de: {
     // Header
@@ -466,6 +478,18 @@ const translations: Record<Language, Record<string, string>> = {
     'team.member.role.diagnostic': 'Diagnose-Spezialist',
     'team.member.role.emergency': 'Notfall-Leitung',
     'team.member.role.install': 'Installations-Profi',
+
+    // Services
+    'services.leak-detection.title': 'Leckortung & Reparatur',
+    'services.leak-detection.desc': 'Professionelle Reparatur von undichten Rohren zum Schutz Ihrer Immobilie vor Wasserschäden. Wir nutzen fortschrittliche Diagnosewerkzeuge zur genauen Ortung.',
+    'services.drain-cleaning.title': 'Abfluss-Entstopfung',
+    'services.drain-cleaning.desc': 'Umfassende Abflussreinigung mit sicheren, effektiven motorisierten Spiralen und Hochdruckreinigung zur Entfernung tiefliegender Verstopfungen.',
+    'services.fixture-replacement.title': 'Armatur-Austausch',
+    'services.fixture-replacement.desc': 'Fachgerechte Installation und Austausch von Wasserhähnen, Toiletten, Duschköpfen und anderen Haushaltsarmaturen. Minimierung von Wasserverlusten.',
+    'services.water-heater.title': 'Warmwasserbereiter Reparatur',
+    'services.water-heater.desc': 'Diagnose und Reparaturservices für herkömmliche und Durchlauferhitzer. Wir stellen die Warmwasserversorgung effizient wieder her.',
+    'services.sewer-line.title': 'Kanalreparatur',
+    'services.sewer-line.desc': 'Zerstörungsfreie visuelle Inspektion von unterirdischen Kanalisationsleitungen und Rohren zur Zustandsermittlung ohne Grabungen.'
   }
 }
 
