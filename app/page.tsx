@@ -14,6 +14,7 @@ import { JoinModal } from '@/components/join-modal'
 import { StackingSection } from '@/components/ui/stacking-section'
 import { StickyConversion } from '@/components/sticky-conversion'
 import { ProblemSolution } from '@/components/problem-solution'
+import { Differentiator } from '@/components/differentiator'
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -36,22 +37,26 @@ export default function Home() {
       </StackingSection>
 
       <StackingSection index={3}>
+        <Differentiator />
+      </StackingSection>
+
+      <StackingSection index={4}>
         <MasterExpertSection />
       </StackingSection>
       
-      <StackingSection index={4}>
+      <StackingSection index={5}>
         <ServicesSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={5}>
+      <StackingSection index={6}>
         <TestimonialsSection />
       </StackingSection>
       
-      <StackingSection index={6}>
+      <StackingSection index={7}>
         <PricingSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={7}>
+      <StackingSection index={8}>
         <FaqSection />
       </StackingSection>
       

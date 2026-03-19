@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, MapPin, ArrowRight, HardHat, Cpu, ShieldCheck, Box, MoveHorizontal, Camera, Search, FileText, Timer } from 'lucide-react'
+import { Upload, Droplet, CircleOff, Wrench, Plus, CheckCircle, Clock, MapPin, ArrowRight, HardHat, Cpu, ShieldCheck, Box, MoveHorizontal, Camera, Search, FileText, Timer, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
@@ -16,18 +16,18 @@ import { cn } from '@/lib/utils'
 
 function TrustPulse() {
   const { language } = useLanguage()
-  const [pulse, setPulse] = useState({ city: 'Berlin', action: 'Fixed-Price Quote Locked' })
-  const cities = ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf']
+  const [pulse, setPulse] = useState({ city: 'Bremen-Walle', action: '3D Protocol Generated' })
+  const cities = ['Bremen-Walle', 'Bremen-Findorff', 'Bremen-Horn', 'Bremen-Neustadt', 'Verden', 'Bremen-Nord', 'Bremen-Hastedt']
   
   useEffect(() => {
     const interval = setInterval(() => {
       setPulse({
         city: cities[Math.floor(Math.random() * cities.length)],
         action: Math.random() > 0.5 
-          ? (language === 'de' ? 'Festpreis gesichert' : 'Fixed-Price Quote Locked')
-          : (language === 'de' ? 'Techniker entsandt' : 'Technician Dispatched')
+          ? (language === 'de' ? '3D-Protokoll erstellt' : '3D Protocol Generated')
+          : (language === 'de' ? 'Fahrzeug 4 entsandt' : 'Truck 4 Dispatched')
       })
-    }, 5000)
+    }, 4000)
     return () => clearInterval(interval)
   }, [language])
 
@@ -36,11 +36,11 @@ function TrustPulse() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       key={pulse.city}
-      className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black uppercase tracking-widest text-white shadow-2xl"
+      className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/10 backdrop-blur-md rounded-none border-l-4 border-red-600 text-[10px] font-black uppercase tracking-widest text-white shadow-2xl"
     >
       <span className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
       </span>
       <span>{pulse.city}: {pulse.action}</span>
     </motion.div>
@@ -140,9 +140,9 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
   }
 
   const variants = {
-    initial: { opacity: 0, scale: 0.95, y: 10 },
+    initial: { opacity: 0, scale: 0.98, y: 5 },
     animate: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.95, y: -10 }
+    exit: { opacity: 0, scale: 0.98, y: -5 }
   } as any
 
   return (
@@ -150,15 +150,15 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
       {/* Background Image with Overlay for Visual Context */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/hero-bg.png" 
+          src="https://images.unsplash.com/photo-1541888941293-1e8fbf3d12c8?w=1600&q=80" 
           alt="Technical Site Survey Context" 
-          className="w-full h-full object-cover opacity-40 mix-blend-luminosity scale-105"
+          className="w-full h-full object-cover opacity-30 mix-blend-luminosity grayscale"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900/90" />
-        <div className="absolute inset-0 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0B0D]/90 via-[#0A0B0D]/70 to-[#0A0B0D]" />
+        <div className="absolute inset-0 backdrop-blur-[1px]" />
       </div>
 
-      <div className="absolute inset-0 opacity-10 pointer-events-none blueprint-grid z-0" />
+      <div className="absolute inset-0 opacity-5 pointer-events-none blueprint-grid z-0" />
 
       <div className="max-w-5xl mx-auto relative z-10 text-center space-y-8">
         <motion.div
@@ -179,16 +179,21 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button
-              onClick={() => setIsFunnelOpen(true)}
-              size="lg"
-              className="bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-widest h-12 px-8 rounded-xl shadow-xl transition-all hover:scale-105 active:scale-95 text-sm"
-            >
-              <span className="flex items-center gap-3">
-                {t('hero.calculate')}
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            </Button>
+            <div className="relative group">
+              <div className="absolute -top-3 -left-3 px-3 py-1 bg-white text-red-600 text-[8px] font-black uppercase tracking-[0.3em] z-20 border border-red-600 shadow-xl italic">
+                Master Visual Service
+              </div>
+              <Button
+                onClick={() => setIsFunnelOpen(true)}
+                size="lg"
+                className="bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-widest h-14 px-10 rounded-none border-b-4 border-r-4 border-red-900 shadow-xl transition-all hover:scale-105 active:scale-95 text-sm"
+              >
+                <span className="flex items-center gap-3">
+                  {t('hero.calculate')}
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 pt-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
@@ -207,57 +212,73 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
       </div>
 
       <Dialog open={isFunnelOpen} onOpenChange={setIsFunnelOpen}>
-        <DialogContent className="max-w-xl p-0 bg-white border-0 shadow-2xl overflow-visible">
-          <Card className="border-0 shadow-none">
-            <CardContent className="p-8 sm:p-10 relative max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-xl p-0 bg-[#0A0B0D] border border-white/10 shadow-3xl overflow-visible">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardContent className="p-8 sm:p-12 relative max-h-[90vh] overflow-y-auto">
               <AnimatePresence mode="wait">
                 {isSuccess ? (
                   <motion.div key="success" variants={variants} initial="initial" animate="animate" className="text-center py-8">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
-                      <ShieldCheck className="w-10 h-10 text-white" />
+                    <div className="w-24 h-24 mx-auto mb-8 bg-red-600/10 border border-red-600/30 rounded-none flex items-center justify-center shadow-lg">
+                      <ShieldCheck className="w-12 h-12 text-red-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2 uppercase">{t('funnel.success.title')}</h2>
-                    <p className="text-slate-500 mb-8 font-medium">{t('funnel.success.desc')}</p>
-                    <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
-                      <p className="text-xs font-bold text-slate-500 uppercase mb-1">Guaranteed ID</p>
-                      <p className="text-xl font-bold text-slate-900 underline decoration-green-500">{formData.quote?.partNumber}</p>
+                    <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tighter">{t('funnel.success.title')}</h2>
+                    <p className="text-slate-400 mb-8 font-medium italic">{t('funnel.success.desc')}</p>
+                    <div className="bg-white/5 rounded-none p-6 mb-8 border border-white/10">
+                      <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Rotek Protocol ID</p>
+                      <p className="text-2xl font-mono font-bold text-white uppercase">RTK-{formData.quote?.partNumber}-WL</p>
                     </div>
-                    <div className="flex items-center justify-center gap-2 py-3 px-5 bg-slate-900 rounded-lg text-white border border-slate-900 shadow-xl">
-                      <MapPin className="w-4 h-4 text-green-400" />
-                      <span className="font-bold uppercase tracking-wider text-xs">Technician Dispatched (15-30m)</span>
+                    <div className="flex items-center justify-center gap-3 py-4 px-6 bg-red-600 rounded-none text-white border-b-4 border-red-900 shadow-xl">
+                      <HardHat className="w-5 h-5" />
+                      <span className="font-black uppercase tracking-widest text-xs">Einsatzleiter Andreas: Dispatching NOW</span>
                     </div>
                   </motion.div>
                 ) : isSubmitting ? (
                   <motion.div key="submitting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-20 flex flex-col items-center justify-center text-center">
-                    <div className="relative w-24 h-24 mb-10">
-                      <div className="absolute inset-0 bg-slate-100 rounded-full animate-ping opacity-20" />
-                      <div className="absolute inset-0 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                    <div className="relative w-32 h-32 mb-10">
+                      <div className="absolute inset-0 bg-red-600/20 rounded-full animate-ping opacity-20" />
+                      <div className="absolute inset-0 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Wrench className="w-10 h-10 text-slate-900" />
+                        <Activity className="w-12 h-12 text-red-600" />
                       </div>
+                      {/* Scanning Overlays */}
+                      <motion.div 
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                        className="absolute -top-12 left-1/2 -translate-x-1/2 text-[10px] font-mono text-red-500 whitespace-nowrap"
+                      >
+                        [ MEISTER-VALIDIERUNG... ]
+                      </motion.div>
+                      <motion.div 
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 0.7, repeat: Infinity, delay: 0.2 }}
+                        className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-[10px] font-mono text-white/50 whitespace-nowrap"
+                      >
+                        PROTOKOLL-STATUS: AKTIV
+                      </motion.div>
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{t('hero.diagnosisInProgress')}</h3>
-                    <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] animate-pulse">{t('hero.diagnosing')}</p>
-                    <div className="mt-8 space-y-2 w-full max-w-[200px]">
-                       <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-                          <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }} className="h-full w-1/3 bg-slate-900" />
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">{t('hero.diagnosisInProgress')}</h3>
+                    <p className="text-red-500 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">{t('hero.diagnosing')}</p>
+                    <div className="mt-12 space-y-3 w-full max-w-[240px]">
+                       <div className="h-1 bg-white/10 rounded-none overflow-hidden">
+                          <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className="h-full w-1/3 bg-red-600" />
                        </div>
+                       <p className="text-[9px] font-mono text-slate-500 italic">SYNC: BREMER KATASTERAMT...</p>
                     </div>
                   </motion.div>
                 ) : (
                   <motion.div key={step} variants={variants} initial="initial" animate="animate" exit="exit">
                     {/* Step 1: Upload */}
                     {step === 1 && (
-                      <div className="space-y-10">
+                      <div className="space-y-12">
                         <div className="text-center">
-                          <h2 className="text-4xl font-black tracking-tighter uppercase mb-3 italic">{t('funnel.step1.title')}</h2>
-                          <p className="text-slate-500 font-medium text-lg italic">{t('funnel.step1.desc')}</p>
+                          <h2 className="text-5xl font-black tracking-tighter uppercase mb-4 italic text-white">{t('funnel.step1.title')}</h2>
+                          <p className="text-slate-400 font-medium text-lg italic">{t('funnel.step1.desc')}</p>
                         </div>
-                        <div className="relative border-4 border-dashed border-slate-200 hover:border-slate-900 rounded-[3rem] p-20 text-center cursor-pointer transition-all duration-500 hover:bg-slate-50 group">
+                        <div className="relative border-2 border-white/10 hover:border-red-600/50 rounded-none p-16 text-center cursor-pointer transition-all duration-500 bg-white/[0.02] hover:bg-red-600/[0.03] group">
                           <input type="file" accept="image/*" onChange={handleImageSelect} className="hidden" id="image-upload" />
                           <label htmlFor="image-upload" className="cursor-pointer block">
-                            <Upload className="w-16 h-16 text-slate-400 mx-auto mb-8 group-hover:scale-110 transition-transform group-hover:text-slate-900" />
-                            <span className="block text-sm font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-slate-900">{t('funnel.step1.formats')}</span>
+                            <Camera className="w-20 h-20 text-slate-700 mx-auto mb-10 group-hover:scale-110 transition-transform group-hover:text-red-600" />
+                            <span className="block text-xs font-black uppercase tracking-[0.4em] text-slate-500 group-hover:text-white transition-colors">{t('funnel.step1.formats')}</span>
                           </label>
                         </div>
                       </div>
@@ -266,24 +287,27 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
                     {/* Step 2: Complexity Check */}
                     {step === 2 && (
                       <div className="space-y-12">
-                        <div className="flex items-center gap-8 mb-10">
+                        <div className="flex items-center gap-10 mb-10">
                           {formData.imagePreview && (
                             <div className="relative">
-                               <img src={formData.imagePreview} alt="Issue" className="w-24 h-24 object-cover rounded-[2rem] ring-8 ring-white shadow-2xl" />
-                               <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-lg">
-                                  <CheckCircle className="w-4 h-4" />
+                               <img src={formData.imagePreview} alt="Issue" className="w-28 h-28 object-cover rounded-none ring-4 ring-white/10 shadow-3xl grayscale hover:grayscale-0 transition-all" />
+                               <div className="absolute -bottom-2 -right-2 bg-red-600 text-white p-1.5 rounded-none shadow-lg">
+                                  <Activity className="w-4 h-4" />
                                </div>
                             </div>
                           )}
-                          <h2 className="text-3xl font-black uppercase italic leading-none">{t('funnel.step3.title')}</h2>
+                          <h2 className="text-4xl font-black uppercase italic leading-tight text-white">{t('funnel.step2.title')} <br/><span className="text-xs text-red-500 not-italic tracking-[0.3em]">INITIAL SCAN COMPLETE</span></h2>
                         </div>
-                        <div className="px-6 space-y-10">
-                          <Slider value={[formData.accessibility]} onValueChange={(v) => setFormData(p => ({...p, accessibility: v[0]}))} min={1} max={5} step={1} className="py-4" />
-                          <div className="flex justify-between text-[10px] font-black uppercase text-slate-400 px-2 tracking-widest">
-                            <span>Easy Access</span>
-                            <span>Obstructed</span>
+                        <div className="px-6 space-y-12">
+                          <div className="space-y-4">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t('funnel.step3.title')}</Label>
+                            <Slider value={[formData.accessibility]} onValueChange={(v) => setFormData(p => ({...p, accessibility: v[0]}))} min={1} max={5} step={1} className="py-4" />
+                            <div className="flex justify-between text-[10px] font-black uppercase text-slate-600 px-2 tracking-widest">
+                              <span>Clear Path</span>
+                              <span>Complex Obstruction</span>
+                            </div>
                           </div>
-                          <Button onClick={handleStartAnalysis} className="w-full h-16 bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-widest rounded-xl shadow-lg text-lg">
+                          <Button onClick={handleStartAnalysis} className="w-full h-18 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest rounded-none border-r-4 border-b-4 border-red-900 shadow-xl text-lg transition-all active:translate-y-1 active:border-b-0">
                             {t('funnel.cta')}
                           </Button>
                         </div>
@@ -292,42 +316,42 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
 
                     {/* Step 4: Technical Quote Report */}
                     {step === 4 && formData.quote && (
-                      <div className="space-y-8 text-left">
-                        <div className="text-center mb-8">
-                          <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                             <Cpu className="w-8 h-8 text-white" />
+                      <div className="space-y-10 text-left">
+                        <div className="text-center mb-10">
+                          <div className="w-20 h-20 bg-red-600/10 border border-red-600/20 rounded-none flex items-center justify-center mx-auto mb-6 shadow-xl">
+                             <Activity className="w-10 h-10 text-red-600" />
                           </div>
-                          <h2 className="text-3xl font-bold uppercase tracking-tight text-slate-900">{t('diagnosis.title')}</h2>
+                          <h2 className="text-4xl font-black uppercase tracking-tighter text-white italic">{t('diagnosis.title')}</h2>
                         </div>
                         
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                              <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">{t('diagnosis.problem')}</h3>
-                              <p className="text-sm font-bold text-slate-900">{formData.quote.partName}</p>
-                              <p className="text-[10px] text-slate-400 font-mono mt-1">REF: {formData.quote.partNumber}</p>
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white/5 p-6 rounded-none border border-white/10">
+                              <h3 className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-3">{t('diagnosis.problem')}</h3>
+                              <p className="text-md font-bold text-white uppercase tracking-tight">{formData.quote.partName}</p>
+                              <p className="text-[10px] text-slate-500 font-mono mt-2">REF: {formData.quote.partNumber}</p>
                             </div>
-                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                              <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">{t('diagnosis.complexity')}</h3>
-                              <p className="text-sm font-bold text-slate-900">{formData.quote.complexity} Level</p>
-                              <p className="text-[10px] text-slate-400 mt-1">Labor: {formData.quote.laborHours}h</p>
+                            <div className="bg-white/5 p-6 rounded-none border border-white/10">
+                              <h3 className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-3">{t('diagnosis.complexity')}</h3>
+                              <p className="text-md font-bold text-white uppercase tracking-tight">{formData.quote.complexity} DEPTH</p>
+                              <p className="text-[10px] text-slate-500 mt-2 font-mono">EST: {formData.quote.laborHours}h OPS</p>
                             </div>
                           </div>
 
-                          <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                             <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">{t('diagnosis.tools')}</h3>
-                             <div className="flex gap-3">
-                                <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm"><Wrench className="w-4 h-4 text-slate-900" /></div>
-                                <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm"><Box className="w-4 h-4 text-slate-900" /></div>
-                                <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm"><ShieldCheck className="w-4 h-4 text-slate-900" /></div>
+                          <div className="bg-white/5 p-6 rounded-none border border-white/10">
+                             <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">{t('diagnosis.tools')} REQUIRED</h3>
+                             <div className="flex gap-4">
+                                <div className="p-3 bg-white/5 border border-white/10 text-white"><Wrench className="w-5 h-5" /></div>
+                                <div className="p-3 bg-white/5 border border-white/10 text-white"><Box className="w-5 h-5" /></div>
+                                <div className="p-3 bg-red-600/20 border border-red-600/30 text-red-500"><ShieldCheck className="w-5 h-5" /></div>
                              </div>
                           </div>
                           
-                          <div className="bg-slate-900 p-8 rounded-xl text-center relative overflow-hidden mt-6">
-                            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 relative z-10">{t('diagnosis.price')}</h3>
-                            <p className="text-5xl font-bold text-white mb-6 relative z-10">€{formData.quote.price}</p>
-                            <Button onClick={() => setStep(5)} className="w-full h-14 bg-white text-slate-900 hover:bg-slate-100 font-bold uppercase tracking-widest rounded-lg transition-transform hover:scale-[1.02] active:scale-95 relative z-10">
+                          <div className="bg-[#0A0B0D] p-10 rounded-none border-2 border-red-600 border-dashed text-center relative overflow-hidden mt-8">
+                            <div className="absolute top-0 left-0 w-full h-full bg-red-600/5 animate-pulse" />
+                            <h3 className="text-[11px] font-black uppercase tracking-widest text-red-500 mb-2 relative z-10">{t('diagnosis.price')} (FIXED)</h3>
+                            <p className="text-6xl font-black text-white mb-8 relative z-10 font-mono">€{formData.quote.price}</p>
+                            <Button onClick={() => setStep(5)} className="w-full h-16 bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-widest rounded-none border-b-4 border-r-4 border-red-900 transition-all active:translate-y-1 active:border-b-0 relative z-10">
                               {t('diagnosis.book')}
                             </Button>
                           </div>
@@ -337,31 +361,31 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
 
                     {/* Step 5: Master Booking Form */}
                     {step === 5 && (
-                      <div className="space-y-8">
-                        <div className="text-center space-y-2">
-                           <h2 className="text-3xl font-bold uppercase tracking-tight text-slate-900">Secure Your Quote</h2>
-                           <p className="text-slate-500 font-medium italic">Lock-in your fixed price by providing contact details.</p>
+                      <div className="space-y-10">
+                        <div className="text-center space-y-3">
+                           <h2 className="text-4xl font-black uppercase tracking-tighter text-white italic">Protocol Clearance</h2>
+                           <p className="text-slate-500 font-medium italic">Finalize technical report for Central Walle Dispatch.</p>
                         </div>
-                        <form onSubmit={handleFormSubmit} className="space-y-5">
+                        <form onSubmit={handleFormSubmit} className="space-y-6">
                           {[
                             { id: 'name', label: t('form.name'), type: 'text' },
                             { id: 'phone', label: t('form.phone'), type: 'tel' },
                             { id: 'email', label: t('form.email'), type: 'email' },
                             { id: 'address', label: t('form.address'), type: 'text' }
                           ].map((field) => (
-                            <div key={field.id} className="space-y-1">
-                              <Label htmlFor={field.id} className="text-[10px] font-black uppercase tracking-widest opacity-50 ml-1">{field.label}</Label>
+                            <div key={field.id} className="space-y-2">
+                              <Label htmlFor={field.id} className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">{field.label}</Label>
                               <Input
                                 id={field.id}
                                 required
                                 value={(formData as any)[field.id]}
                                 onChange={(e) => setFormData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                                className="bg-slate-50 border-0 rounded-xl h-12 focus:ring-2 ring-slate-900/10 transition-all font-bold"
+                                className="bg-white/5 border-white/10 rounded-none h-14 focus:ring-2 ring-red-600/20 transition-all font-bold text-white"
                               />
                             </div>
                           ))}
-                          <Button type="submit" className="w-full bg-slate-900 text-white font-bold uppercase tracking-widest h-16 rounded-xl mt-6 shadow-xl text-lg hover:bg-slate-800">
-                             Confirm Booking & Fixed Quote
+                          <Button type="submit" className="w-full bg-red-600 text-white font-black uppercase tracking-widest h-18 rounded-none mt-8 shadow-xl text-lg hover:bg-red-700 border-b-4 border-r-4 border-red-900 transition-all active:translate-y-1 active:border-b-0">
+                             Confirm Protocol & Dispatch
                           </Button>
                         </form>
                       </div>

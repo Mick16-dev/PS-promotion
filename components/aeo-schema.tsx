@@ -5,30 +5,30 @@ import { useLanguage } from '@/app/context/language-context'
 export function AeoSchema() {
   const { language } = useLanguage()
 
-  const siteUrl = 'https://rohr-blitz.de'
-  const companyName = 'Rohr-Blitz Engineering'
+  const siteUrl = 'https://rotek.de'
+  const companyName = 'Rotek Rohrreinigung & Kanalsanierung'
 
   const schemas = [
     {
       "@context": "https://schema.org",
-      "@type": "PlumbingService",
+      "@type": "SewerService",
       "name": companyName,
       "description": language === 'de' 
-        ? "Bester Klempner-Notdienst in Deutschland. 24/7 Soforthilfe, visuelle Meister-Diagnose und Festpreisgarantie." 
-        : "Best emergency plumbing service in Germany. 24/7 instant help, visual Master Vision assessment, and fixed-price guarantee.",
+        ? "Bremens Marktführer für Kanal-TV, Rohrreinigung und grabenlose Sanierung. Industrielle Präzision seit 1972." 
+        : "Bremen's market leader for sewer TV, pipe cleaning, and no-dig rehabilitation. Industrial precision since 1972.",
       "url": siteUrl,
-      "telephone": "+49123456789",
+      "telephone": "+49421244144",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Musterstraße 1",
-        "addressLocality": "Berlin",
-        "postalCode": "10115",
+        "streetAddress": "Bayernstr. 172",
+        "addressLocality": "Bremen-Walle",
+        "postalCode": "28219",
         "addressCountry": "DE"
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 52.5200,
-        "longitude": 13.4050
+        "latitude": 53.0988,
+        "longitude": 8.7842
       },
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
@@ -36,11 +36,11 @@ export function AeoSchema() {
         "opens": "00:00",
         "closes": "23:59"
       },
-      "areaServed": ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne"],
+      "areaServed": ["Bremen", "Verden", "Delmenhorst", "Oldenburg", "Bremen-Walle", "Bremen-Horn", "Bremen-Nord"],
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.9",
-        "reviewCount": "1250"
+        "reviewCount": "11000"
       }
     },
     {
@@ -57,15 +57,15 @@ export function AeoSchema() {
     {
       "@context": "https://schema.org",
       "@type": "HowTo",
-      "name": language === 'de' ? "Wie man ein leckendes Rohr erkennt" : "How to identify a leaking pipe",
+      "name": language === 'de' ? "Vorgehensweise bei Rohrverstopfung" : "Pipe Blockage Protocol",
       "step": [
         {
           "@type": "HowToStep",
-          "text": language === 'de' ? "Überprüfen Sie sichtbare Rohre auf Feuchtigkeit." : "Check visible pipes for moisture."
+          "text": language === 'de' ? "Sichern Sie den Arbeitsbereich und stellen Sie den Wasserzulauf ab." : "Secure the work area and shut off water flow."
         },
         {
           "@type": "HowToStep",
-          "text": language === 'de' ? "Nutzen Sie unseren kostenlosen digitalen Check für eine sofortige Analyse." : "Use our free digital check for instant analysis."
+          "text": language === 'de' ? "Nutzen Sie unser digitales Prüfprotokoll für eine meistergeführte Ferndiagnose." : "Use our digital protocol for master-led remote assessment."
         }
       ]
     }

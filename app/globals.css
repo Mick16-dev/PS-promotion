@@ -4,67 +4,31 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Core Brand - Navy Blue (Deep & Rich) */
-  --primary: oklch(0.28 0.08 250);
-  --primary-foreground: oklch(0.98 0 0);
+  /* Rotek Industrial Core - Traffic Red (#D70014) */
+  --primary: oklch(0.52 0.23 25.5);
+  --primary-foreground: oklch(0.98 0.01 25.5);
   
-  /* CTA Orange (Vibrant but Premium) */
-  --secondary: oklch(0.72 0.22 45);
-  --secondary-foreground: oklch(0.98 0 0);
+  /* Rotek Secondary - Golden Yellow (#FFCC00) */
+  --secondary: oklch(0.85 0.20 85);
+  --secondary-foreground: oklch(0.10 0.01 85);
   
-  /* Emergency Red */
-  --destructive: oklch(0.55 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  
-  /* Success Green */
-  --success: oklch(0.65 0.20 150);
-  --success-foreground: oklch(0.98 0 0);
-  
-  /* Neutrals - Slate with a hint of Navy */
-  --background: oklch(0.99 0.005 250);
-  --foreground: oklch(0.15 0.03 250);
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.40 0.02 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.03 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.03 250);
-  --border: oklch(0.92 0.01 250);
-  --input: oklch(0.92 0.01 250);
-  --ring: oklch(0.28 0.08 250);
-  --accent: oklch(0.96 0.01 250);
-  --accent-foreground: oklch(0.15 0.03 250);
-  
-  --radius: 1.5rem;
-}
-
-.dark {
-  --primary: oklch(0.75 0.12 250);
-  --primary-foreground: oklch(0.10 0 0);
-  --secondary: oklch(0.72 0.22 45);
-  --secondary-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.62 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.65 0.20 150);
-  --success-foreground: oklch(0.10 0 0);
-  --background: oklch(0.12 0.02 250);
-  --foreground: oklch(0.98 0 0);
-  --muted: oklch(0.20 0.02 250);
-  --muted-foreground: oklch(0.70 0.02 250);
-  --card: oklch(0.15 0.03 250);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.15 0.03 250);
-  --popover-foreground: oklch(0.98 0 0);
+  /* Industrial Dark Palette - Rotek Base (#0A0B0D) */
+  --background: oklch(0.14 0.02 250);
+  --foreground: oklch(0.95 0.01 250);
+  --muted: oklch(0.18 0.02 250);
+  --muted-foreground: oklch(0.55 0.01 250);
+  --card: oklch(0.16 0.02 250);
+  --card-foreground: oklch(0.98 0.01 250);
   --border: oklch(0.25 0.02 250);
   --input: oklch(0.25 0.02 250);
-  --ring: oklch(0.75 0.12 250);
-  --accent: oklch(0.20 0.02 250);
-  --accent-foreground: oklch(0.98 0 0);
+  --ring: oklch(0.52 0.23 25.5);
+  
+  --radius: 0rem; /* Sharp industrial edges */
 }
 
 @theme inline {
-  --font-heading: var(--font-heading), 'Inter', system-ui, sans-serif;
-  --font-body: var(--font-body), 'Inter', system-ui, sans-serif;
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -84,70 +48,21 @@
 @layer base {
   html {
     font-size: 16px;
-    @apply scroll-smooth;
+    @apply scroll-smooth bg-[#0A0B0D];
   }
 
-  @media (min-width: 640px) {
-    html {
-      font-size: 18px;
-    }
-  }
-
-  @media (min-width: 1280px) {
-    html {
-      font-size: 20px;
-    }
-  }
-
-  * {
-    @apply border-border outline-ring/50;
-  }
-  
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased selection:bg-red-600 selection:text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight;
   }
 }
 
 @layer utilities {
-  .glass-header {
-    @apply backdrop-blur-md bg-background/80 border-b border-border/50 sticky top-0 z-50;
-  }
-  
-  .glass-card {
-    @apply backdrop-blur-sm bg-card/60 border border-white/20 dark:border-white/10 shadow-lg;
-  }
-  
-  .mesh-gradient {
-    background: 
-      radial-gradient(circle at 0% 0%, color-mix(in oklch, var(--primary) 15%, transparent) 0%, transparent 50%),
-      radial-gradient(circle at 100% 100%, color-mix(in oklch, var(--secondary) 10%, transparent) 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--success) 5%, transparent) 0%, transparent 40%);
-  }
-  
-  .grain-overlay::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.03;
-    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-    filter: contrast(120%) brightness(120%);
-  }
-
   .blueprint-grid {
     background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 }
 

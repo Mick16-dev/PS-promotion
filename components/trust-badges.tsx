@@ -1,42 +1,57 @@
 'use client'
 
+import {
+  Clock,
+  Shield,
+  ClipboardCheck,
+  Camera, 
+  Upload, 
+  Activity, 
+  CheckCircle, 
+  ArrowRight, 
+  MapPin, 
+  ShieldCheck, 
+  Wrench, 
+  Box, 
+  Cpu, 
+  HardHat 
+} from 'lucide-react'
 import { useLanguage } from '@/app/context/language-context'
-import { Clock, HardHat, Shield, ClipboardCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 const trustItems = [
   {
     icon: Clock,
-    keyEn: 'Average response time',
-    keyDe: 'Durchschn. Reaktionszeit',
-    stat: '15',
+    keyEn: 'Response Time',
+    keyDe: 'Notdienst-Anfahrt',
+    stat: '20',
     unit: 'min',
-    color: 'text-amber-500'
+    color: 'text-red-600'
   },
   {
     icon: HardHat,
-    keyEn: 'Elite Technicians',
-    keyDe: 'Elite-Techniker',
-    stat: '50+',
+    keyEn: 'Industry Staff',
+    keyDe: 'Fachpersonal (Fest)',
+    stat: '32',
     unit: '',
-    color: 'text-slate-900'
+    color: 'text-white'
   },
   {
     icon: Shield,
-    keyEn: 'Trust Guarantee',
-    keyDe: 'Vertrauensgarantie',
-    stat: '100%',
+    keyEn: 'Founding Year',
+    keyDe: 'Gegründet in',
+    stat: '1972',
     unit: '',
     color: 'text-red-600'
   },
   {
     icon: ClipboardCheck,
-    keyEn: 'Project Coverage',
-    keyDe: 'Projektabdeckung',
-    stat: '2M',
-    unit: '€',
-    color: 'text-slate-900'
+    keyEn: 'Specialized Trucks',
+    keyDe: 'Spezial-Fahrzeuge',
+    stat: '11',
+    unit: '',
+    color: 'text-white'
   }
 ]
 
@@ -62,7 +77,8 @@ export function TrustBadges() {
   } as any
 
   return (
-    <section className="py-20 px-4 bg-background relative overflow-hidden">
+    <section className="py-24 px-4 bg-[#0A0B0D] relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-white/5" />
       <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
           variants={container}
@@ -77,8 +93,8 @@ export function TrustBadges() {
               variants={item}
               className="group flex flex-col items-center text-center space-y-4"
             >
-              <div className="w-16 h-16 rounded-3xl bg-muted/50 flex items-center justify-center group-hover:bg-primary/5 transition-colors duration-500">
-                <trust.icon className={cn("w-8 h-8 transition-transform duration-500 group-hover:scale-110", trust.color)} />
+              <div className="w-16 h-16 rounded-none bg-white/5 flex items-center justify-center group-hover:bg-red-600/10 transition-colors duration-500 border border-white/10 group-hover:border-red-600/50">
+                <trust.icon className={cn("w-6 h-6 transition-transform duration-500 group-hover:scale-110", trust.color)} />
               </div>
               
               <div className="space-y-1">
@@ -87,7 +103,7 @@ export function TrustBadges() {
                     {trust.stat}
                   </span>
                   {trust.unit && (
-                    <span className="text-lg font-black text-secondary uppercase italic">
+                    <span className="text-xl font-black text-red-600 uppercase italic">
                       {trust.unit}
                     </span>
                   )}

@@ -1,53 +1,47 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, Outfit } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
+import { Inter } from 'next/font/google'
+import { Analytics } from '@vercel.analytics/next'
 import { LanguageProvider } from './context/language-context'
 import './globals.css'
 
-const bricolage = Bricolage_Grotesque({ 
+const inter = Inter({ 
   subsets: ["latin"], 
-  variable: '--font-heading',
-  display: 'swap',
-});
-
-const outfit = Outfit({ 
-  subsets: ["latin"], 
-  variable: '--font-body',
+  variable: '--font-sans',
   display: 'swap',
 });
 
 export const viewport: Viewport = {
-  themeColor: '#1E3A5F',
+  themeColor: '#D70014',
   width: 'device-width',
   initialScale: 1,
 }
 
 export const metadata: Metadata = {
   title: {
-    default: 'Rohr-Blitz | Master Expert Plumbing Diagnosis & Repair',
-    template: '%s | Rohr-Blitz'
+    default: 'Rotek | Industrielle Rohrreinigung & TV-Untersuchung seit 1972',
+    template: '%s | Rotek'
   },
-  description: 'Experience the future of home maintenance. Instant visual diagnosis, 24/7 premium emergency service, and transparent estimates in seconds with Rohr-Blitz Master Technicians.',
-  keywords: ['plumbing', 'master diagnosis', 'emergency plumber', 'Germany', 'home repair', 'Rohr-Blitz', 'leak detection', 'clogged drain repair', 'pipe burst service', 'Meisterbetrieb'],
-  authors: [{ name: 'Rohr-Blitz Engineering' }],
-  creator: 'Rohr-Blitz Engineering',
-  publisher: 'Rohr-Blitz',
+  description: 'Zertifizierter Fachbetrieb für Kanalreinigung, TV-Untersuchung und Rohrortung in Bremen & Verden. Industrieller Standard für private & gewerbliche Abwassersysteme.',
+  keywords: ['Kanalreinigung Bremen', 'TV-Untersuchung', 'Rohrreinigung', 'Rotek', 'Abwassertechnik', 'Verstopfung beseitigen', 'Bremen-Walle', 'Dichtheitsprüfung', 'Meisterbetrieb'],
+  authors: [{ name: 'Rotek Industrietechnik' }],
+  creator: 'Rotek Engineering',
+  publisher: 'Rotek',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   openGraph: {
-    title: 'Rohr-Blitz | Expert Master Plumbing',
-    description: 'Instant visual plumbing diagnosis and expert repair service. Available 24/7.',
-    url: 'https://rohr-blitz.de',
-    siteName: 'Rohr-Blitz',
+    title: 'Rotek | Expert Industrial Wastewater Engineering',
+    description: 'Instant technical pipe diagnosis and expert repair service. Available 24/7 in Bremen & Umzu.',
+    url: 'https://rotek.de',
+    siteName: 'Rotek',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630',
+        url: 'https://images.unsplash.com/photo-1541888941293-1e8fbf3d12c8?w=1200&h=630&q=80',
         width: 1200,
         height: 630,
-        alt: 'Rohr-Blitz Master Expert Engineering',
+        alt: 'Rotek Industrial Engineering',
       },
     ],
     locale: 'de_DE',
@@ -55,10 +49,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rohr-Blitz | Master Expert Plumbing',
-    description: 'Bespoke Plumbing Diagnosis & Expert Engineering. Instant estimates, 24/7 service.',
-    images: ['https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630'],
-    creator: '@rohrblitz',
+    title: 'Rotek | Industrial Wastewater Engineering',
+    description: 'Bespoke Technical Diagnosis & Expert Engineering. Since 1972.',
+    images: ['https://images.unsplash.com/photo-1541888941293-1e8fbf3d12c8?w=1200&h=630&q=80'],
+    creator: '@rotek_bremen',
   },
   icons: {
     icon: [
@@ -85,23 +79,23 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "PlumbingService",
-  "name": "Rohr-Blitz",
-  "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630",
-  "@id": "https://rohr-blitz.de",
-  "url": "https://rohr-blitz.de",
-  "telephone": "+49123456789",
+  "name": "Rotek GmbH & Co. KG",
+  "image": "https://images.unsplash.com/photo-1541888941293-1e8fbf3d12c8?w=1200&h=630&q=80",
+  "@id": "https://rotek.de",
+  "url": "https://rotek.de",
+  "telephone": "+49421391714",
   "priceRange": "$$",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Musterstraße 1",
-    "addressLocality": "Berlin",
-    "postalCode": "10115",
+    "streetAddress": "Bayernstr. 172",
+    "addressLocality": "Bremen",
+    "postalCode": "28219",
     "addressCountry": "DE"
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": 52.5200,
-    "longitude": 13.4050
+    "latitude": 53.0989,
+    "longitude": 8.7845
   },
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
@@ -112,32 +106,12 @@ const jsonLd = {
     "closes": "23:59"
   },
   "areaServed": [
-    { "@type": "City", "name": "Berlin" },
-    { "@type": "City", "name": "Munich" },
-    { "@type": "City", "name": "Hamburg" },
-    { "@type": "City", "name": "Frankfurt" },
-    { "@type": "City", "name": "Cologne" }
-  ],
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Plumbing Services",
-    "itemListElement": [
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Emergency Leak Repair"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Pipe Diagnostic Analysis"
-        }
-      }
-    ]
-  }
+    { "@type": "City", "name": "Bremen" },
+    { "@type": "City", "name": "Verden" },
+    { "@type": "District", "name": "Bremen-Walle" },
+    { "@type": "District", "name": "Bremen-Findorff" },
+    { "@type": "District", "name": "Bremen-Horn" }
+  ]
 }
 
 import { AeoSchema } from '@/components/aeo-schema'
@@ -148,9 +122,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="de" className={`${bricolage.variable} ${outfit.variable} scroll-smooth`}>
-      <head />
-      <body className="font-body antialiased selection:bg-secondary/30 selection:text-secondary-foreground overflow-x-hidden text-base sm:text-lg">
+    <html lang="de" className={`${inter.variable} scroll-smooth`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="font-sans antialiased selection:bg-red-600 selection:text-white overflow-x-hidden text-base sm:text-lg bg-[#0A0B0D]">
         <LanguageProvider>
           <AeoSchema />
           {children}

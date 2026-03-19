@@ -46,36 +46,36 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
 
   const text = {
     en: {
-      title: 'Expert Restoration',
-      subtitle: 'Connect with our master plumbing team for immediate assistance.',
-      customerTitle: 'Request a Master Quote',
-      customerDesc: 'Direct access to certified master technicians',
+      title: 'Technical Protocol',
+      subtitle: 'Synchronizing with Central Walle Dispatch for immediate mission clearance.',
+      customerTitle: 'Initiate Protocol',
+      customerDesc: 'Direct access to Rotek master engineering fleet',
       formName: 'Full Name',
       formEmail: 'Email Address',
       formPhone: 'Phone Number',
-      formProblem: 'Problem Type (e.g. Leaking, Clogged)',
-      formMessage: 'Additional Details',
-      submitCustomer: 'Send Request to Masters',
-      back: 'Back',
-      successTitle: 'Request Received',
-      successCustomer: 'Our master plumbing team has received your details and will contact you shortly.',
-      close: 'Close'
+      formProblem: 'Issue Class (e.g. SML DN100 Blockage)',
+      formMessage: 'Additional Technical Details',
+      submitCustomer: 'Transmit Protocol to Dispatch',
+      back: 'Abort',
+      successTitle: 'Protocol Transmitted',
+      successCustomer: 'Central Dispatch has received your mission parameters. Fleet Command is preparing technical units.',
+      close: 'Exit Console'
     },
     de: {
-      title: 'Meister-Service',
-      subtitle: 'Verbinden Sie sich mit unserem Experten-Team für sofortige Hilfe.',
-      customerTitle: 'Meister-Angebot anfordern',
-      customerDesc: 'Direkter Zugang zu zertifizierten Sanitärmeistern',
+      title: 'Technisches Protokoll',
+      subtitle: 'Synchronisierung mit Zentrale Walle für sofortige Einsatzfreigabe.',
+      customerTitle: 'Protokoll Initiieren',
+      customerDesc: 'Direkter Zugriff auf Rotek Meister-Flotte',
       formName: 'Vollständiger Name',
       formEmail: 'E-Mail-Adresse',
       formPhone: 'Telefonnummer',
-      formProblem: 'Art des Problems (z.B. Leck, Verstopfung)',
-      formMessage: 'Zusätzliche Details',
-      submitCustomer: 'Anfrage an Meister senden',
-      back: 'Zurück',
-      successTitle: 'Anfrage erhalten',
-      successCustomer: 'Unser Team hat Ihre Daten erhalten und wird Sie in Kürze kontaktieren.',
-      close: 'Schließen'
+      formProblem: 'Störungsklasse (z.B. SML DN100 Verstopfung)',
+      formMessage: 'Zusätzliche technische Details',
+      submitCustomer: 'Protokoll an Zentrale senden',
+      back: 'Abbrechen',
+      successTitle: 'Protokoll Übermittelt',
+      successCustomer: 'Die Zentrale hat Ihre Einsatzparameter erhalten. Die Einsatzleitung bereitet die Einheiten vor.',
+      close: 'Konsole verlassen'
     }
   }
 
@@ -84,153 +84,137 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Elite Backdrop */}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
+          {/* Industrial Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-primary/95 backdrop-blur-2xl"
+            className="absolute inset-0 bg-[#0A0B0D]/98 backdrop-blur-sm"
             onClick={handleClose}
           />
 
-          {/* Modal Container */}
+          {/* Modal Container - Blueprint Style */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-2xl bg-white rounded-[4rem] shadow-[0_64px_128px_-32px_rgba(0,0,0,0.5)] overflow-hidden border border-white/20"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="relative w-full max-w-2xl bg-[#0A0B0D] rounded-none shadow-3xl overflow-hidden border border-white/10"
           >
-            {/* Liquid Background Accents */}
-            <div className="absolute -top-32 -right-32 w-64 h-64 bg-secondary/10 rounded-full blur-[100px]" />
-            <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
+            {/* Technical Overlays */}
+            <div className="absolute inset-0 blueprint-grid opacity-10 pointer-events-none" />
+            <div className="absolute top-0 left-0 w-32 h-32 bg-red-600/5 -translate-x-1/2 -translate-y-1/2 rotate-45" />
 
-            {/* Close button */}
+            {/* Close button - Scanner Style */}
             <button
               onClick={handleClose}
-              className="absolute top-8 right-8 w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-white transition-all z-20 group"
+              className="absolute top-8 right-8 w-14 h-14 rounded-none bg-white/5 flex items-center justify-center text-slate-500 hover:bg-red-600 hover:text-white transition-all z-20 group border border-white/10"
             >
               <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
             </button>
 
             <AnimatePresence mode="wait">
-              {/* Universal Form Container */}
               {step === 'customer' && (
                 <motion.div
                   key="form"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="p-12 lg:p-20 relative z-10"
+                  exit={{ opacity: 0, y: -10 }}
+                  className="p-10 lg:p-20 relative z-10"
                 >
-                  <div className="text-center mb-12">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary text-[10px] font-black rounded-xl uppercase tracking-[0.3em] mb-6">
+                  <div className="text-left mb-16 border-l-4 border-red-600 pl-8">
+                    <span className="inline-flex items-center gap-3 px-0 py-2 text-red-600 text-[10px] font-black uppercase tracking-[0.4em] mb-4">
                       <ShieldCheck className="w-4 h-4" />
-                      Secure Priority Intake
+                      PRIORITY ALPHA PROTOCOL
                     </span>
-                    <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-4 tracking-tighter italic uppercase leading-none">{t.customerTitle}</h2>
-                    <p className="text-muted-foreground font-medium italic">{t.subtitle}</p>
+                    <h2 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tighter italic uppercase leading-none">{t.customerTitle}</h2>
+                    <p className="text-slate-400 font-medium italic text-lg">{t.subtitle}</p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">{t.formName}</Label>
-                      <Input
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="h-14 rounded-2xl border-2 border-muted bg-muted/30 focus:border-secondary focus:ring-0 transition-all font-bold"
-                        placeholder="John Doe"
-                      />
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">{t.formName}</Label>
+                        <Input
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                          className="h-16 rounded-none border-white/10 bg-white/[0.03] text-white focus:border-red-600 focus:ring-0 transition-all font-black uppercase italic tracking-tight"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">{t.formEmail}</Label>
+                        <Input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          className="h-16 rounded-none border-white/10 bg-white/[0.03] text-white focus:border-red-600 focus:ring-0 transition-all font-black uppercase italic tracking-tight"
+                        />
+                      </div>
                     </div>
+                    
                     <div className="space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">{t.formEmail}</Label>
-                      <Input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        className="h-14 rounded-2xl border-2 border-muted bg-muted/30 focus:border-secondary focus:ring-0 transition-all font-bold"
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    <div className="sm:col-span-2 space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">{t.formProblem}</Label>
+                      <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">{t.formProblem}</Label>
                       <Input
                         required
                         value={formData.problemType}
                         onChange={(e) => setFormData(prev => ({ ...prev, problemType: e.target.value }))}
-                        className="h-14 rounded-2xl border-2 border-muted bg-muted/30 focus:border-secondary focus:ring-0 transition-all font-bold"
-                        placeholder="e.g. Burst pipe in kitchen"
-                      />
-                    </div>
-                    <div className="sm:col-span-2 space-y-3">
-                      <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">{t.formMessage}</Label>
-                      <textarea
-                        rows={3}
-                        value={formData.message}
-                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                        className="w-full rounded-[1.5rem] border-2 border-muted bg-muted/30 p-4 focus:border-secondary focus:outline-none transition-all font-bold resize-none"
-                        placeholder="Any other details..."
+                        className="h-16 rounded-none border-white/10 bg-white/[0.03] text-white focus:border-red-600 focus:ring-0 transition-all font-black uppercase italic tracking-tight"
                       />
                     </div>
 
-                    <div className="sm:col-span-2 pt-4">
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full h-16 rounded-2xl bg-secondary text-white hover:bg-secondary/90 font-black uppercase tracking-[0.2em] shadow-2xl shadow-secondary/20 transition-all active:scale-95 group relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                        {isSubmitting ? (
-                          <div className="flex items-center gap-3">
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                            Sending...
-                          </div>
-                        ) : (
-                          <span className="relative z-10 flex items-center justify-center gap-3 italic text-lg">
-                            {t.submitCustomer}
-                            <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                          </span>
-                        )}
-                      </Button>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">{t.formMessage}</Label>
+                      <textarea
+                        rows={4}
+                        value={formData.message}
+                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                        className="w-full rounded-none border border-white/10 bg-white/[0.03] p-6 text-white focus:border-red-600 focus:outline-none transition-all font-medium italic resize-none"
+                      />
                     </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full h-24 rounded-none bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-[0.3em] shadow-3xl transition-all active:translate-y-1 active:border-b-0 border-b-8 border-r-8 border-red-900 group relative overflow-hidden"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-4">
+                          <Loader2 className="w-8 h-8 animate-spin" />
+                          TRANSMITTING...
+                        </div>
+                      ) : (
+                        <span className="relative z-10 flex items-center justify-center gap-6 italic text-xl">
+                          {t.submitCustomer}
+                          <ArrowRight className="w-8 h-8 group-hover:translate-x-2' transition-transform" />
+                        </span>
+                      )}
+                    </Button>
                   </form>
                 </motion.div>
               )}
 
-              {/* Success */}
               {step === 'success' && (
                 <motion.div
                   key="success"
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-12 lg:p-24 text-center relative z-10"
                 >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", damping: 12, stiffness: 200 }}
-                    className="w-24 h-24 mx-auto mb-10 bg-success rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-success/30 rotate-12"
-                  >
-                    <CheckCircle className="w-12 h-12 text-white" />
-                  </motion.div>
-                  <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-6 italic uppercase tracking-tighter leading-none">{t.successTitle}</h2>
-                  <p className="text-xl font-medium text-muted-foreground mb-12 italic leading-relaxed max-w-md mx-auto">
+                  <div className="w-32 h-32 mx-auto mb-12 bg-red-600/10 border-2 border-red-600 rounded-none flex items-center justify-center shadow-3xl shadow-red-900/40">
+                    <CheckCircle className="w-16 h-16 text-red-600" />
+                  </div>
+                  <h2 className="text-5xl sm:text-7xl font-black text-white mb-8 italic uppercase tracking-tighter leading-none">{t.successTitle}</h2>
+                  <p className="text-2xl font-medium text-slate-400 mb-16 italic leading-relaxed max-w-md mx-auto">
                     {t.successCustomer}
                   </p>
                   <Button
                     onClick={handleClose}
-                    className="bg-primary text-white hover:bg-primary/90 font-black uppercase tracking-[0.2em] h-16 px-12 rounded-2xl shadow-2xl active:scale-95"
+                    className="bg-white text-black hover:bg-white/90 font-black uppercase tracking-[0.1em] h-20 px-16 rounded-none shadow-3xl active:scale-95 text-lg italic"
                   >
                     {t.close}
                   </Button>
-
-                  {/* Decorative icon (Abstract) */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-full h-full opacity-20">
-                    <ShieldCheck className="absolute top-10 left-10 w-8 h-8 text-secondary animate-pulse" />
-                    <CheckCircle className="absolute bottom-10 right-10 w-12 h-12 text-primary animate-bounce" />
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

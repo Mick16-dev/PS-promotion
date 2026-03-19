@@ -1,35 +1,25 @@
-# v0-plumbing-landing-page
+# Rotek Industrial Engineering - Digital Hub
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Rotek Industrial's regional digital platform for high-precision pipe rehabilitation and environmental technology. Established 1972.
 
-## Built with v0
+## Technology Stack
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Kernel**: Next.js 14 (App Router)
+- **Fluid UI**: Framer Motion for industrial-grade cinematic transitions.
+- **Surface Engine**: Tailwind CSS with custom Rotek Industrial tokens.
+- **Data Layer**: Internationalization Protocol (i18n) for regional EN/DE deployment.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_hUuHJAgIrg1AZfLpjJ3MbyQGZnl5)
+## Deployment Protocols
 
-## Getting Started
-
-First, run the development server:
-
+### Technical Environment
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+npm install # Protocol Init
+npm run dev # Dynamic Execution
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Protocol Validation
+- Production-grade deployment in Bremen/Verden clusters.
+- Optimized for Answer Engine Optimization (AEO) and master technician authority.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
-
-<a href="https://v0.app/chat/api/kiro/clone/Mick16-dev/v0-plumbing-landing-page" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+---
+© 1972-2026 Rotek Rohrreinigung & Kanalsanierung. All rights reserved.

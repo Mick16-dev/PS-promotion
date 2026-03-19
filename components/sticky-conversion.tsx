@@ -12,11 +12,7 @@ export function StickyConversion({ onCtaClick }: { onCtaClick: () => void }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 800) {
-        setIsVisible(true)
-      } else {
-        setIsVisible(false)
-      }
+      setIsVisible(window.scrollY > 800)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -29,19 +25,19 @@ export function StickyConversion({ onCtaClick }: { onCtaClick: () => void }) {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-lg"
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-sm px-4"
         >
-          <div className="bg-slate-900 border border-white/20 backdrop-blur-2xl p-4 rounded-[2rem] shadow-2xl flex items-center justify-between gap-4">
-            <div className="hidden sm:flex flex-col items-start pl-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 leading-none mb-1">Response Time</p>
-              <p className="text-sm font-black text-white uppercase tracking-tighter">~15 Minutes</p>
+          <div className="bg-[#0A0B0D]/95 border border-white/10 backdrop-blur-xl p-2 rounded-none shadow-3xl flex items-center justify-between gap-2 border-b-4 border-red-600">
+            <div className="flex flex-col items-start pl-4">
+              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-red-600 leading-none mb-1">Status</p>
+              <p className="text-[10px] font-black text-white uppercase tracking-tighter italic whitespace-nowrap">20 MIN ANFAHRT</p>
             </div>
             
             <Button
               onClick={onCtaClick}
-              className="flex-1 h-14 bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95 text-xs"
+              className="flex-1 h-12 bg-red-600 text-white hover:bg-red-700 font-black uppercase tracking-widest rounded-none shadow-xl transition-all active:scale-95 text-[10px] border-r-2 border-b-2 border-red-900"
             >
-              {language === 'de' ? 'Sofort-Angebot' : 'Instant Quote Engine'}
+              {language === 'de' ? 'Digitaler Meister-Check' : 'Master Visual Service'}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </div>

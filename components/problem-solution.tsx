@@ -2,31 +2,31 @@
 
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
-import { AlertTriangle, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Activity, Camera, ShieldAlert, CheckCircle2, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 const problems = [
   {
-    icon: AlertTriangle,
-    problemEn: 'Unexpected Water Damage',
-    problemDe: 'Unerwarteter Wasserschaden',
-    solutionEn: '24/7 Rapid Response & Leak Mitigation',
-    solutionDe: '24/7 Soforthilfe & Schadensbegrenzung'
+    icon: Activity,
+    problemEn: 'Sewer Line Obstruction',
+    problemDe: 'Siel-Verstopfung (SML/KG)',
+    solutionEn: 'High-Pressure Hydro-Jetting (HD-Spülung)',
+    solutionDe: 'Hochdruck-Spülung & TV-Nachweis'
   },
   {
-    icon: AlertTriangle,
-    problemEn: 'Slow or Blocked Drains',
-    problemDe: 'Langsame oder verstopfte Abflüsse',
-    solutionEn: 'Professional Hydro-Jetting Clearance',
-    solutionDe: 'Professionelle Rohrreinigung mit Hochdruck'
+    icon: Camera,
+    problemEn: 'Undocumented Pipe Network',
+    problemDe: 'Unklarer Rohrverlauf (Plan fehlt)',
+    solutionEn: 'Digital 3D Pipe Mapping & Analysis',
+    solutionDe: '3D-Rohrortung & Digital-Protokoll'
   },
   {
-    icon: AlertTriangle,
-    problemEn: 'Cold Water / No Pressure',
-    problemDe: 'Kaltes Wasser / Kein Druck',
-    solutionEn: 'Instant Tankless & Boiler Diagnosis',
-    solutionDe: 'Sofortige Thermen- & Kesseldiagnose'
+    icon: ShieldAlert,
+    problemEn: 'Grease Trap Overflow',
+    problemDe: 'Fettabscheider-Überlauf',
+    solutionEn: 'Industrial Extraction & Maintenance',
+    solutionDe: 'Fachgerechte Absaugung & Wartung'
   }
 ]
 
@@ -34,55 +34,60 @@ export function ProblemSolution({ onCtaClick }: { onCtaClick: () => void }) {
   const { language } = useLanguage()
 
   return (
-    <section className="py-14 sm:py-16 px-4 bg-slate-50 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+    <section className="py-24 px-4 bg-[#0A0B0D] relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-white/5" />
       
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-slate-900 mb-2">
-            {language === 'de' ? 'Häufige Sanitär-Notfälle' : 'Common Plumbing Disruptions'}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white mb-4 italic">
+            {language === 'de' ? 'Technische Störungsbehebung' : 'Technical Disruption Recovery'}
           </h2>
-          <p className="text-slate-500 font-medium text-sm">
-            {language === 'de' ? 'Wir lösen sie mit technischer Präzision' : 'We resolve them with technical precision'}
+          <p className="text-slate-500 font-medium text-lg italic max-w-2xl mx-auto leading-relaxed">
+            {language === 'de' 
+              ? 'Wir lösen komplexe Abwassersystem-Probleme mit zertifizierter industrieller Präzision.' 
+              : 'We resolve complex wastewater system issues with certified industrial precision.'}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 gap-8">
           {problems.map((p, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="group p-6 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all hover:shadow-md"
+              className="group p-8 bg-white/[0.02] rounded-none border border-white/10 hover:border-red-600/50 transition-all duration-500 hover:bg-white/[0.04] relative"
             >
-              <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center mb-4">
-                <p.icon className="w-4 h-4 text-red-500" />
+              <div className="absolute top-0 left-0 w-1 h-0 bg-red-600 group-hover:h-full transition-all duration-500" />
+              
+              <div className="w-12 h-12 rounded-none bg-red-600/10 flex items-center justify-center mb-8 border border-red-600/20 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                <p.icon className="w-6 h-6 text-red-600 group-hover:text-white transition-colors" />
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Problem</p>
-                  <p className="text-base font-bold text-slate-900">{language === 'de' ? p.problemDe : p.problemEn}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-600 mb-2">Technical Defect</p>
+                  <p className="text-xl font-black text-white uppercase italic tracking-tight leading-tight">{language === 'de' ? p.problemDe : p.problemEn}</p>
                 </div>
                 
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 mb-1">Solution</p>
-                  <div className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                    <p className="text-sm text-slate-600 leading-snug">{language === 'de' ? p.solutionDe : p.solutionEn}</p>
+                <div className="pt-6 border-t border-white/5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-3">Rotek Protocol</p>
+                  <div className="flex gap-3 items-start">
+                    <CheckCircle2 className="w-4 h-4 text-white shrink-0 mt-0.5" />
+                    <p className="text-sm text-slate-400 font-medium leading-relaxed italic">{language === 'de' ? p.solutionDe : p.solutionEn}</p>
                   </div>
                 </div>
 
-                <Button 
-                  onClick={onCtaClick} 
-                  variant="outline" 
-                  className="w-full h-9 text-xs font-bold uppercase tracking-wider border-slate-200 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all rounded-lg"
-                >
-                  {language === 'de' ? 'Jetzt beheben' : 'Get Help Now'}
-                  <ArrowRight className="w-3 h-3 ml-1" />
-                </Button>
+                <div className="pt-4">
+                  <Button 
+                    onClick={onCtaClick} 
+                    className="w-full h-12 text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 border border-white/10 hover:border-red-600 group-hover:bg-red-600 group-hover:text-white rounded-none transition-all duration-300"
+                  >
+                    {language === 'de' ? 'Analyse anfordern' : 'Request Analysis'}
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ))}
