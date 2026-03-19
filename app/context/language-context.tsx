@@ -162,8 +162,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.accreditations': 'ACCREDITATIONS',
     'footer.certifiedMeister': 'MASTER CERTIFIED',
     'footer.emergency': '24/7 EMERGENCY',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.'
-  },
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
 
     // Services
     'services.kanal-tv.title': '3D Sewer TV Inspection',
@@ -319,8 +318,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.accreditations': 'ZERTIFIZIERUNGEN',
     'footer.certifiedMeister': 'ZERTIFIZIERTER MEISTER',
     'footer.emergency': '24/7 NOTDIENST',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.'
-  }
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
 
     // Services
     'services.kanal-tv.title': '3D Kanal-TV-Untersuchung',
