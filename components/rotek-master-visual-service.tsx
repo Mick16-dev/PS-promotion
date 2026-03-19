@@ -21,7 +21,7 @@ const SCAN_LINES_DE: Record<Extract<ScanState, { kind: 'scanning' }>['step'], st
   3: 'Technisches Protokoll wird erstellt…',
 }
 
-export function RotekMasterVisualService({ onCtaClick }: { onCtaClick: () => void }) {
+export function RotekMasterVisualService({ onCtaClick }: { onCtaClick?: () => void }) {
   const [state, setState] = useState<ScanState>({ kind: 'idle' })
   const [tick, setTick] = useState(0)
 
@@ -63,14 +63,16 @@ export function RotekMasterVisualService({ onCtaClick }: { onCtaClick: () => voi
               Präzisions-Eingang für den Industrieeinsatz: Visuelle Erfassung, technische Validierung durch die Zentrale Walle und sofortige Protokoll-Erstellung.
             </p>
             
-            <div className="space-y-4">
-              <Button 
-                onClick={onCtaClick}
-                className="h-16 px-8 rounded-none bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest border-b-4 border-red-900 shadow-2xl transition-all active:translate-y-1 active:border-b-0"
-              >
-                Analyse anfordern
-              </Button>
-            </div>
+            {onCtaClick && (
+              <div className="space-y-4">
+                <Button 
+                  onClick={onCtaClick}
+                  className="h-16 px-8 rounded-none bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest border-b-4 border-red-900 shadow-2xl transition-all active:translate-y-1 active:border-b-0"
+                >
+                  Analyse anfordern
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="rounded-none border border-white/10 bg-white/[0.02] backdrop-blur-3xl overflow-hidden relative group">

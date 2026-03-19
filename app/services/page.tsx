@@ -53,7 +53,7 @@ export default function ServicesPage() {
 
       <section className="py-16 px-4 border-t border-border/50">
         <div className="max-w-6xl mx-auto grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-2xl border border-border/60 bg-card/50 backdrop-blur-[6px] p-6 sm:p-8">
+          <div className="lg:col-span-2 rounded-none border border-border/60 bg-card/50 backdrop-blur-[6px] p-6 sm:p-8">
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mb-2">
               {language === 'de' ? 'Betriebsdaten' : 'Company facts'}
             </h2>
@@ -63,12 +63,12 @@ export default function ServicesPage() {
                 : 'Since 1972. 32 staff. 11 specialist vehicles. Offices in Bremen-Walle and Verden.'}
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
+              <div className="rounded-none border border-border/50 bg-muted/20 p-4">
                 <div className="text-[11px] font-semibold tracking-[0.14em] uppercase text-muted-foreground">Büro Bremen</div>
                 <div className="mt-1 text-sm font-semibold text-foreground">Bayernstr. 172 · 28219 Bremen-Walle</div>
                 <div className="mt-1 text-sm text-muted-foreground">Tel. 0421 39 17 14</div>
               </div>
-              <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
+              <div className="rounded-none border border-border/50 bg-muted/20 p-4">
                 <div className="text-[11px] font-semibold tracking-[0.14em] uppercase text-muted-foreground">Büro Verden</div>
                 <div className="mt-1 text-sm font-semibold text-foreground">Conrad-Wode-Straße 1 · 27283 Verden</div>
                 <div className="mt-1 text-sm text-muted-foreground">Tel. 04231 98 2435</div>
@@ -76,7 +76,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/60 bg-card/50 backdrop-blur-[6px] p-6 sm:p-8">
+          <div className="rounded-none border border-border/60 bg-card/50 backdrop-blur-[6px] p-6 sm:p-8">
             <h2 className="text-xl font-extrabold tracking-tight text-foreground mb-2">
               {language === 'de' ? 'Einsatzgebiete' : 'Areas served'}
             </h2>
@@ -89,7 +89,7 @@ export default function ServicesPage() {
               {['Walle', 'Findorff', 'Horn', 'Neustadt', 'Verden', 'Umzu.'].map((d) => (
                 <span
                   key={d}
-                  className="inline-flex items-center rounded-full border border-border/60 bg-muted/20 px-3 py-1 text-xs font-semibold text-foreground/90"
+                  className="inline-flex items-center rounded-none border border-border/60 bg-muted/20 px-3 py-1 text-xs font-semibold text-foreground/90"
                 >
                   {d}
                 </span>

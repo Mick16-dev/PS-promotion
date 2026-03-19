@@ -74,10 +74,10 @@ export function Header({ onEmergencyClick }: HeaderProps) {
                         {services.map((service) => (
                           <Link
                             key={service.id}
-                            href={`/services/${service.id}`}
+                            href={`/services/${service.slug}`}
                             className="block px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-white/5 hover:text-white transition-all border-l-2 border-transparent hover:border-red-600"
                           >
-                            {t(service.titleKey)}
+                            {language === 'de' ? service.titleDe : service.titleEn}
                           </Link>
                         ))}
                         <div className="border-t border-white/10 mt-2 pt-2">
