@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
 type Language = 'en' | 'de'
 
@@ -12,91 +12,30 @@ interface LanguageContextType {
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    // Header
-    'header.emergency': 'Emergency 24/7',
-    'header.logo': 'Rotek',
-    'nav.overview': 'Overview',
+    // Navigation
     'nav.services': 'Services',
+    'nav.testimonials': 'Cases',
     'nav.pricing': 'Pricing',
-    'nav.about': 'About',
-    'nav.reviews': 'Reviews',
-    'nav.howItWorks': 'How It Works',
-    'nav.questions': 'Questions',
-    'nav.team': 'Team',
-    'nav.contact': 'Contact',
+    'nav.faq': 'FAQ',
+    'nav.emergency': 'Emergency Protocol',
+    'nav.about': 'About Us',
 
-    // Hero
-    'hero.badge': 'Industrial Maintenance Since 1972',
-    'hero.title': 'High-End Sewer & Pipe Diagnostics',
-    'hero.subtitle': 'Bremen\'s technical leader for sewer TV inspection, cleaning, and grabenlose rehabilitation. 32 specialists, 11 high-tech trucks, 100% human engineered.',
-
-    // Rotek Master Visual Service (Replacement for Funnel)
-    'funnel.step1.title': 'Master Visual Terminal',
-    'funnel.step1.desc': 'Submit a photo or video of your disruption. Our masters at Central Walle will perform a remote diagnosis and create a technical protocol – free of charge.',
-    'funnel.step1.formats': 'Industrial standards ISYBAU/ATV applied.',
-    'funnel.step2.title': 'Technical Validation',
-    'funnel.step3.title': 'Bremen Land Registry Check',
-    'funnel.step3.desc': 'Coordinating with local municipal data for precise routing.',
-    'funnel.step4.title': 'Technical Protocol',
-    'funnel.cta': 'Initiate Master Review',
-    'funnel.success.title': 'Protocol Transmitted',
-    'funnel.success.desc': 'Technical assessment completed. Transmitted to Central Walle. Fleet Commander Andreas is preparing Truck 4.',
-    'funnel.success.eta': 'Standard Response Window',
-
-    // Issue Categories
-    'issue.leaking': 'Leaking Pipe',
-    'issue.clogged': 'Clogged Drain',
-    'issue.broken': 'Broken Fixture',
-    'issue.installation': 'New Installation',
-
-    // Severity
-    'severity.1': 'Minor',
-    'severity.2': 'Moderate',
-    'severity.3': 'Significant',
-    'severity.4': 'Severe',
-    'severity.5': 'Emergency',
-
-    // Form
-    'form.name': 'Full Name',
-    'form.phone': 'Phone Number',
-    'form.email': 'Email Address',
-    'form.address': 'Address',
-
-    // Precision Report & Workflow
-    'diagnosis.title': 'Precision Quote Analysis',
-    'diagnosis.problem': 'Identified Hardware/Issue',
-    'diagnosis.action': 'Projected Solution',
-    'diagnosis.tools': 'Parts/Inventory Required',
-    'diagnosis.price': 'Fixed-Price Guarantee',
-    'diagnosis.book': 'Lock-in Quote & Book',
-    'diagnosis.complexity': 'Complexity Rating',
-    'diagnosis.labor': 'Estimated Labor Depth',
-    
-    'diagnosis.leaking.problem': 'Burst or Leaking Pipe',
-    'diagnosis.leaking.action': 'Shut off main water valve immediately. Place a bucket underneath.',
-    'diagnosis.leaking.tools': 'Pipe wrench, replacement piping, sealant.',
-    'diagnosis.clogged.problem': 'Severe Blockage / Clog',
-    'diagnosis.clogged.action': 'Stop running water. Do not use chemical drain cleaners.',
-    'diagnosis.clogged.tools': 'Motorized plumbing snake, hydro-jetting equipment.',
-    'diagnosis.broken.problem': 'Damaged Fixture',
-    'diagnosis.broken.action': 'Shut off local water valve under the affected fixture.',
-    'diagnosis.broken.tools': 'Adjustable wrench, replacement fixture hardware.',
-    'diagnosis.installation.problem': 'New Component Installation',
-    'diagnosis.installation.action': 'Please clear the surrounding area for secure access.',
-    'diagnosis.installation.tools': 'Measuring tape, level, associated fittings.',
-
-    // Gallery
-    'gallery.title': 'Before & After Transformations',
-    'gallery.subtitle': 'See the quality of our master plumbing work',
-    'gallery.cta': 'Start Your Diagnosis',
-    'gallery.badge': 'Visual Excellence',
-
-    // Testimonials
-    'testimonials.title': 'What Our Customers Say',
-    'testimonials.verified': 'Verified Customer',
+    // Hero Section
+    'hero.badge': 'Industrial Precision Since 1972',
+    'hero.title': 'MASTER VISUAL SERVICE',
+    'hero.subtitle': 'Bespoke Technical Diagnosis & Expert Engineering. Submit your disruption for immediate master-led verification at Central Walle.',
+    'hero.cta': 'Initiate Master Visual Review',
+    'hero.emergency': 'Emergency Protocol',
+    'hero.diagnose': 'Analyze Disruption',
+    'hero.calculate': 'Initiate Master Visual Review',
+    'hero.diagnosisInProgress': 'Master Protocol Verification',
+    'hero.diagnosing': 'Synchronizing with Central Walle Dispatch...',
+    'hero.encrypted': 'AES-256 Encrypted',
+    'hero.gdpr': 'GDPR Data Compliance',
+    'hero.masterEstimate': 'Master Technical Estimate',
 
     // Trust
-    'trust.title': 'Trusted by Thousands',
+    'trust.title': 'Industrial Excellence',
     'trust.response': '30 min average response',
     'trust.certified': 'Certified Technicians',
     'trust.guarantee': 'Satisfaction Guarantee',
@@ -169,184 +108,99 @@ const translations: Record<Language, Record<string, string>> = {
     'pricing.cta': 'Choose Plan',
     'pricing.popular': 'Industrial Standard',
     'pricing.month': 'month',
+    'pricing.badge': 'Service Plans',
+
+    // Funnel / Contact
+    'funnel.step1.title': 'Initiate Master Visual Review',
+    'funnel.step1.desc': 'Submit a photo or video of your disruption. Our masters at Central Walle will perform a remote diagnosis and create a technical protocol.',
+    'funnel.step2.title': 'Technical Details',
+    'funnel.step2.desc': 'Specify the technical scope of the disruption.',
+    'funnel.step3.title': 'Contact Info',
+    'funnel.step3.desc': 'Where should we deploy our master protocol?',
+    'funnel.next': 'Next Phase',
+    'funnel.back': 'Previous Phase',
+    'funnel.submit': 'Transmit Protocol to Dispatch',
+    'funnel.success.title': 'Protocol Transmitted',
+    'funnel.success.desc': 'Technical assessment complete. Transmitted to Central Walle. Operations Manager Andreas is preparing Vehicle 4.',
+    'funnel.success.eta': 'Standard Deployment Window',
+
+    // Issues
+    'issue.leaking': 'Pipe Leak / Burst',
+    'issue.clogged': 'Clogged Drain',
+    'issue.broken': 'Broken Fixture',
+    'issue.installation': 'New Installation',
 
     // FAQ
     'faq.title': 'Frequently Asked Questions',
     'faq.badge': 'Clear Answers',
     'faq.stillHaveQuestions': 'Still have questions? Chat with our support expert.',
-    'faq.cantFind': 'Cant find what you need?',
-    'faq.supportTeam': 'Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.',
-    'faq.requestSupport': 'Request VIP Support',
-
-    // Testimonials Additional
-    'testimonials.verifiedTitle': 'Verified Elite Reviews',
-    'testimonials.globalScore': 'Global Satisfaction Score',
-    'testimonials.casesResolved': 'Verified Cases Resolved',
-    'testimonials.verifiedIntervention': 'Verified Professional Intervention',
-    'testimonials.videoTitle': 'Case #892: Professional Restoration',
-    'testimonials.videoLoading': 'Technical Testimonial Loading...',
-
-    // Hero Additional
-    'hero.verifiedExperts': 'Verified Experts',
-    'hero.response': '15m Response',
-    'hero.calculate': 'Initiate Master Visual Review',
-    'hero.diagnosisInProgress': 'Master Protocol Verification',
-    'hero.diagnosing': 'Synchronizing with Central Walle Dispatch...',
-    'hero.encrypted': 'Encrypted',
-    'hero.gdpr': 'GDPR Ready',
-    'hero.masterEstimate': 'Master Estimate',
-
-    // Pricing
-    'pricing.badge': 'Pricing & Protection Plans',
-
-    // Footer
-    'footer.cta': 'Get Started Now',
-    'footer.contact': 'Contact Us',
-    'footer.legal': 'Legal',
-    'footer.privacy': 'Privacy Policy',
-    'footer.terms': 'Terms of Service',
-    'footer.imprint': 'Imprint',
-    'footer.readyFor': 'Ready for a ',
-    'footer.goldStandard': 'Gold Standard',
-    'footer.fix': ' Fix?',
-    'footer.experience': 'Experience the future of plumbing with expert master diagnostics and 24/7 elite response.',
-    'footer.premiumPlumbing': 'Premium Plumbing',
-    'footer.redefining': 'Redefining residential restoration through expert diagnostic tools and elite craftsmanship. Available 24/7 across Bremen and Verden.',
-    'footer.accreditations': 'Accreditations',
-    'footer.certifiedMeister': 'Certified Meister',
-    'footer.emergency': '24/7 Emergency',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
 
     // Team Page
-    'team.title': 'The Masters of Rotek',
-    'team.subtitle': 'Our precision-driven technicians are the heartbeat of our operation. Certified, disciplined, and ready to resolve any pipe disruption.',
+    'team.title': 'The Rotek Team',
+    'team.subtitle': 'Our technicians are experts for complex pipeline networks. Certified, disciplined, and experienced.',
     'team.story.title': 'The Rotek Story',
-    'team.story.tagline': 'Industrial Excellence Since 1972',
-    'team.story.desc': 'Founded in 1972 in Bremen, Rotek was born from a simple observation: large-scale infrastructure requires industrial-grade precision. We transitioned from traditional plumbing to master-led engineering. Today, we manage some of the most complex sewer networks in Northern Germany.',
-    'team.coverage.title': 'Our Service Hubs',
-    'team.coverage.desc': 'We deploy our specialized fleet from our central hubs in Bremen-Walle and Verden.',
-    'team.expertise.title': 'The 4 Pillars of Mastery',
-    'team.expertise.1': 'Certified Master Business',
-    'team.expertise.1.desc': 'Officially registered as a master-led engineering firm for pipe and sewer technology.',
-    'team.expertise.2': 'Regulated Qualifications',
-    'team.expertise.2.desc': 'Every technician holds valid state licenses for Sielsanierung and TV-inspection.',
-    'team.expertise.3': 'Precision Assessment',
-    'team.expertise.3.desc': 'Our diagnosis isn\'t a guess; it\'s a technical calculation validated by 50+ years of site data.',
-    'team.expertise.4': 'Liability Guaranteed',
-    'team.expertise.4.desc': 'We stand behind every weld, every seal, and every repair with comprehensive industrial insurance.',
-    'team.member.role.master': 'Master of Pipe Engineering',
-    'team.member.role.diagnostic': 'Diagnostic Specialist',
-    'team.member.role.emergency': 'Emergency Lead',
-    'team.member.role.install': 'Installation Expert',
+    'team.story.tagline': 'Industrial Excellence since 1972',
+    'team.story.desc': 'Founded 1972 in Bremen, Rotek arose from the necessity for industrial precision in drainage technology. We evolved from classic craftsmanship to a master-led engineering enterprise. Today, we manage the most complex sewer networks in Northern Germany.',
+    'team.expertise.title': 'The 4 Pillars of Rotek',
+    'team.expertise.1': 'Registered Master Enterprise',
+    'team.expertise.2': 'State-Certified Qualifications',
+    'team.expertise.3': 'Technical Validation',
+    'team.expertise.4': 'Fully Insured',
+
+    // Footer
+    'footer.readyFor': 'Ready for Rotek Precision?',
+    'footer.experience': 'Experience the future of pipe engineering with professional master diagnostics.',
+    'footer.premiumPlumbing': 'Premium Pipe Engineering',
+    'footer.redefining': 'Specialists for sewer restoration and TV inspection. For over 50 years in Bremen and Verden.',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
 
     // Services
     'services.kanal-tv.title': '3D Sewer TV Inspection',
-    'services.kanal-tv.desc': 'High-definition 360° diagnostics for pipes from DN 40 to DN 2000. Digital data tracking included.',
-    'services.rohrreinigung.title': 'Pipe Cleaning (24/7)',
-    'services.rohrreinigung.desc': 'Professional mechanical or hydrodynamic blockage removal available around the clock.',
+    'services.kanal-tv.desc': 'High-resolution 360° diagnostics for pipes from DN 40 to DN 2000. "Wir machen schmutzige Filme".',
+    'services.rohrreinigung.title': 'High-Pressure Jetting (24/7)',
+    'services.rohrreinigung.desc': 'Mechanical or hydrodynamic cleaning of drainage lines around the clock.',
     'services.fettabscheider.title': 'Grease Trap Service',
-    'services.fettabscheider.desc': 'Mandatory cleaning and maintenance for commercial kitchens. Legal disposal certificates provided.',
-    'services.kanalsanierung.title': 'Sewer Rehabilitation',
-    'services.kanalsanierung.desc': 'Sustainable no-dig repairs. Fixing damaged sections without excavating your property.',
-    'services.hebeanlagen.title': 'Leak Testing & Pumping',
-    'services.hebeanlagen.desc': 'Official functional safety checks and pumping station maintenance according to DIN standards.'
+    'services.fettabscheider.desc': 'Mandatory emptying and maintenance for industry and gastronomy.',
+    'services.kanalsanierung.title': 'Inliner Rehabilitation',
+    'services.kanalsanierung.desc': 'Sustainable trenchless restoration. Repair defects without excavation.',
+    'services.hebeanlagen.title': 'Lifting Stations / Leak Test',
+    'services.hebeanlagen.desc': 'Official function testing and maintenance according to DIN EN 1610 / 1986-30.'
   },
   de: {
-    // Header
-    'header.emergency': 'Notdienst 24/7',
-    'header.logo': 'Rotek',
-    'nav.overview': 'Übersicht',
+    // Navigation
     'nav.services': 'Leistungen',
+    'nav.testimonials': 'Einsätze',
     'nav.pricing': 'Preise',
+    'nav.faq': 'FAQ',
+    'nav.emergency': 'Havariemanagement',
     'nav.about': 'Über uns',
-    'nav.reviews': 'Bewertungen',
-    'nav.howItWorks': 'Ablauf',
-    'nav.questions': 'Fragen',
-    'nav.team': 'Team',
-    'nav.contact': 'Kontakt',
 
-    // Hero
-    'hero.badge': 'Meisterbetrieb seit 1972',
-    'hero.title': 'High-End Kanal- & Rohrsystem-Diagnostik',
-    'hero.subtitle': 'Bremens technischer Marktführer für Kanal-TV, Reinigung und grabenlose Sanierung. 32 Spezialisten, 11 Hightech-Fahrzeuge, 100% deutsche Handwerksqualität.',
-
-    // Rotek Master Visual Service (Digitaler Meister-Check)
-    'funnel.step1.title': 'Meister-Video-Terminal',
-    'funnel.step1.desc': 'Senden Sie uns ein Foto oder Video Ihrer Störung. Unsere Meister in der Zentrale Walle führen eine Fern-Diagnose durch und erstellen ein technisches Protokoll – kostenlos.',
-    'funnel.step1.formats': 'Industrie-Standards ISYBAU/ATV werden angewendet.',
-    'funnel.step2.title': 'Technische Validierung',
-    'funnel.step3.title': 'Abgleich Bremer Katasteramt',
-    'funnel.step3.desc': 'Synchronisation mit städtischen Leitungsdaten für Präzisions-Anfahrt.',
-    'funnel.step4.title': 'Technisches Protokoll',
-    'funnel.cta': 'Meister-Überprüfung starten',
-    'funnel.success.title': 'Protokoll Übermittelt',
-    'funnel.success.desc': 'Technische Einschätzung abgeschlossen. Übermittelt an Zentrale Walle. Einsatzleiter Andreas bereitet Fahrzeug 4 vor.',
-    'funnel.success.eta': 'Standard-Anfahrtsfenster',
-
-    // Issue Categories
-    'issue.leaking': 'Undichtes Rohr',
-    'issue.clogged': 'Verstopfter Abfluss',
-    'issue.broken': 'Defekte Armatur',
-    'issue.installation': 'Neuinstallation',
-
-    // Severity
-    'severity.1': 'Gering',
-    'severity.2': 'Mäßig',
-    'severity.3': 'Erheblich',
-    'severity.4': 'Schwer',
-    'severity.5': 'Notfall',
-
-    // Form
-    'form.name': 'Vollständiger Name',
-    'form.phone': 'Telefonnummer',
-    'form.email': 'E-Mail-Adresse',
-    'form.address': 'Adresse',
-
-    // Precision Report & Workflow
-    'diagnosis.title': 'Präzisions-Angebotsanalyse',
-    'diagnosis.problem': 'Identifizierte Hardware/Problem',
-    'diagnosis.action': 'Projektierte Lösung',
-    'diagnosis.tools': 'Benötigte Teile/Inventar',
-    'diagnosis.price': 'Festpreis-Garantie',
-    'diagnosis.book': 'Angebot sichern & Buchen',
-    'diagnosis.complexity': 'Komplexitätsgrad',
-    'diagnosis.labor': 'Geschätzter Arbeitsaufwand',
-    
-    'diagnosis.leaking.problem': 'Rohrbruch oder Undichtes Rohr',
-    'diagnosis.leaking.action': 'Hauptwasserhahn sofort abstellen. Eimer unterstellen.',
-    'diagnosis.leaking.tools': 'Rohrzange, Ersatzrohre, Dichtmittel.',
-    'diagnosis.clogged.problem': 'Schwere Verstopfung',
-    'diagnosis.clogged.action': 'Wasserzulauf stoppen. Keine chemischen Reiniger verwenden.',
-    'diagnosis.clogged.tools': 'Motorisierte Rohrreinigungsspirale, Hochdruck-Spülgerät.',
-    'diagnosis.broken.problem': 'Beschädigte Armatur',
-    'diagnosis.broken.action': 'Eckventil unter dem betroffenen Becken abstellen.',
-    'diagnosis.broken.tools': 'Verstellbarer Schraubenschlüssel, Ersatzarmatur.',
-    'diagnosis.installation.problem': 'Neue Sanitärinstallation',
-    'diagnosis.installation.action': 'Bitte Arbeitsbereich für sicheren Zugang freiräumen.',
-    'diagnosis.installation.tools': 'Maßband, Wasserwaage, entsprechende Anschlüsse.',
-
-    // Gallery
-    'gallery.title': 'Vorher & Nachher',
-    'gallery.subtitle': 'Sehen Sie die Qualität unserer Meisterarbeit',
-    'gallery.cta': 'Diagnose starten',
-    'gallery.badge': 'Visuelle Exzellenz',
-
-    // Testimonials
-    'testimonials.title': 'Kundenstimmen',
-    'testimonials.verified': 'Verifizierter Kunde',
+    // Hero Section
+    'hero.badge': 'Industrielle Präzision seit 1972',
+    'hero.title': 'ROTEK MASTER VISUAL SERVICE',
+    'hero.subtitle': 'Bespoke Technische Diagnose & Experten-Engineering. Übermitteln Sie Ihre Störung für eine sofortige Meister-Validierung in der Zentrale Walle.',
+    'hero.cta': 'Meister-Video-Diagnose starten',
+    'hero.emergency': 'Havariemanagement',
+    'hero.diagnose': 'Störung analysieren',
+    'hero.calculate': 'Meister-Video-Diagnose starten',
+    'hero.diagnosisInProgress': 'Meister-Protokoll-Verifizierung',
+    'hero.diagnosing': 'Synchronisierung mit Zentrale Walle...',
+    'hero.encrypted': 'AES-256 Verschlüsselt',
+    'hero.gdpr': 'DSGVO-Datenschutz',
+    'hero.masterEstimate': 'Technisches Meister-Angebot',
 
     // Trust
-    'trust.title': 'Von Tausenden vertraut',
-    'trust.response': '30 Min. durchschnittliche Reaktionszeit',
+    'trust.title': 'Industrielle Exzellenz',
+    'trust.response': '30 Min. Reaktionszeit',
     'trust.certified': 'Zertifizierte Techniker',
     'trust.guarantee': 'Zufriedenheitsgarantie',
     'trust.insurance': 'Vollversichert',
     'trust.badge': 'Der Goldstandard',
 
     // Features Section
-    'features.badge': 'Warum wir',
-    'features.title': 'Warum Rotek wählen?',
-    'features.subtitle': 'Wir kombinieren 50 Jahre Erfahrung mit modernsten Diagnose-Werkzeugen für eine präzise Umsetzung.',
+    'features.badge': 'Warum Rotek',
+    'features.title': 'Warum Rotek Industrietechnik?',
+    'features.subtitle': '50 Jahre deutsche Ingenieurskunst in der Abwassertechnik. Keine Subunternehmer, keine Kompromisse. Nur wo Rotek auf dem LKW steht, ist Rotek Qualität drin.',
     'features.painPoint': 'Das Problem',
     'features.solution': 'Unsere Lösung',
 
@@ -391,93 +245,60 @@ const translations: Record<Language, Record<string, string>> = {
     'features.masterDeepDive.step4.title': 'Präzisions-Einsatz',
     'features.masterDeepDive.step4.desc': 'Ein Techniker wird mit dem exakten Inventar entsandt und löst das Problem in einem Besuch.',
 
-    // Results Stats
-    'features.results.title': 'Echte Ergebnisse, echte Ersparnisse',
-    'features.results.diagnosis': 'Durchschn. Diagnosezeit',
-    'features.results.savings': 'Ersparnis vs. traditionell',
-    'features.results.accuracy': 'Diagnosegenauigkeit',
-    'features.results.satisfaction': 'Kundenbewertung',
-    'features.cta': 'Meister-Diagnose starten',
-    'features.ctaSubtext': 'Fachgerechte Einschätzung. Schätzung in unter 5 Minuten.',
-
     // Pricing
-    'pricing.title': 'Transparente Preise',
-    'pricing.subtitle': 'Keine versteckten Gebühren',
+    'pricing.title': 'Kalkulierbare Präzision',
+    'pricing.subtitle': 'Transparente Preisgestaltung für zertifizierte Abwasser-Dienstleistungen.',
     'pricing.basic': 'Basis',
     'pricing.standard': 'Standard',
     'pricing.premium': 'Premium',
     'pricing.cta': 'Plan wählen',
     'pricing.popular': 'Industrie-Standard',
     'pricing.month': 'Monat',
+    'pricing.badge': 'Sanierungspläne',
+
+    // Funnel / Contact
+    'funnel.step1.title': 'Meister-Video-Diagnose starten',
+    'funnel.step1.desc': 'Übermitteln Sie ein Foto oder Video Ihrer Störung. Unsere Meister in der Zentrale Walle führen eine Ferndiagnose durch.',
+    'funnel.step2.title': 'Technische Details',
+    'funnel.step2.desc': 'Spezifizieren Sie das technische Ausmaß der Störung.',
+    'funnel.step3.title': 'Kontaktdaten',
+    'funnel.step3.desc': 'Wohin sollen wir unser Meister-Protokoll senden?',
+    'funnel.next': 'Nächste Phase',
+    'funnel.back': 'Vorherige Phase',
+    'funnel.submit': 'Protokoll an Einsatzleitung senden',
+    'funnel.success.title': 'Protokoll übermittelt',
+    'funnel.success.desc': 'Technische Einschätzung abgeschlossen. Übermittelt an Zentrale Walle. Einsatzleiter Andreas bereitet Fahrzeug 4 vor.',
+    'funnel.success.eta': 'Standard-Anfahrtsfenster',
+
+    // Issues
+    'issue.leaking': 'Rohrbruch / Undichtheit',
+    'issue.clogged': 'Verstopfter Abfluss',
+    'issue.broken': 'Kanal-Defekt',
+    'issue.installation': 'Sanierung/Neuinstallation',
 
     // FAQ
     'faq.title': 'Häufig gestellte Fragen',
     'faq.badge': 'Klare Antworten',
     'faq.stillHaveQuestions': 'Noch Fragen? Chatten Sie mit unserem Experten-Team.',
-    'faq.cantFind': 'Nicht gefunden, was Sie suchen?',
-    'faq.supportTeam': 'Unser Team steht Ihnen 24/7 für JEDEN Notfall oder jede technische Anfrage zur Verfügung.',
-    'faq.requestSupport': 'Einsatzleitung kontaktieren',
-
-    // Testimonials Additional
-    'testimonials.verifiedTitle': 'Verifizierte Referenzen',
-    'testimonials.globalScore': 'Zufriedenheits-Index',
-    'testimonials.casesResolved': 'Gelöste Einsätze',
-    'testimonials.verifiedIntervention': 'Verifizierter technischer Einsatz',
-    'testimonials.videoTitle': 'Fall #892: Professionelle Sanierung',
-    'testimonials.videoLoading': 'Technisches Video lädt...',
-
-    // Hero Additional
-    'hero.verifiedExperts': 'Geprüfte Techniker',
-    'hero.response': '15 Min. Reaktionszeit',
-    'hero.calculate': 'Meister-Video-Diagnose starten',
-    'hero.diagnosisInProgress': 'Meister-Protokoll-Verifizierung',
-    'hero.diagnosing': 'Synchronisierung mit Zentrale Walle...',
-    'hero.encrypted': 'Verschlüsselt',
-    'hero.gdpr': 'DSGVO-konform',
-    'hero.masterEstimate': 'Meister-Schätzung',
-
-    // Pricing
-    'pricing.badge': 'Preise & Sanierungspläne',
-
-    // Footer
-    'footer.cta': 'Jetzt starten',
-    'footer.contact': 'Kontakt',
-    'footer.legal': 'Rechtliches',
-    'footer.privacy': 'Datenschutz',
-    'footer.terms': 'AGB',
-    'footer.imprint': 'Impressum',
-    'footer.readyFor': 'Bereit für Rotek ',
-    'footer.goldStandard': 'Präzision',
-    'footer.fix': '?',
-    'footer.experience': 'Erleben Sie die Zukunft der Rohrtechnik mit professioneller Meisterdiagnostik.',
-    'footer.premiumPlumbing': 'Premium-Rohrtechnik',
-    'footer.redefining': 'Spezialisten für Sielsanierung und TV-Untersuchung. Seit über 50 Jahren in Bremen und Verden.',
-    'footer.accreditations': 'Zertifizierungen',
-    'footer.certifiedMeister': 'Eingetragener Meisterbetrieb',
-    'footer.emergency': '24/7 Havariendienst',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
 
     // Team Page
     'team.title': 'Das Team von Rotek',
     'team.subtitle': 'Unsere Techniker sind Experten für komplexe Leitungsnetze. Zertifiziert, diszipliniert und erfahren.',
     'team.story.title': 'Die Rotek Geschichte',
     'team.story.tagline': 'Industrielle Exzellenz seit 1972',
-    'team.story.desc': 'Gegründet 1972 in Bremen, entstand Rotek aus der Notwendigkeit für industrielle Präzision in der Entwässerungstechnik. Wir haben uns vom klassischen Handwerk zum meistergeführten Ingenieurbetrieb entwickelt. Heute betreuen wir die komplexesten Kanalnetze Norddeutschlands.',
-    'team.coverage.title': 'Unsere Einsatzzentralen',
-    'team.coverage.desc': 'Wir operieren von unseren Standorten in Bremen-Walle und Verden (Aller).',
+    'team.story.desc': 'Gegründet 1972 in Bremen, entstand Rotek aus der Notwendigkeit für industrielle Präzision in der Entwässerungstechnik. Heute betreuen wir die komplexesten Kanalnetze Norddeutschlands.',
     'team.expertise.title': 'Die 4 Säulen von Rotek',
     'team.expertise.1': 'Eingetragener Meisterbetrieb',
-    'team.expertise.1.desc': 'Zertifiziertes Fachunternehmen für Rohr- und Kanaltechnik.',
     'team.expertise.2': 'Staatliche Qualifikationen',
-    'team.expertise.2.desc': 'Jeder Techniker verfügt über Zulassungen für Sielsanierung und TV-Inspektion.',
     'team.expertise.3': 'Technische Validierung',
-    'team.expertise.3.desc': 'Unsere Diagnose basiert auf 50 Jahren Erfahrung und modernster Messtechnik.',
     'team.expertise.4': 'Vollversichert',
-    'team.expertise.4.desc': 'Umfassender Versicherungsschutz für alle industriellen und privaten Einsätze.',
-    'team.member.role.master': 'Einsatzleiter / Meister',
-    'team.member.role.diagnostic': 'Diagnose-Techniker',
-    'team.member.role.emergency': 'Havariemanagement',
-    'team.member.role.install': 'Sanierungs-Profi',
+
+    // Footer
+    'footer.readyFor': 'Bereit für Rotek Präzision?',
+    'footer.experience': 'Erleben Sie die Zukunft der Rohrtechnik mit professioneller Meisterdiagnostik.',
+    'footer.premiumPlumbing': 'Premium-Rohrtechnik',
+    'footer.redefining': 'Spezialisten für Sielsanierung und TV-Untersuchung. Seit über 50 Jahren in Bremen und Verden.',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
 
     // Services
     'services.kanal-tv.title': '3D Kanal-TV-Untersuchung',
@@ -488,7 +309,7 @@ const translations: Record<Language, Record<string, string>> = {
     'services.fettabscheider.desc': 'Vorgeschriebene Entleerung und Wartung für Industrie & Gastronomie.',
     'services.kanalsanierung.title': 'Inliner-Sanierung',
     'services.kanalsanierung.desc': 'Nachhaltige grabenlose Sanierung. Defekte Stellen reparieren ohne Aufgraben.',
-    'services.hebeanlagen.title': 'Dichtheitsprüfung',
+    'services.hebeanlagen.title': 'Hebeanlagen / Dichtheitsprüfung',
     'services.hebeanlagen.desc': 'Amtliche Funktionsprüfung und Wartung nach DIN EN 1610 / 1986-30.'
   }
 }

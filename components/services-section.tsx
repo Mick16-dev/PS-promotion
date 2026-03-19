@@ -18,7 +18,7 @@ interface ServicesSectionProps {
   onCtaClick: () => void
 }
 
-import { LumnarGrid } from '@/components/lumnar-grid'
+import { LumnarGrid } from '@/components/lumnar/LumnarGrid'
 
 export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
   const { language, t } = useLanguage()
@@ -50,7 +50,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
 
         <LumnarGrid />
 
-        <div className="mt-16 flex flex-col md:flex-row items-center justify-between gap-8 p-8 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+        <div className="mt-16 flex flex-col md:flex-row items-center justify-between gap-8 p-8 rounded-none bg-white/[0.02] border border-white/5 backdrop-blur-sm">
           <div className="flex-1">
             <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">
               {language === 'de' ? 'Digitaler Meister-Check' : 'Digital Master Check'}
