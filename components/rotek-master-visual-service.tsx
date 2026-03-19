@@ -46,7 +46,7 @@ export function RotekMasterVisualService({ onCtaClick }: { onCtaClick?: () => vo
   const reset = () => setState({ kind: 'idle' })
 
   return (
-    <section className="px-4 py-24 bg-[#0A0B0D] relative overflow-hidden">
+    <section className="px-4 py-16 sm:py-20 bg-[#0A0B0D] relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-white/5" />
       
       <div className="mx-auto max-w-6xl relative z-10">
@@ -56,7 +56,7 @@ export function RotekMasterVisualService({ onCtaClick }: { onCtaClick?: () => vo
               <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
               Rotek Master Visual Service
             </div>
-            <h2 className="text-4xl sm:text-6xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-8">
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-8">
               Digitaler <br /> Meister-Check
             </h2>
             <p className="text-base sm:text-lg leading-relaxed text-slate-400 max-w-prose italic border-l-4 border-red-600 pl-6 mb-10">

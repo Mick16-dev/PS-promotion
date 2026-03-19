@@ -24,7 +24,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
   const { language, t } = useLanguage()
 
   return (
-    <section id="services" className="py-14 sm:py-24 px-4 relative overflow-hidden bg-[#0A0B0D]">
+    <section id="services" className="py-12 sm:py-20 px-4 relative overflow-hidden bg-[#0A0B0D]">
       {/* Absolute Industrial Overlays */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -40,7 +40,7 @@ export function ServicesSection({ onCtaClick }: ServicesSectionProps) {
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             {language === 'de' ? 'INDUSTRIELLE PRÄZISION SEIT 1972' : 'INDUSTRIAL PRECISION SINCE 1972'}
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white mb-6 uppercase tracking-tighter italic">
+          <h2 className="text-2xl sm:text-4xl font-black text-white mb-6 uppercase tracking-tighter italic">
             {language === 'de' ? 'Rotek Lumnar-Serie' : 'Rotek Lumnar Series'}
           </h2>
           <p className="text-sm sm:text-lg text-slate-400 max-w-2xl mx-auto tracking-normal font-medium leading-relaxed">

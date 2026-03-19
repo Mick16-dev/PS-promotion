@@ -169,7 +169,7 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
         >
           <div className="flex flex-col items-center gap-6">
             <TrustPulse />
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight max-w-3xl mx-auto uppercase">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight max-w-2xl mx-auto uppercase italic">
               {t('hero.title')}
             </h1>
           </div>
@@ -362,8 +362,8 @@ export function HeroSection({ onCtaClick }: { onCtaClick: () => void }) {
                     {/* Step 5: Master Booking Form */}
                     {step === 5 && (
                       <div className="space-y-10">
-                        <div className="text-center space-y-3">
-                           <h2 className="text-4xl font-black uppercase tracking-tighter text-white italic">Protocol Clearance</h2>
+                        <div className="text-center mb-12">
+                           <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white mb-4 italic leading-tight">Protocol Clearance</h2>
                            <p className="text-slate-500 font-medium italic">Finalize technical report for Central Walle Dispatch.</p>
                         </div>
                         <form onSubmit={handleFormSubmit} className="space-y-6">

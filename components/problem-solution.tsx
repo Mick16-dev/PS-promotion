@@ -34,12 +34,12 @@ export function ProblemSolution({ onCtaClick }: { onCtaClick: () => void }) {
   const { language } = useLanguage()
 
   return (
-    <section className="py-24 px-4 bg-[#0A0B0D] relative overflow-hidden">
+    <section className="py-16 sm:py-20 px-4 bg-[#0A0B0D] relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-white/5" />
       
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white mb-4 italic">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white mb-4 italic leading-tight">
             {language === 'de' ? 'Technische Störungsbehebung' : 'Technical Disruption Recovery'}
           </h2>
           <p className="text-slate-500 font-medium text-lg italic max-w-2xl mx-auto leading-relaxed">
