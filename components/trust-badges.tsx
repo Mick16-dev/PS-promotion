@@ -1,95 +1,101 @@
 'use client'
 
 import { useLanguage } from '@/app/context/language-context'
+import { Clock, HardHat, Shield, ClipboardCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 const trustItems = [
   {
-    keyEn: 'Average response time in Berlin',
-    keyDe: 'Durchschnittliche Reaktionszeit in Berlin',
-    stat: '60',
-    unit: 'min'
+    icon: Clock,
+    keyEn: 'Average response time',
+    keyDe: 'Durchschn. Reaktionszeit',
+    stat: '15',
+    unit: 'min',
+    color: 'text-amber-500'
   },
   {
-    keyEn: 'Years of plumbing experience',
-    keyDe: 'Jahre Erfahrung im Sanitärbereich',
-    stat: '20+',
-    unit: ''
+    icon: HardHat,
+    keyEn: 'Elite Technicians',
+    keyDe: 'Elite-Techniker',
+    stat: '50+',
+    unit: '',
+    color: 'text-slate-900'
   },
   {
-    keyEn: 'Repairs with warranty',
-    keyDe: 'Reparaturen mit Gewährleistung',
-    stat: '2',
-    unit: 'yrs'
+    icon: Shield,
+    keyEn: 'Trust Guarantee',
+    keyDe: 'Vertrauensgarantie',
+    stat: '100%',
+    unit: '',
+    color: 'text-red-600'
   },
   {
-    keyEn: 'Emergency jobs per year',
-    keyDe: 'Notfälle pro Jahr',
-    stat: '500+',
-    unit: ''
+    icon: ClipboardCheck,
+    keyEn: 'Project Coverage',
+    keyDe: 'Projektabdeckung',
+    stat: '2M',
+    unit: '€',
+    color: 'text-slate-900'
   }
 ]
 
 export function TrustBadges() {
-  const { language, t } = useLanguage()
+  const { language } = useLanguage()
 
   const container = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, y: 20 },
     show: {
       opacity: 1,
+      y: 0,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1]
       }
     }
   } as any
 
   const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "circOut" } }
+    hidden: { opacity: 0, scale: 0.95 },
+    show: { opacity: 1, scale: 1 }
   } as any
 
   return (
-    <section className="py-16 px-4 bg-muted/40">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col items-center mb-16"
-        >
-          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground text-center tracking-tight max-w-3xl">
-            {t('trust.title')}
-          </h2>
-        </motion.div>
-
+    <section className="py-20 px-4 bg-background relative overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          viewport={{ once: true }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
         >
           {trustItems.map((trust, index) => (
             <motion.div
               key={index}
               variants={item}
-              className="bg-card rounded-xl p-5 border border-border shadow-sm flex flex-col gap-3"
+              className="group flex flex-col items-center text-center space-y-4"
             >
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-semibold text-foreground tracking-tight">
-                  {trust.stat}
-                </span>
-                {trust.unit && (
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    {trust.unit}
-                  </span>
-                )}
+              <div className="w-16 h-16 rounded-3xl bg-muted/50 flex items-center justify-center group-hover:bg-primary/5 transition-colors duration-500">
+                <trust.icon className={cn("w-8 h-8 transition-transform duration-500 group-hover:scale-110", trust.color)} />
               </div>
-
-              <p className="text-sm text-muted-foreground leading-snug">
-                {language === 'de' ? trust.keyDe : trust.keyEn}
-              </p>
+              
+              <div className="space-y-1">
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-4xl sm:text-5xl font-black text-foreground tracking-tighter italic">
+                    {trust.stat}
+                  </span>
+                  {trust.unit && (
+                    <span className="text-lg font-black text-secondary uppercase italic">
+                      {trust.unit}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60 max-w-[120px] mx-auto leading-tight group-hover:text-primary transition-colors">
+                  {language === 'de' ? trust.keyDe : trust.keyEn}
+                </p>
+              </div>
             </motion.div>
           ))}
         </motion.div>

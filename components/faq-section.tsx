@@ -10,49 +10,44 @@ import {
 import { Button } from '@/components/ui/button'
 import { Magnetic } from '@/components/ui/magnetic'
 import { motion } from 'framer-motion'
+import { HelpCircle, MessageSquare } from 'lucide-react'
 
 const faqs = [
   {
-    questionEn: 'Can I send a photo in advance?',
-    questionDe: 'Kann ich Ihnen vorab ein Foto schicken?',
-    answerEn: 'Yes. A photo and a short description help us to better estimate the effort and to bring the right parts. The final price is always confirmed on site after we have seen everything in person.',
-    answerDe: 'Ja. Ein Foto und eine kurze Beschreibung helfen uns, den Aufwand besser einzuschätzen und die richtigen Teile mitzubringen. Der endgültige Preis wird immer vor Ort bestätigt, nachdem wir uns alles angeschaut haben.'
+    questionEn: 'How does the Master visual diagnostic tool work?',
+    questionDe: 'Wie funktioniert das visuelle Meister-Diagnose-Tool?',
+    answerEn: 'Simply upload a photo of your plumbing issue, and our master technicians analyze the image to provide an instant preliminary estimate. A certified expert then reviews your case and contacts you within 30 minutes.',
+    answerDe: 'Laden Sie einfach ein Foto Ihres Sanitärproblems hoch, und unsere Sanitärmeister analysieren das Bild, um sofort eine vorläufige Schätzung zu liefern. Ein zertifizierter Experte prüft dann Ihren Fall und kontaktiert Sie innerhalb von 30 Minuten.'
   },
   {
-    questionEn: 'How fast can you come in an emergency?',
-    questionDe: 'Wie schnell kommen Sie im Notfall?',
-    answerEn: 'In most cases in Berlin and the surrounding area we can be with you on the same day, often within a few hours. At night we first check by phone what is urgent and what can wait until the morning.',
-    answerDe: 'In den meisten Fällen in Berlin und Umgebung sind wir noch am selben Tag bei Ihnen, oft innerhalb weniger Stunden. Nachts klären wir telefonisch, was wirklich dringend ist und was bis zum Morgen warten kann.'
+    questionEn: 'What is your emergency response time?',
+    questionDe: 'Wie schnell reagieren Sie bei Notfällen?',
+    answerEn: 'Our average emergency response time is under 30 minutes for Premium plan members. Standard plans receive priority response within 1-2 hours. We operate 24/7, 365 days a year.',
+    answerDe: 'Unsere durchschnittliche Notfall-Reaktionszeit liegt für Premium-Mitglieder unter 30 Minuten. Standardpläne erhalten eine Prioritätsreaktion innerhalb von 1-2 Stunden. Wir arbeiten 24/7, 365 Tage im Jahr.'
   },
   {
-    questionEn: 'What does a typical repair cost?',
-    questionDe: 'Was kostet eine typische Reparatur?',
-    answerEn: 'The price depends on the effort and material. On the phone we give you a rough price range. On site we explain again what we recommend and what it will cost before we start.',
-    answerDe: 'Der Preis hängt vom Aufwand und vom Material ab. Am Telefon nennen wir Ihnen einen groben Kostenrahmen. Vor Ort erklären wir noch einmal, was wir empfehlen und was es kostet, bevor wir anfangen.'
+    questionEn: 'Are your technicians certified?',
+    questionDe: 'Sind Ihre Techniker zertifiziert?',
+    answerEn: 'Yes, all our technicians are fully certified, licensed, and insured. They undergo regular training and background checks. We maintain the highest standards in the industry.',
+    answerDe: 'Ja, alle unsere Techniker sind vollständig zertifiziert, lizenziert und versichert. Sie werden regelmäßig geschult und überprüft. Wir halten die höchsten Standards der Branche ein.'
   },
   {
-    questionEn: 'Do you also do small jobs?',
-    questionDe: 'Machen Sie auch kleine Aufträge?',
-    answerEn: 'Yes. A dripping tap, a new siphon or a blocked toilet are exactly the kind of jobs we do every day.',
-    answerDe: 'Ja. Eine tropfende Armatur, ein neuer Siphon oder eine verstopfte Toilette sind genau die Einsätze, die wir täglich machen.'
+    questionEn: 'What areas do you service?',
+    questionDe: 'Welche Gebiete bedienen Sie?',
+    answerEn: 'We currently service all major German cities including Berlin, Munich, Hamburg, Frankfurt, Cologne, and their surrounding areas. Enter your postal code during booking to confirm coverage.',
+    answerDe: 'Wir bedienen derzeit alle großen deutschen Städte, darunter Berlin, München, Hamburg, Frankfurt, Köln und deren Umgebung. Geben Sie bei der Buchung Ihre Postleitzahl ein, um die Abdeckung zu bestätigen.'
   },
   {
-    questionEn: 'Do I have to prepare anything before you arrive?',
-    questionDe: 'Muss ich vor Ihrem Besuch etwas vorbereiten?',
-    answerEn: 'If possible, clear the area in front of the affected place (sink, toilet, access hatch) and keep pets away. Everything else we bring with us.',
-    answerDe: 'Wenn möglich, räumen Sie den Bereich vor der betroffenen Stelle (Waschbecken, Toilette, Revisionsöffnung) frei und halten Sie Haustiere fern. Alles andere bringen wir mit.'
+    questionEn: 'What payment methods do you accept?',
+    questionDe: 'Welche Zahlungsmethoden akzeptieren Sie?',
+    answerEn: 'We accept all major credit cards, PayPal, bank transfers, and cash. For subscription plans, we offer monthly or annual billing with a 15% discount on annual payments.',
+    answerDe: 'Wir akzeptieren alle gängigen Kreditkarten, PayPal, Banküberweisungen und Bargeld. Für Abonnementpläne bieten wir monatliche oder jährliche Abrechnung mit 15% Rabatt bei jährlicher Zahlung.'
   },
   {
-    questionEn: 'Which areas do you cover?',
-    questionDe: 'Welche Gebiete decken Sie ab?',
-    answerEn: 'We mainly work in Berlin and the surrounding area. For larger jobs we are also happy to drive a bit further – simply ask us by phone.',
-    answerDe: 'Wir sind hauptsächlich in Berlin und Umgebung unterwegs. Für größere Arbeiten fahren wir auch gerne ein Stück weiter – sprechen Sie uns einfach telefonisch an.'
-  },
-  {
-    questionEn: 'How can I pay?',
-    questionDe: 'Wie kann ich bezahlen?',
-    answerEn: 'You can usually pay in cash or by bank transfer. For recurring customers and businesses we are happy to agree individual arrangements.',
-    answerDe: 'In der Regel können Sie bar oder per Überweisung zahlen. Für Stammkunden und Unternehmen vereinbaren wir gerne individuelle Regelungen.'
+    questionEn: 'Is the estimate guaranteed?',
+    questionDe: 'Ist die Schätzung garantiert?',
+    answerEn: 'Our expert-generated estimates are preliminary and based on the information provided. The final price is confirmed after on-site inspection. We guarantee no surprise charges beyond the quoted range without your approval.',
+    answerDe: 'Unsere expertengestützten Schätzungen sind vorläufig und basieren auf den bereitgestellten Informationen. Der endgültige Preis wird nach der Vor-Ort-Inspektion bestätigt. Wir garantieren keine Überraschungskosten über den genannten Bereich hinaus ohne Ihre Zustimmung.'
   }
 ]
 
@@ -74,33 +69,33 @@ export function FaqSection() {
   }
 
   return (
-    <section id="faq" className="py-32 px-4 relative overflow-hidden bg-background">
+    <section className="py-16 sm:py-20 px-4 relative overflow-hidden bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
+
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-secondary/5 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-[120px]" />
 
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-24"
+          className="text-center mb-10"
         >
-          <span className="inline-flex px-5 py-2 bg-muted text-muted-foreground text-xs font-semibold rounded-full uppercase tracking-[0.2em] mb-6">
-            {language === 'de' ? 'Gut zu wissen' : 'Good to know'}
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 tracking-tight">
+
+          <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight uppercase">
             {t('faq.title')}
           </h2>
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
-            {language === 'de'
-              ? 'Wenn Sie unsicher sind, rufen Sie lieber einmal mehr an.'
-              : 'If you are unsure, it is better to call us once more.'}
+          <div className="flex items-center justify-center gap-2 text-muted-foreground font-medium text-xs">
+            <MessageSquare className="w-3.5 h-3.5 text-secondary" />
+            {t('faq.stillHaveQuestions')}
           </div>
         </motion.div>
 
-        <Accordion type="single" collapsible className="space-y-6">
+        <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
@@ -111,14 +106,14 @@ export function FaqSection() {
             >
               <AccordionItem
                 value={`item-${index}`}
-                className="group border border-border/60 rounded-2xl px-6 bg-card shadow-sm overflow-hidden"
+                className="group border border-border/50 rounded-xl px-5 bg-white shadow-sm transition-all duration-300 hover:shadow-md overflow-hidden"
               >
-                <AccordionTrigger className="text-left hover:no-underline py-8">
-                  <span className="text-lg sm:text-xl font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors pr-6">
+                <AccordionTrigger className="text-left hover:no-underline py-4">
+                  <span className="text-sm font-bold text-foreground uppercase tracking-tight group-hover:text-primary transition-colors pr-4">
                     {language === 'de' ? faq.questionDe : faq.questionEn}
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-6 text-sm text-muted-foreground leading-relaxed pr-6">
+                <AccordionContent className="pb-4 text-sm text-muted-foreground leading-relaxed pr-8">
                   <div className="flex gap-4">
                     <div className="w-1 h-auto bg-secondary/30 rounded-full shrink-0" />
                     <div>{language === 'de' ? faq.answerDe : faq.answerEn}</div>
@@ -133,17 +128,18 @@ export function FaqSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-16 p-8 rounded-2xl border border-secondary/30 bg-muted flex flex-col items-center text-center"
+          className="mt-12 p-8 bg-white rounded-xl border border-slate-200 flex flex-col items-center text-center"
         >
-          <h3 className="text-2xl font-bold tracking-tight text-foreground mb-4">
-            {t('faq.moreHelpTitle') || "Can't find what you need?"}
+          <HelpCircle className="w-7 h-7 text-secondary mb-4" />
+          <h3 className="text-lg font-bold uppercase tracking-tight text-foreground mb-2">
+            {t('faq.cantFind')}
           </h3>
-          <p className="text-muted-foreground font-medium mb-8 max-w-lg">
-            Our support team is available 24/7 to assist with ANY plumbing emergency or technical query.
+          <p className="text-sm text-muted-foreground font-medium mb-6 max-w-md">
+            {t('faq.supportTeam')}
           </p>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-11 px-6 rounded-xl">
-            {t('faq.cta') || 'Ask a question'}
-          </Button>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-wider h-10 px-6 rounded-lg text-xs transition-all active:scale-95">
+              {t('faq.requestSupport')}
+            </Button>
         </motion.div>
       </div>
     </section>

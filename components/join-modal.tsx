@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, CheckCircle, Loader2, ArrowRight } from 'lucide-react'
+import { X, Users, Briefcase, CheckCircle, Loader2, ArrowRight, UserCheck, ShieldCheck } from 'lucide-react'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -124,7 +124,8 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
                   className="p-12 lg:p-20 relative z-10"
                 >
                   <div className="text-center mb-12">
-                    <span className="inline-flex px-4 py-2 bg-primary/5 text-primary text-[10px] font-black rounded-full uppercase tracking-[0.3em] mb-6">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary text-[10px] font-black rounded-xl uppercase tracking-[0.3em] mb-6">
+                      <ShieldCheck className="w-4 h-4" />
                       Secure Priority Intake
                     </span>
                     <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-4 tracking-tighter italic uppercase leading-none">{t.customerTitle}</h2>
@@ -225,7 +226,11 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
                     {t.close}
                   </Button>
 
-                  {/* Decorative layer removed to keep UI simple */}
+                  {/* Decorative icon (Abstract) */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-full h-full opacity-20">
+                    <ShieldCheck className="absolute top-10 left-10 w-8 h-8 text-secondary animate-pulse" />
+                    <CheckCircle className="absolute bottom-10 right-10 w-12 h-12 text-primary animate-bounce" />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

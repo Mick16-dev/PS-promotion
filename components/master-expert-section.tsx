@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
+import { HardHat, Wrench, DraftingCompass, ClipboardCheck } from 'lucide-react'
 import Image from 'next/image'
 
 const experts = [
@@ -27,79 +28,69 @@ export function MasterExpertSection() {
   const { language, t } = useLanguage()
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-background">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-
+    <section className="py-24 px-4 relative overflow-hidden bg-white border-t border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
-          {/* Left: Team Story */}
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left: Authority Text */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-6"
           >
-            <div className="space-y-4">
-              <h2 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight leading-[1.1]">
-                {language === 'de'
-                  ? 'Wir sind keine Plattform, sondern Ihr fester Klempnerbetrieb.'
-                  : 'We are not a platform, we are your local plumbing team.'}
+            <div className="space-y-2">
+              <h2 className="text-3xl sm:text-5xl font-bold text-slate-900 tracking-tight uppercase leading-tight">
+                {language === 'de' ? 'Meisterhafte Präzision.' : 'Professional Level Precision.'}
               </h2>
             </div>
 
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-slate-600 font-medium leading-relaxed">
               {language === 'de'
-                ? 'Hinter jedem Einsatz stehen echte Menschen aus der Region. Wir kommen selbst, hören zu, erklären in Ruhe und machen erst dann weiter, wenn Sie verstanden haben, was wir tun.'
-                : 'Every job is carried out by the same small team. We come ourselves, listen first, explain in simple words and only start once you are happy with the plan.'}
+                ? 'Hinter unseren technischen Werkzeugen stehen deutsche Handwerksmeister. Jede Einschätzung wird von zertifizierten Experten validiert, um höchste Sicherheit und Qualität zu garantieren.'
+                : 'Behind our technical tools stand German Master Craftsmen. Every assessment is validated by certified experts to guarantee the highest safety and quality standards.'}
             </p>
 
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-4">
               {[
-                { labelDe: 'Seit vielen Jahren als Sanitärbetrieb in der Region unterwegs', labelEn: 'Many years of plumbing experience in this region' },
-                { labelDe: 'Ausbildung im Handwerk statt anonymer Plattform', labelEn: 'Trained craftsmen, not anonymous platform workers' },
-                { labelDe: 'Wir erklären Probleme so, dass Sie sie wirklich verstehen', labelEn: 'We explain problems so you really understand them' },
-                { labelDe: 'Wir verlassen Bad und Küche sauber und aufgeräumt', labelEn: 'We leave bathrooms and kitchens clean and tidy' },
+                { icon: HardHat, labelDe: 'Zertifizierter Meisterbetrieb', labelEn: 'Certified Master Business' },
+                { icon: Wrench, labelDe: 'Regulierte Qualifikationen', labelEn: 'Regulated Qualifications' },
+                { icon: DraftingCompass, labelDe: 'Präzisions-Diagnostik', labelEn: 'Precision Assessment' },
+                { icon: ClipboardCheck, labelDe: 'Haftungs-Garantie', labelEn: 'Liability Guaranteed' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 bg-card/30 p-4 rounded-2xl border border-white/40">
-                  <span className="text-xs font-black uppercase tracking-wider">
-                    {language === 'de' ? item.labelDe : item.labelEn}
-                  </span>
+                <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <item.icon className="w-5 h-5 text-red-600" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-900">{language === 'de' ? item.labelDe : item.labelEn}</span>
                 </div>
               ))}
             </div>
-
-            {/* Removed decorative certification seal image */}
           </motion.div>
 
           {/* Right: Expert Profiles */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative">
-            <div className="absolute inset-0 bg-secondary/5 blur-[120px] rounded-full" />
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
             {experts.map((expert, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.2 }}
+                transition={{ delay: idx * 0.1 }}
                 viewport={{ once: true }}
                 className="group relative"
               >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-[3rem] border-4 border-white/60 shadow-2xl transition-all duration-700 group-hover:scale-[1.02]">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-all duration-500 group-hover:shadow-md">
                   <Image
                     src={expert.image}
                     alt={expert.name}
                     fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-80" />
 
-                  <div className="absolute bottom-8 left-8 right-8">
-                    <h4 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">{expert.name}</h4>
-                    <p className="text-secondary font-black text-[10px] uppercase tracking-[0.2em] mb-4">
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <h4 className="text-xl font-bold uppercase tracking-tight mb-0.5">{expert.name}</h4>
+                    <p className="text-slate-300 font-bold text-[10px] uppercase tracking-wider mb-3">
                       {language === 'de' ? expert.roleDe : expert.roleEn}
                     </p>
-                    <div className="h-px w-12 bg-white/30 mb-4 transition-all group-hover:w-full" />
-                    <p className="text-white/80 text-xs font-bold italic">{language === 'de' ? expert.expDe : expert.expEn}</p>
+                    <p className="text-white/80 text-xs font-medium">{language === 'de' ? expert.expDe : expert.expEn}</p>
                   </div>
                 </div>
               </motion.div>

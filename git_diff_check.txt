@@ -1,0 +1,56 @@
+components/faq-section.tsx:90: leftover conflict marker
+components/faq-section.tsx:94: leftover conflict marker
+components/faq-section.tsx:97: leftover conflict marker
+components/faq-section.tsx:102: leftover conflict marker
+components/faq-section.tsx:106: leftover conflict marker
+components/faq-section.tsx:111: leftover conflict marker
+components/faq-section.tsx:150: leftover conflict marker
+components/faq-section.tsx:155: leftover conflict marker
+components/faq-section.tsx:158: leftover conflict marker
+components/faq-section.tsx:163: leftover conflict marker
+components/faq-section.tsx:169: leftover conflict marker
+components/faq-section.tsx:173: leftover conflict marker
+components/features-section.tsx:170: leftover conflict marker
+components/features-section.tsx:174: leftover conflict marker
+components/features-section.tsx:184: leftover conflict marker
+components/hero-section.tsx:45: leftover conflict marker
+components/hero-section.tsx:59: leftover conflict marker
+components/hero-section.tsx:67: leftover conflict marker
+components/hero-section.tsx:78: leftover conflict marker
+components/hero-section.tsx:355: leftover conflict marker
+components/hero-section.tsx:357: leftover conflict marker
+components/pricing-section.tsx:47: leftover conflict marker
+components/pricing-section.tsx:51: leftover conflict marker
+components/pricing-section.tsx:53: leftover conflict marker
+components/pricing-section.tsx:61: leftover conflict marker
+components/pricing-section.tsx:65: leftover conflict marker
+components/pricing-section.tsx:68: leftover conflict marker
+components/pricing-section.tsx:78: leftover conflict marker
+components/pricing-section.tsx:154: leftover conflict marker
+components/pricing-section.tsx:180: leftover conflict marker
+components/testimonials-section.tsx:98: leftover conflict marker
+components/testimonials-section.tsx:102: leftover conflict marker
+components/testimonials-section.tsx:105: leftover conflict marker
+components/testimonials-section.tsx:112: leftover conflict marker
+components/testimonials-section.tsx:123: leftover conflict marker
+components/testimonials-section.tsx:138: leftover conflict marker
+components/testimonials-section.tsx:143: leftover conflict marker
+components/testimonials-section.tsx:167: leftover conflict marker
+components/testimonials-section.tsx:168: trailing whitespace.
++          <motion.div 
+components/testimonials-section.tsx:176: trailing whitespace.
++              <motion.div 
+components/testimonials-section.tsx:185: trailing whitespace.
++                    <img 
+components/testimonials-section.tsx:186: trailing whitespace.
++                      src={testimonial.avatar} 
+components/testimonials-section.tsx:187: leftover conflict marker
+components/testimonials-section.tsx:192: leftover conflict marker
+components/testimonials-section.tsx:203: leftover conflict marker
+components/testimonials-section.tsx:204: leftover conflict marker
+components/testimonials-section.tsx:226: leftover conflict marker
+components/testimonials-section.tsx:233: leftover conflict marker
+components/testimonials-section.tsx:237: leftover conflict marker
+components/testimonials-section.tsx:244: leftover conflict marker
+components/testimonials-section.tsx:294: leftover conflict marker
+components/testimonials-section.tsx:295: leftover conflict marker

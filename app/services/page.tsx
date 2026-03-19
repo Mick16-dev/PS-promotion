@@ -1,10 +1,9 @@
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
+import { useLanguage } from '@/app/context/language-context'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { useLanguage } from '@/app/context/language-context'
-import { useState } from 'react'
 import { JoinModal } from '@/components/join-modal'
 import { LumnarGrid } from '@/components/lumnar/LumnarGrid'
 import { Badge } from '@/components/ui/badge'

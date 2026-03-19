@@ -1,12 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
 import { Magnetic } from '@/components/ui/magnetic'
-import { ArrowRight } from 'lucide-react'
+import {
+  PiggyBank,
+  Shield,
+  Wrench,
+  CheckCircle2,
+  Camera,
+  FileText,
+  Timer,
+  ArrowRight,
+  Search
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FeaturesSectionProps {
@@ -16,27 +25,36 @@ interface FeaturesSectionProps {
 const pillars = [
   {
     id: 'expert-diagnosis',
-    border: 'border-primary/30'
+    icon: Search,
+    color: 'text-secondary',
+    bg: 'bg-secondary/10',
+    border: 'border-secondary/20'
   },
   {
     id: 'time-cost',
-    border: 'border-primary/30'
+    icon: PiggyBank,
+    color: 'text-success',
+    bg: 'bg-success/10',
+    border: 'border-success/20'
   },
   {
     id: 'reliability',
-    border: 'border-primary/30'
+    icon: Shield,
+    color: 'text-primary',
+    bg: 'bg-primary/10',
+    border: 'border-primary/20'
   },
 ]
 
 const diagnosisSteps = [
-  { step: 1 },
-  { step: 2 },
-  { step: 3 },
-  { step: 4 },
+  { icon: Camera, step: 1 },
+  { icon: Search, step: 2 },
+  { icon: FileText, step: 3 },
+  { icon: Wrench, step: 4 },
 ]
 
 export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const [activePillar, setActivePillar] = useState<string>('expert-diagnosis')
 
   const container = {
@@ -53,7 +71,8 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
   } as any
 
   return (
-    <section id="services" className="py-32 px-4 relative overflow-hidden bg-background">
+    <section className="py-16 sm:py-20 px-4 relative overflow-hidden bg-background">
+      <div className="absolute inset-0 mesh-gradient opacity-30" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
@@ -61,15 +80,13 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-24"
+          className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-semibold rounded-xl uppercase tracking-[0.15em] mb-6">
-            {t('features.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-6xl font-black text-foreground mb-6 tracking-tighter italic uppercase">
+          {/* Badge removed to avoid AI/Badge vibe */}
+          <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight uppercase">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-sm text-muted-foreground max-w-lg mx-auto font-medium leading-relaxed">
             {t('features.subtitle')}
           </p>
         </motion.div>
@@ -80,54 +97,68 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-6 mb-16"
+          className="grid md:grid-cols-3 gap-5 mb-12"
         >
           {pillars.map((pillar) => (
             <motion.div
               key={pillar.id}
               variants={item}
+              whileHover={{ y: -10 }}
               onClick={() => setActivePillar(pillar.id)}
               className={cn(
-                "cursor-pointer p-6 rounded-2xl border bg-card",
-                activePillar === pillar.id ? pillar.border : "border-border"
+                "group cursor-pointer p-5 rounded-xl border transition-all duration-300",
+                activePillar === pillar.id
+                  ? cn("bg-white shadow-md", pillar.border)
+                  : "bg-card/30 border-border/50 hover:bg-white/50"
               )}
             >
-              <h3 className="text-2xl font-black text-foreground mb-4 italic uppercase tracking-tighter">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-all",
+                activePillar === pillar.id ? pillar.bg : "bg-muted/50"
+              )}>
+                <pillar.icon className={cn("w-5 h-5", activePillar === pillar.id ? pillar.color : "text-muted-foreground")} />
+              </div>
+
+              <h3 className="text-base font-bold text-foreground mb-2 uppercase tracking-tight">
                 {t(`features.${pillar.id}.title`)}
               </h3>
 
-              <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+              <p className="text-xs text-muted-foreground font-medium mb-4 leading-relaxed">
                 {t(`features.${pillar.id}.tagline`)}
               </p>
 
-              <Link
-                href={pillar.id === 'expert-diagnosis' ? '/services/drain-cleaning' : pillar.id === 'time-cost' ? '/services' : '/team'}
-                className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-secondary hover:gap-2 transition-all"
-              >
-                {pillar.id === 'expert-diagnosis' ? (language === 'de' ? 'Leistung ansehen' : 'View service') : pillar.id === 'time-cost' ? (language === 'de' ? 'Alle Leistungen' : 'All services') : t('features.learnMore')} <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-secondary group-hover:gap-4 transition-all">
+                {t('features.learnMore')} <ArrowRight className="w-4 h-4" />
+              </div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Feature Deep Dive */}
+        {/* Feature Deep Dive - Glass Card */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activePillar}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="rounded-2xl p-6 lg:p-10 border border-border bg-card shadow-sm"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="bg-white rounded-2xl p-6 lg:p-10 border border-slate-200 shadow-sm relative overflow-hidden"
           >
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+
+            <div className="grid lg:grid-cols-2 gap-10 items-center">
               {/* Left Side: Detail & Timeline */}
               <div className="space-y-12">
                 <div className="space-y-6">
-                  <h3 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">
-                    {t(`features.${activePillar}.title`)}
-                  </h3>
-                  <p className="text-base text-muted-foreground leading-relaxed">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                      <Wrench className="w-6 h-6 text-secondary" />
+                    </div>
+                    <h3 className="text-3xl font-black italic uppercase tracking-tighter text-foreground">
+                      {t(`features.${activePillar}.title`)}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                     {t(`features.${activePillar}.solution`)}
                   </p>
                 </div>
@@ -136,27 +167,31 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                   {[1, 2, 3].map((i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex items-center gap-3 bg-muted/40 p-3 rounded-xl border border-border/60"
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100"
                     >
-                      <span className="font-bold text-foreground tracking-tight">
-                        {t(`features.${activePillar}.benefit${i}`)}
-                      </span>
+                      <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{t(`features.${activePillar}.benefit${i}`)}</span>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* Right Side: Simple steps */}
-              <div className="bg-muted rounded-2xl p-6 lg:p-8">
-                <h4 className="text-lg font-semibold text-foreground mb-6">
+              {/* Right Side: Timeline/Steps */}
+              <div className="bg-primary rounded-xl p-6 lg:p-8 shadow-lg relative">
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary rounded-full blur-3xl opacity-30 group-hover:opacity-60 transition-opacity" />
+
+                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
+                  <Timer className="w-4 h-4 text-secondary" />
                   {t('features.howItWorks')}
                 </h4>
 
-                <div className="space-y-10 relative">
-                  <div className="absolute left-5 top-10 bottom-10 w-px bg-border" />
+                <div className="space-y-5 relative">
+                  <div className="absolute left-4 top-6 bottom-6 w-px bg-white/20" />
 
                   {diagnosisSteps.map((step, idx) => (
                     <motion.div
@@ -164,52 +199,30 @@ export function FeaturesSection({ onCtaClick }: FeaturesSectionProps) {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.15 }}
-                      className="flex gap-8 relative z-10"
+                      className="flex gap-4 relative z-10"
                     >
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                        <step.icon className="w-3.5 h-3.5 text-secondary" />
+                      </div>
                       <div>
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-1">
-                          Step {step.step}
-                        </p>
-                        <h5 className="text-base font-semibold text-foreground mb-1 tracking-tight">
-                          {t(`features.masterDeepDive.step${step.step}.title`)}
-                        </h5>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {t(`features.masterDeepDive.step${step.step}.desc`)}
-                        </p>
+                        <p className="text-[9px] font-bold text-secondary uppercase tracking-widest mb-0.5">{t('features.step')} {step.step}</p>
+                        <h5 className="text-sm font-bold text-white mb-0.5">{t(`features.masterDeepDive.step${step.step}.title`)}</h5>
+                        <p className="text-[11px] text-white/60 leading-relaxed">{t(`features.masterDeepDive.step${step.step}.desc`)}</p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
+
+                  <Button
+                    onClick={onCtaClick}
+                    className="w-full mt-6 bg-secondary text-white hover:bg-secondary/90 font-bold uppercase tracking-wider py-5 rounded-lg text-xs transition-all active:scale-95"
+                  >
+                    {t('features.cta')}
+                  </Button>
               </div>
             </div>
           </motion.div>
         </AnimatePresence>
-
-        {/* Simple services list */}
-        <div className="mt-16 grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-xl font-semibold mb-4">
-              {t('services.commonIssues') || 'Typical plumbing problems'}
-            </h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>- {t('services.leaks') || 'Leaking pipes, taps and radiators'}</li>
-              <li>- {t('services.blocks') || 'Blocked toilets, showers and kitchen sinks'}</li>
-              <li>- {t('services.heating') || 'Problems with hot water and heating'}</li>
-              <li>- {t('services.emergency') || 'Emergency water damage and burst pipes'}</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-4">
-              {t('services.projects') || 'Planned work and renovations'}
-            </h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>- {t('services.bathroom') || 'Bathroom modernisation and new fittings'}</li>
-              <li>- {t('services.kitchen') || 'Kitchen sinks, dishwashers and washing machines'}</li>
-              <li>- {t('services.replacement') || 'Replacement of old pipe sections and fittings'}</li>
-              <li>- {t('services.checks') || 'Checking existing installations before buying or renting'}</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </section>
   )

@@ -1,0 +1,55 @@
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 3 and 26 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+	new file:   IMPLEMENTATION.cmd
+	modified:   IMPLEMENTATION.md
+	modified:   app/page.tsx
+	new file:   app/services/[slug]/page.tsx
+	new file:   app/services/page.tsx
+	new file:   app/team/page.tsx
+	new file:   components/about-section.tsx
+	modified:   components/before-after-gallery.tsx
+	new file:   components/diagnostic-funnel.tsx
+	modified:   components/header.tsx
+	new file:   components/instant-diagnosis-section.tsx
+	modified:   components/join-modal.tsx
+	new file:   components/service-area-section.tsx
+	modified:   components/trust-badges.tsx
+	modified:   components/ui/magnetic.tsx
+	new file:   lib/diagnostic-rules.ts
+	new file:   lib/services-data.ts
+	modified:   next-env.d.ts
+	modified:   next.config.mjs
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+	both modified:   app/context/language-context.tsx
+	both modified:   components/faq-section.tsx
+	both modified:   components/features-section.tsx
+	both modified:   components/footer.tsx
+	both modified:   components/hero-section.tsx
+	both modified:   components/master-expert-section.tsx
+	both modified:   components/pricing-section.tsx
+	both modified:   components/testimonials-section.tsx
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   components/before-after-gallery.tsx
+	modified:   next-env.d.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	copy-media.mjs
+	git_status.txt
+	git_status_full.txt
+	public/pipe-before.png
+	public/plumber-after.png
+
