@@ -46,35 +46,35 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
 
   const text = {
     en: {
-      title: 'Expert Restoration',
-      subtitle: 'Connect with our master plumbing team for immediate assistance.',
-      customerTitle: 'Request a Master Quote',
-      customerDesc: 'Direct access to certified master technicians',
+      title: 'Contact Rotek',
+      subtitle: 'Send your inquiry. We will get back to you shortly.',
+      customerTitle: 'Send inquiry',
+      customerDesc: 'We will contact you as soon as possible.',
       formName: 'Full Name',
       formEmail: 'Email Address',
       formPhone: 'Phone Number',
-      formProblem: 'Problem Type (e.g. Leaking, Clogged)',
+      formProblem: 'Service needed (e.g. Rohrreinigung, Kanal-TV)',
       formMessage: 'Additional Details',
-      submitCustomer: 'Send Request to Masters',
+      submitCustomer: 'Send inquiry',
       back: 'Back',
-      successTitle: 'Request Received',
-      successCustomer: 'Our master plumbing team has received your details and will contact you shortly.',
+      successTitle: 'Inquiry received',
+      successCustomer: 'We have received your details and will contact you shortly.',
       close: 'Close'
     },
     de: {
-      title: 'Meister-Service',
-      subtitle: 'Verbinden Sie sich mit unserem Experten-Team für sofortige Hilfe.',
-      customerTitle: 'Meister-Angebot anfordern',
-      customerDesc: 'Direkter Zugang zu zertifizierten Sanitärmeistern',
+      title: 'Kontakt Rotek',
+      subtitle: 'Senden Sie Ihre Anfrage. Wir melden uns umgehend.',
+      customerTitle: 'Anfrage senden',
+      customerDesc: 'Wir kontaktieren Sie schnellstmöglich.',
       formName: 'Vollständiger Name',
       formEmail: 'E-Mail-Adresse',
       formPhone: 'Telefonnummer',
-      formProblem: 'Art des Problems (z.B. Leck, Verstopfung)',
-      formMessage: 'Zusätzliche Details',
-      submitCustomer: 'Anfrage an Meister senden',
+      formProblem: 'Benötigte Leistung (z.B. Rohrreinigung, Kanal-TV)',
+      formMessage: 'Zusätzliche Angaben',
+      submitCustomer: 'Anfrage senden',
       back: 'Zurück',
       successTitle: 'Anfrage erhalten',
-      successCustomer: 'Unser Team hat Ihre Daten erhalten und wird Sie in Kürze kontaktieren.',
+      successCustomer: 'Wir haben Ihre Angaben erhalten und melden uns in Kürze.',
       close: 'Schließen'
     }
   }
@@ -126,7 +126,7 @@ export function JoinModal({ isOpen, onClose }: JoinModalProps) {
                   <div className="text-center mb-12">
                     <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary text-[10px] font-black rounded-xl uppercase tracking-[0.3em] mb-6">
                       <ShieldCheck className="w-4 h-4" />
-                      Secure Priority Intake
+                      {language === 'de' ? 'Anfrage' : 'Inquiry'}
                     </span>
                     <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-4 tracking-tighter italic uppercase leading-none">{t.customerTitle}</h2>
                     <p className="text-muted-foreground font-medium italic">{t.subtitle}</p>

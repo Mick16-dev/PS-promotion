@@ -4,7 +4,6 @@ import { Phone, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/app/context/language-context'
 import { Button } from '@/components/ui/button'
-import { Magnetic } from '@/components/ui/magnetic'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -15,119 +14,114 @@ interface HeaderProps {
 }
 
 export function Header({ onEmergencyClick }: HeaderProps) {
-  const { language, setLanguage, t } = useLanguage()
+  const { language, setLanguage } = useLanguage()
   const [isServicesOpen, setIsServicesOpen] = useState(false)
 
   return (
-    <motion.header 
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group cursor-pointer shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105 p-2">
-              <img src="/logo-custom.svg" alt="Rohr-Blitz Logo" className="w-full h-full object-contain brightness-0 invert" />
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-18">
+          <Link href="/" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-card border border-border/60 rounded-lg flex items-center justify-center p-1.5">
+              <img
+                src="/logo-custom.svg"
+                alt="Rotek"
+                className="w-full h-full object-contain opacity-90"
+              />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold uppercase tracking-tight leading-none text-slate-900">{t('header.logo')}</span>
-              <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-500">Premium Plumbing</span>
-            </div>
+            <span className="text-lg font-bold tracking-tight text-foreground">Rotek</span>
           </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 mx-4">
-            {[
-              { key: 'nav.overview', name: t('nav.overview'), href: '/' },
-              { key: 'nav.services', name: t('nav.services'), href: '/services', hasDropdown: true },
-              { key: 'nav.pricing', name: t('nav.pricing'), href: '/pricing' },
-              { key: 'nav.team', name: t('nav.team'), href: '/team' },
-              { key: 'nav.contact', name: t('nav.contact'), href: '/contact' }
-            ].map((item) => (
-              <div 
-                key={item.key} 
-                className="relative group"
-                onMouseEnter={() => item.hasDropdown && setIsServicesOpen(true)}
-                onMouseLeave={() => item.hasDropdown && setIsServicesOpen(false)}
-              >
-                <Link
-                  href={item.href}
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap flex items-center gap-1"
-                >
-                  {t(item.key)}
-                  {item.hasDropdown && <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", isServicesOpen && "rotate-180")} />}
-                </Link>
 
-                {item.hasDropdown && (
-                  <AnimatePresence>
-                    {isServicesOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute top-full left-0 w-52 bg-white border border-slate-200 shadow-lg rounded-lg py-1 z-50"
+          <nav className="hidden lg:flex items-center gap-1">
+            <Link
+              href="/"
+              className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {language === 'de' ? 'Start' : 'Home'}
+            </Link>
+            <div
+              className="relative"
+              onMouseEnter={() => setIsServicesOpen(true)}
+              onMouseLeave={() => setIsServicesOpen(false)}
+            >
+              <Link
+                href="/services"
+                className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              >
+                {language === 'de' ? 'Leistungen' : 'Services'}
+                <ChevronDown className={cn('w-4 h-4', isServicesOpen && 'rotate-180')} />
+              </Link>
+              <AnimatePresence>
+                {isServicesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    className="absolute top-full left-0 w-56 bg-card border border-border/60 rounded-xl py-1.5 z-50 shadow-lg"
+                  >
+                    {services.map((s) => (
+                      <Link
+                        key={s.id}
+                        href={`/services/${s.slug}`}
+                        className="block px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
                       >
-                        {services.map((service) => (
-                          <Link
-                            key={service.id}
-                            href={`/services/${service.slug}`}
-                            className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                          >
-                            {language === 'de' ? service.titleDe : service.titleEn}
-                          </Link>
-                        ))}
-                        <div className="border-t border-slate-100 mt-1 pt-1">
-                          <Link 
-                            href="/services" 
-                            className="block px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-900 transition-colors"
-                          >
-                             {language === 'de' ? 'Alle ansehen →' : 'View all →'}
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        {language === 'de' ? s.titleDe : s.titleEn}
+                      </Link>
+                    ))}
+                    <div className="border-t border-border/50 mt-1 pt-1">
+                      <Link
+                        href="/services"
+                        className="block px-4 py-2 text-xs font-semibold text-primary"
+                      >
+                        {language === 'de' ? 'Alle Leistungen →' : 'View all →'}
+                      </Link>
+                    </div>
+                  </motion.div>
                 )}
-              </div>
-            ))}
+              </AnimatePresence>
+            </div>
+            <Link
+              href="/ueber-uns"
+              className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {language === 'de' ? 'Über uns' : 'About'}
+            </Link>
+            <Link
+              href="/kontakt"
+              className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {language === 'de' ? 'Kontakt' : 'Contact'}
+            </Link>
           </nav>
 
-          {/* Language Toggle + Emergency CTA */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-            {/* Language Toggle */}
-            <div className="hidden sm:flex items-center border border-slate-200 rounded-lg p-1 bg-slate-50/50">
-              {(['en', 'de'] as const).map((lang) => (
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="hidden sm:flex items-center border border-border/60 rounded-lg p-0.5 bg-muted/30">
+              {(['de', 'en'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
                   className={cn(
-                    "px-3 py-1.5 text-xs font-bold rounded-md transition-all uppercase",
-                    language === lang 
-                      ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
-                      : "text-slate-500 hover:text-slate-900"
+                    'px-3 py-1.5 text-xs font-semibold rounded-md uppercase',
+                    language === lang
+                      ? 'bg-card text-foreground border border-border/60'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   {lang}
                 </button>
               ))}
             </div>
-
-            {/* Emergency CTA */}
-            <Button 
-              onClick={onEmergencyClick}
-              className="bg-red-600 text-white hover:bg-red-700 font-bold px-4 h-10 sm:h-12 rounded-lg shadow-sm border-0 flex items-center gap-2"
+            <a
+              href="tel:+49421391714"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-4 h-10 rounded-lg text-sm"
             >
               <Phone className="w-4 h-4" />
-              <span className="hidden lg:inline uppercase tracking-wider text-xs">{t('header.emergency')}</span>
-              <span className="lg:hidden text-xs">24/7</span>
-            </Button>
+              <span className="hidden sm:inline">0421 391714</span>
+              <span className="sm:hidden">24h</span>
+            </a>
           </div>
         </div>
       </div>
-    </motion.header>
+    </header>
   )
 }

@@ -1,143 +1,109 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, Outfit } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { LanguageProvider } from './context/language-context'
 import './globals.css'
 
-const bricolage = Bricolage_Grotesque({ 
-  subsets: ["latin"], 
-  variable: '--font-heading',
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
   display: 'swap',
-});
-
-const outfit = Outfit({ 
-  subsets: ["latin"], 
-  variable: '--font-body',
-  display: 'swap',
-});
+})
 
 export const viewport: Viewport = {
-  themeColor: '#1E3A5F',
+  themeColor: '#0B0F14',
   width: 'device-width',
   initialScale: 1,
 }
 
 export const metadata: Metadata = {
   title: {
-    default: 'Rohr-Blitz | Master Expert Plumbing Diagnosis & Repair',
-    template: '%s | Rohr-Blitz'
+    default: 'Rotek Rohrreinigungsdienst | Bremen & Verden | Seit 1972',
+    template: '%s | Rotek Bremen',
   },
-  description: 'Experience the future of home maintenance. Instant visual diagnosis, 24/7 premium emergency service, and transparent estimates in seconds with Rohr-Blitz Master Technicians.',
-  keywords: ['plumbing', 'master diagnosis', 'emergency plumber', 'Germany', 'home repair', 'Rohr-Blitz', 'leak detection', 'clogged drain repair', 'pipe burst service', 'Meisterbetrieb'],
-  authors: [{ name: 'Rohr-Blitz Engineering' }],
-  creator: 'Rohr-Blitz Engineering',
-  publisher: 'Rohr-Blitz',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  description:
+    'Fachbetrieb für Rohrreinigung, Kanalreinigung und Kanalsanierung. 24-Stunden Notdienst. Bayernstr. 172, Bremen-Walle. Rotek Rohrreinigungsdienst GmbH.',
+  keywords: [
+    'Rohrreinigung',
+    'Kanalreinigung',
+    'Rotek',
+    'Bremen',
+    'Verden',
+    '24h Notdienst',
+    'Kanal-TV',
+    'Dichtheitsprüfung',
+    'Kanalsanierung',
+    'Hebeanlagen',
+    'Fettabscheider',
+  ],
+  authors: [{ name: 'Rotek Rohrreinigungsdienst GmbH' }],
+  creator: 'Rotek Rohrreinigungsdienst GmbH',
+  publisher: 'Rotek Rohrreinigungsdienst GmbH',
+  formatDetection: { email: false, address: false, telephone: false },
   openGraph: {
-    title: 'Rohr-Blitz | Expert Master Plumbing',
-    description: 'Instant visual plumbing diagnosis and expert repair service. Available 24/7.',
-    url: 'https://rohr-blitz.de',
-    siteName: 'Rohr-Blitz',
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630',
-        width: 1200,
-        height: 630,
-        alt: 'Rohr-Blitz Master Expert Engineering',
-      },
-    ],
+    title: 'Rotek Rohrreinigungsdienst | Bremen & Verden | Seit 1972',
+    description: 'Rohrreinigung, Kanalreinigung, Kanal-TV, Dichtheitsprüfung. 24h Notdienst. Bremen-Walle & Verden.',
+    url: 'https://rotek.de',
+    siteName: 'Rotek Rohrreinigungsdienst',
     locale: 'de_DE',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rohr-Blitz | Master Expert Plumbing',
-    description: 'Bespoke Plumbing Diagnosis & Expert Engineering. Instant estimates, 24/7 service.',
-    images: ['https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630'],
-    creator: '@rohrblitz',
+    title: 'Rotek Rohrreinigungsdienst | Bremen & Verden',
+    description: 'Rohrreinigung, Kanalreinigung, 24h Notdienst. Seit 1972.',
   },
   icons: {
-    icon: [
-      { url: '/logo-custom.svg', type: 'image/svg+xml' },
-      { url: '/logo-custom.svg', sizes: '32x32', type: 'image/svg+xml' },
-    ],
-    apple: [
-      { url: '/logo-custom.svg', sizes: '180x180', type: 'image/svg+xml' },
-    ],
+    icon: [{ url: '/logo-custom.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/logo-custom.svg', sizes: '180x180', type: 'image/svg+xml' }],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: { index: true, follow: true },
 }
 
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "PlumbingService",
-  "name": "Rohr-Blitz",
-  "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200&h=630",
-  "@id": "https://rohr-blitz.de",
-  "url": "https://rohr-blitz.de",
-  "telephone": "+49123456789",
-  "priceRange": "$$",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Musterstraße 1",
-    "addressLocality": "Berlin",
-    "postalCode": "10115",
-    "addressCountry": "DE"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 52.5200,
-    "longitude": 13.4050
-  },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-    ],
-    "opens": "00:00",
-    "closes": "23:59"
-  },
-  "areaServed": [
-    { "@type": "City", "name": "Berlin" },
-    { "@type": "City", "name": "Munich" },
-    { "@type": "City", "name": "Hamburg" },
-    { "@type": "City", "name": "Frankfurt" },
-    { "@type": "City", "name": "Cologne" }
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Rotek Rohrreinigungsdienst GmbH',
+  image: 'https://rotek.de/wp-content/uploads/2021/04/Logo-Rotek.png',
+  '@id': 'https://rotek.de',
+  url: 'https://rotek.de',
+  telephone: '+49 421 391714',
+  priceRange: '€€',
+  address: [
+    {
+      '@type': 'PostalAddress',
+      streetAddress: 'Bayernstr. 172',
+      addressLocality: 'Bremen',
+      addressRegion: 'Bremen-Walle',
+      postalCode: '28219',
+      addressCountry: 'DE',
+    },
+    {
+      '@type': 'PostalAddress',
+      streetAddress: 'Conrad-Wode-Straße 1',
+      addressLocality: 'Verden',
+      postalCode: '27283',
+      addressCountry: 'DE',
+    },
   ],
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Plumbing Services",
-    "itemListElement": [
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Emergency Leak Repair"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Pipe Diagnostic Analysis"
-        }
-      }
-    ]
-  }
+  geo: { '@type': 'GeoCoordinates', latitude: 53.1078, longitude: 8.7953 },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '00:00',
+    closes: '23:59',
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Bremen' },
+    { '@type': 'AdministrativeArea', name: 'Walle' },
+    { '@type': 'AdministrativeArea', name: 'Findorff' },
+    { '@type': 'AdministrativeArea', name: 'Horn' },
+    { '@type': 'AdministrativeArea', name: 'Neustadt' },
+    { '@type': 'City', name: 'Verden' },
+  ],
+  foundingDate: '1972',
+  numberOfEmployees: 32,
+  slogan: 'Alles rund ums Rohr',
 }
 
 import { AeoSchema } from '@/components/aeo-schema'
@@ -148,9 +114,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="de" className={`${bricolage.variable} ${outfit.variable} scroll-smooth`}>
-      <head />
-      <body className="font-body antialiased selection:bg-secondary/30 selection:text-secondary-foreground overflow-x-hidden text-base sm:text-lg">
+    <html lang="de" className={`${inter.variable} scroll-smooth`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="font-sans antialiased selection:bg-primary/20 selection:text-primary-foreground overflow-x-hidden text-base">
         <LanguageProvider>
           <AeoSchema />
           {children}

@@ -14,7 +14,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // Header
     'header.emergency': 'Emergency 24/7',
-    'header.logo': 'Rohr-Blitz',
+    'header.logo': 'Rotek',
     'nav.overview': 'Overview',
     'nav.services': 'Services',
     'nav.pricing': 'Pricing',
@@ -105,7 +105,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Features Section
     'features.badge': 'Why Choose Us',
-    'features.title': 'Why Choose Rohr-Blitz?',
+    'features.title': 'Why Choose Rotek?',
     'features.subtitle': 'We combine expert craftsmanship with modern diagnostic tools to deliver faster, more accurate, and cost-effective solutions.',
     'features.painPoint': 'The Problem',
     'features.solution': 'Our Solution',
@@ -215,14 +215,14 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.accreditations': 'Accreditations',
     'footer.certifiedMeister': 'Certified Meister',
     'footer.emergency': '24/7 Emergency',
-    'footer.copyright': '© 2026 Rohr-Blitz. Crafted for Master Excellence.',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH',
 
     // Team Page
-    'team.title': 'The Masters of Rohr-Blitz',
+    'team.title': 'About Rotek',
     'team.subtitle': 'Our precision-driven technicians are the heartbeat of our operation. Certified, disciplined, and ready to resolve any plumbing disruption.',
-    'team.story.title': 'The Rohr-Blitz Story',
+    'team.story.title': 'The Rotek Story',
     'team.story.tagline': 'From a Local Workshop to a Master-Led Network',
-    'team.story.desc': 'Founded in 2008 by Master Plumber Stefan Krause, Rohr-Blitz was born from a simple observation: plumbing is missing precision and transparency. Stefan envisioned a service where engineering-grade diagnostics meet traditional craftsmanship. Today, we are a network of 50+ hand-picked Master Technicians across Germany.',
+    'team.story.desc': 'Rotek Rohrreinigungsdienst GmbH – seit 1972 Fachbetrieb für Rohrreinigung, Kanalreinigung und Kanalsanierung in Bremen und Verden.',
     'team.coverage.title': 'Our Service Hubs',
     'team.coverage.desc': 'We currently deploy masters across Berlin, Munich, Hamburg, and Frankfurt, with local response teams available 24/7.',
     'team.expertise.title': 'The 4 Pillars of Mastery',
@@ -254,7 +254,7 @@ const translations: Record<Language, Record<string, string>> = {
   de: {
     // Header
     'header.emergency': 'Notdienst 24/7',
-    'header.logo': 'Rohr-Blitz',
+    'header.logo': 'Rotek',
     'nav.overview': 'Übersicht',
     'nav.services': 'Leistungen',
     'nav.pricing': 'Preise',
@@ -345,7 +345,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Features Section
     'features.badge': 'Warum wir',
-    'features.title': 'Warum Rohr-Blitz wählen?',
+    'features.title': 'Warum Rotek wählen?',
     'features.subtitle': 'Wir kombinieren echtes Handwerk mit modernen Diagnose-Tools für schnellere, genauere und kostengünstigere Lösungen.',
     'features.painPoint': 'Das Problem',
     'features.solution': 'Unsere Lösung',
@@ -455,14 +455,14 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.accreditations': 'Akkreditierungen',
     'footer.certifiedMeister': 'Zertifizierter Meister',
     'footer.emergency': '24/7 Notfall',
-    'footer.copyright': '© 2026 Rohr-Blitz. Für meisterhafte Exzellenz gefertigt.',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH',
 
     // Team Page
-    'team.title': 'Die Meister von Rohr-Blitz',
+    'team.title': 'Über Rotek',
     'team.subtitle': 'Unsere präzisen Techniker sind das Herzstück unseres Betriebs. Zertifiziert, diszipliniert und bereit für jede Herausforderung.',
-    'team.story.title': 'Die Rohr-Blitz Geschichte',
+    'team.story.title': 'Die Rotek Geschichte',
     'team.story.tagline': 'Vom lokalen Betrieb zum meistergeführten Netzwerk',
-    'team.story.desc': 'Gegründet 2008 von Sanitärmeister Stefan Krause, entstand Rohr-Blitz aus einer einfachen Beobachtung: Dem Handwerk fehlte es an Präzision und Transparenz. Stefan visionierte einen Service, bei dem Ingenieursdiagnostik auf traditionelles Handwerk trifft. Heute sind wir ein Netzwerk von über 50 Handwerksmeistern in ganz Deutschland.',
+    'team.story.desc': 'Rotek Rohrreinigungsdienst GmbH – seit 1972 Fachbetrieb für Rohrreinigung, Kanalreinigung und Kanalsanierung in Bremen und Verden.',
     'team.coverage.title': 'Unsere Einsatzgebiete',
     'team.coverage.desc': 'Wir sind derzeit mit festen Teams in Berlin, München, Hamburg und Frankfurt vertreten, mit lokalen Notdiensten rund um die Uhr.',
     'team.expertise.title': 'Die 4 Säulen der Meisterschaft',
@@ -499,7 +499,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
 
   useEffect(() => {
-    const stored = localStorage.getItem('rohr-blitz-lang') as Language | null
+    const stored = localStorage.getItem('rotek-lang') as Language | null
     if (stored && (stored === 'en' || stored === 'de')) {
       setLanguageState(stored)
     } else {
@@ -512,7 +512,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
-    localStorage.setItem('rohr-blitz-lang', lang)
+    localStorage.setItem('rotek-lang', lang)
   }
 
   const t = (key: string): string => {

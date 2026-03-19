@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
+import { Phone } from 'lucide-react'
 import { useLanguage } from '@/app/context/language-context'
-import { ArrowRight, Zap } from 'lucide-react'
 
 export function StickyConversion({ onCtaClick }: { onCtaClick: () => void }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -29,22 +28,17 @@ export function StickyConversion({ onCtaClick }: { onCtaClick: () => void }) {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-lg"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md"
         >
-          <div className="bg-slate-900 border border-white/20 backdrop-blur-2xl p-4 rounded-[2rem] shadow-2xl flex items-center justify-between gap-4">
-            <div className="hidden sm:flex flex-col items-start pl-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 leading-none mb-1">Response Time</p>
-              <p className="text-sm font-black text-white uppercase tracking-tighter">~15 Minutes</p>
-            </div>
-            
-            <Button
-              onClick={onCtaClick}
-              className="flex-1 h-14 bg-white text-slate-900 hover:bg-slate-100 font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95 text-xs"
-            >
-              {language === 'de' ? 'Sofort-Angebot' : 'Instant Quote Engine'}
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </div>
+          <a
+            href="tel:+49421391714"
+            className="flex items-center justify-center gap-3 bg-card border border-border/60 backdrop-blur-md p-4 rounded-2xl shadow-xl hover:bg-muted/50 transition-colors"
+          >
+            <Phone className="w-5 h-5 text-primary" />
+            <span className="text-sm font-bold text-foreground">
+              {language === 'de' ? '24h Notdienst' : '24h emergency'}: 0421 391714
+            </span>
+          </a>
         </motion.div>
       )}
     </AnimatePresence>

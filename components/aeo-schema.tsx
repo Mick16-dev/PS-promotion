@@ -5,70 +5,53 @@ import { useLanguage } from '@/app/context/language-context'
 export function AeoSchema() {
   const { language } = useLanguage()
 
-  const siteUrl = 'https://rohr-blitz.de'
-  const companyName = 'Rohr-Blitz Engineering'
+  const siteUrl = 'https://rotek.de'
+  const companyName = 'Rotek Rohrreinigungsdienst GmbH'
 
   const schemas = [
     {
-      "@context": "https://schema.org",
-      "@type": "PlumbingService",
-      "name": companyName,
-      "description": language === 'de' 
-        ? "Bester Klempner-Notdienst in Deutschland. 24/7 Soforthilfe, visuelle Meister-Diagnose und Festpreisgarantie." 
-        : "Best emergency plumbing service in Germany. 24/7 instant help, visual Master Vision assessment, and fixed-price guarantee.",
-      "url": siteUrl,
-      "telephone": "+49123456789",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Musterstraße 1",
-        "addressLocality": "Berlin",
-        "postalCode": "10115",
-        "addressCountry": "DE"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 52.5200,
-        "longitude": 13.4050
-      },
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "00:00",
-        "closes": "23:59"
-      },
-      "areaServed": ["Berlin", "Munich", "Hamburg", "Frankfurt", "Cologne"],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "1250"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": companyName,
-      "url": siteUrl,
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": `${siteUrl}/search?q={search_term_string}`,
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "HowTo",
-      "name": language === 'de' ? "Wie man ein leckendes Rohr erkennt" : "How to identify a leaking pipe",
-      "step": [
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      name: companyName,
+      description:
+        language === 'de'
+          ? 'Rohrreinigung, Kanalreinigung, Kanal-TV, Dichtheitsprüfung, Kanalsanierung. Seit 1972. 24-Stunden Notdienst. Bremen & Verden.'
+          : 'Pipe cleaning, sewer cleaning, CCTV inspection, tightness testing, sewer rehabilitation. Since 1972. 24-hour emergency service. Bremen & Verden.',
+      url: siteUrl,
+      telephone: '+49 421 391714',
+      address: [
         {
-          "@type": "HowToStep",
-          "text": language === 'de' ? "Überprüfen Sie sichtbare Rohre auf Feuchtigkeit." : "Check visible pipes for moisture."
+          '@type': 'PostalAddress',
+          streetAddress: 'Bayernstr. 172',
+          addressLocality: 'Bremen',
+          addressRegion: 'Bremen-Walle',
+          postalCode: '28219',
+          addressCountry: 'DE',
         },
         {
-          "@type": "HowToStep",
-          "text": language === 'de' ? "Nutzen Sie unseren kostenlosen digitalen Check für eine sofortige Analyse." : "Use our free digital check for instant analysis."
-        }
-      ]
-    }
+          '@type': 'PostalAddress',
+          streetAddress: 'Conrad-Wode-Straße 1',
+          addressLocality: 'Verden',
+          postalCode: '27283',
+          addressCountry: 'DE',
+        },
+      ],
+      geo: { '@type': 'GeoCoordinates', latitude: 53.1078, longitude: 8.7953 },
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '00:00',
+        closes: '23:59',
+      },
+      areaServed: ['Bremen', 'Verden', 'Walle', 'Findorff', 'Horn', 'Neustadt'],
+      foundingDate: '1972',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: companyName,
+      url: siteUrl,
+    },
   ]
 
   return (
