@@ -37,65 +37,53 @@ export default function ServicePage() {
         <div className="max-w-4xl mx-auto">
           <Link
             href="/services"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> {language === 'de' ? 'Zurück zu den Leistungen' : 'Back to services'}
           </Link>
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">{title}</h1>
-          <p className="text-xl text-muted-foreground leading-relaxed">{intro}</p>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight mb-6">{title}</h1>
+          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">{intro}</p>
         </div>
       </section>
 
-      {/* Before / After */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-8">
-            {language === 'de' ? 'Vorher und Nachher' : 'Before & after'}
-          </h2>
-          <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] overflow-hidden rounded-2xl border border-border bg-black/5">
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${service.afterImage})` }} />
+      {/* Hero image */}
+      {service.afterImage && (
+        <section className="py-12 px-4">
+          <div className="max-w-4xl mx-auto">
             <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${service.beforeImage})`, clipPath: 'inset(0 50% 0 0)' }}
+              className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-border/60 bg-muted/20"
+              style={{ backgroundImage: `url(${service.afterImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
             />
-            <div className="absolute top-6 left-6 px-4 py-2 bg-black/50 text-white text-sm font-bold uppercase rounded-xl">
-              {language === 'de' ? 'Vorher' : 'Before'}
-            </div>
-            <div className="absolute top-6 right-6 px-4 py-2 bg-success/90 text-white text-sm font-bold uppercase rounded-xl">
-              {language === 'de' ? 'Nachher' : 'After'}
-            </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              {language === 'de' ? 'Rotek Rohrreinigungsdienst GmbH' : 'Rotek Rohrreinigungsdienst GmbH'}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            {language === 'de'
-              ? 'Typische Ausgangslage und Ergebnis unserer Arbeit (Beispielbilder).'
-              : 'Typical starting point and result of our work (sample images).'}
-          </p>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-16">
+      <section className="py-16 px-4 border-t border-border/50">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 lg:gap-16">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mb-6">
               {language === 'de' ? 'Was wir machen' : 'What we do'}
             </h2>
             <ul className="space-y-3">
               {whatWeDo.map((item, i) => (
                 <li key={i} className="flex gap-3">
-                  <span className="text-secondary font-bold shrink-0">–</span>
+                  <span className="text-primary font-semibold shrink-0">–</span>
                   <span className="text-muted-foreground">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              {language === 'de' ? 'Wann Sie anrufen sollten' : 'When to call'}
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mb-6">
+              {language === 'de' ? 'Wann anrufen' : 'When to call'}
             </h2>
             <ul className="space-y-3">
               {whenToCall.map((item, i) => (
                 <li key={i} className="flex gap-3">
-                  <span className="text-secondary font-bold shrink-0">–</span>
+                  <span className="text-primary font-semibold shrink-0">–</span>
                   <span className="text-muted-foreground">{item}</span>
                 </li>
               ))}
@@ -104,20 +92,20 @@ export default function ServicePage() {
         </div>
       </section>
 
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 border-t border-border/50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-8">
-            {language === 'de' ? 'So läuft ein typischer Einsatz ab' : 'How a typical visit works'}
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mb-8">
+            {language === 'de' ? 'Ablauf' : 'Process'}
           </h2>
-          <div className="space-y-10">
+          <div className="space-y-8">
             {process.map((step, i) => (
-              <div key={i} className="flex gap-6">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 font-bold text-primary">
+              <div key={i} className="flex gap-5">
+                <div className="w-9 h-9 rounded-lg border border-border/60 bg-card/40 flex items-center justify-center shrink-0 font-bold text-primary text-sm">
                   {i + 1}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.desc}</p>
+                  <h3 className="text-base font-semibold text-foreground mb-0.5">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -125,21 +113,21 @@ export default function ServicePage() {
         </div>
       </section>
 
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            {language === 'de' ? 'Kostenloser Kostenvoranschlag' : 'Free quote'}
+      <section className="py-16 px-4 border-t border-border/50 bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-xl font-extrabold tracking-tight text-foreground mb-2">
+            {language === 'de' ? 'Anfrage stellen' : 'Request'}
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-6 max-w-xl">
             {language === 'de'
-              ? 'Grobe Preisspanne: ab €' + service.fromPrice + '. Der genaue Preis hängt von Aufwand und Material ab.'
-              : 'Rough price range: from €' + service.fromPrice + '. Exact price depends on effort and materials.'}
+              ? 'Rufen Sie uns an oder schreiben Sie uns – wir nennen Ihnen grobe Kosten und mögliche Termine.'
+              : 'Call or message us – we will give you rough costs and possible appointment times.'}
           </p>
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-12 px-8 rounded-xl inline-flex items-center gap-2"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-11 px-6 rounded-xl inline-flex items-center gap-2"
           >
-            {language === 'de' ? 'Anfrage senden' : 'Send request'} <ArrowRight className="w-5 h-5" />
+            {language === 'de' ? 'Anfrage senden' : 'Send request'} <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </section>
