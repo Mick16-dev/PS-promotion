@@ -78,7 +78,9 @@ export default function Home() {
         <FaqSection />
       </StackingSection>
       
-      <Footer onCtaClick={openModal} />
+      <StackingSection index={11}>
+        <Footer onCtaClick={openModal} />
+      </StackingSection>
       <JoinModal isOpen={isModalOpen} onClose={closeModal} />
       <StickyConversion onCtaClick={openModal} />
     </main>

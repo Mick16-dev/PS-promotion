@@ -148,11 +148,22 @@ const translations: Record<Language, Record<string, string>> = {
     'team.expertise.4': 'Fully Insured',
 
     // Footer
-    'footer.readyFor': 'Ready for Rotek Precision?',
+    'footer.readyFor': 'Ready for Rotek ',
+    'footer.goldStandard': 'Industrial Standard',
+    'footer.fix': ' Restoration?',
     'footer.experience': 'Experience the future of pipe engineering with professional master diagnostics.',
+    'footer.cta': 'Initiate Master Review',
     'footer.premiumPlumbing': 'Premium Pipe Engineering',
     'footer.redefining': 'Specialists for sewer restoration and TV inspection. For over 50 years in Bremen and Verden.',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
+    'footer.legal': 'LEGAL INFORMATION',
+    'footer.privacy': 'Privacy Policy',
+    'footer.terms': 'Terms of Service',
+    'footer.imprint': 'Imprint / Legal Notice',
+    'footer.accreditations': 'ACCREDITATIONS',
+    'footer.certifiedMeister': 'MASTER CERTIFIED',
+    'footer.emergency': '24/7 EMERGENCY',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.'
+  },
 
     // Services
     'services.kanal-tv.title': '3D Sewer TV Inspection',
@@ -294,11 +305,22 @@ const translations: Record<Language, Record<string, string>> = {
     'team.expertise.4': 'Vollversichert',
 
     // Footer
-    'footer.readyFor': 'Bereit für Rotek Präzision?',
+    'footer.readyFor': 'Bereit für Rotek ',
+    'footer.goldStandard': 'Industrie-Standard',
+    'footer.fix': ' Sanierung?',
     'footer.experience': 'Erleben Sie die Zukunft der Rohrtechnik mit professioneller Meisterdiagnostik.',
+    'footer.cta': 'Analyse starten',
     'footer.premiumPlumbing': 'Premium-Rohrtechnik',
     'footer.redefining': 'Spezialisten für Sielsanierung und TV-Untersuchung. Seit über 50 Jahren in Bremen und Verden.',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
+    'footer.legal': 'RECHTLICHES',
+    'footer.privacy': 'Datenschutzerklärung',
+    'footer.terms': 'AGB / Nutzungsbedingungen',
+    'footer.imprint': 'Impressum',
+    'footer.accreditations': 'ZERTIFIZIERUNGEN',
+    'footer.certifiedMeister': 'ZERTIFIZIERTER MEISTER',
+    'footer.emergency': '24/7 NOTDIENST',
+    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.'
+  }
 
     // Services
     'services.kanal-tv.title': '3D Kanal-TV-Untersuchung',
