@@ -67,7 +67,7 @@ export function Footer({ onCtaClick }: FooterProps) {
 
             <div className="grid sm:grid-cols-2 gap-8">
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Zentrale Bremen-Walle</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t('footer.address.walle')}</h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 text-slate-300">
                     <MapPin className="w-4 h-4 text-red-600" />
@@ -80,7 +80,7 @@ export function Footer({ onCtaClick }: FooterProps) {
                 </div>
               </div>
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Büro Verden</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t('footer.address.verden')}</h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 text-slate-300">
                     <MapPin className="w-4 h-4 text-red-600" />
