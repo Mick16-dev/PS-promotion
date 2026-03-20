@@ -104,7 +104,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
   } as any
 
   return (
-    <section id="pricing" className="py-32 px-4 relative overflow-hidden bg-[#0A0B0D]">
+    <section id="pricing" className="py-20 px-4 relative overflow-hidden bg-[#0A0B0D]">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-white/5" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -112,7 +112,7 @@ export function PricingSection({ onCtaClick }: PricingSectionProps) {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="text-center mb-32"
+          className="text-center mb-16"
         >
           <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter italic uppercase leading-none">
             {language === 'de' ? 'Kalkulierbare Präzision.' : 'Fixed Scale Precision.'}

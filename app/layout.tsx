@@ -129,7 +129,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased selection:bg-red-600 selection:text-white overflow-x-hidden text-base sm:text-lg bg-[#0A0B0D]">
+      <body className="font-sans antialiased selection:bg-red-600 selection:text-white overflow-x-hidden text-sm sm:text-base bg-[#0A0B0D]">
         <LanguageProvider>
           <AeoSchema />
           {children}

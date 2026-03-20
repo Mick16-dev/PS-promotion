@@ -62,7 +62,7 @@ export function FaqSection() {
   }
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-[#0A0B0D]">
+    <section className="py-20 px-4 relative overflow-hidden bg-[#0A0B0D]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -75,7 +75,7 @@ export function FaqSection() {
            initial={{ opacity: 0, scale: 0.98 }}
            whileInView={{ opacity: 1, scale: 1 }}
            viewport={{ once: true }}
-           className="text-left mb-20 border-l-8 border-red-600 pl-8"
+           className="text-left mb-12 border-l-8 border-red-600 pl-8"
         >
           <h2 className="text-4xl sm:text-6xl font-black text-white mb-4 tracking-tighter uppercase italic leading-none">
             {language === 'de' ? 'Technische Klärung.' : 'Technical FAQ.'}
@@ -119,7 +119,7 @@ export function FaqSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mt-20 p-12 bg-white/[0.01] rounded-none border border-white/5 flex flex-col items-center text-center group hover:border-red-600/30 transition-colors"
+          className="mt-12 p-12 bg-white/[0.01] rounded-none border border-white/5 flex flex-col items-center text-center group hover:border-red-600/30 transition-colors"
         >
           <HelpCircle className="w-10 h-10 text-red-600 mb-6 group-hover:scale-110 transition-transform" />
           <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-3 italic">

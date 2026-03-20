@@ -69,7 +69,7 @@ export function TestimonialsSection() {
   const { language, t } = useLanguage()
 
   return (
-    <section className="py-32 px-4 relative overflow-hidden bg-[#0A0B0D]">
+    <section className="py-20 px-4 relative overflow-hidden bg-[#0A0B0D]">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-white/5" />
 
       <div className="max-w-6xl mx-auto relative z-10">

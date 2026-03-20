@@ -52,7 +52,7 @@ export function Differentiator() {
   const { language } = useLanguage()
 
   return (
-    <section className="py-32 px-4 bg-[#0A0B0D] relative overflow-hidden">
+    <section className="py-20 px-4 bg-[#0A0B0D] relative overflow-hidden">
       <div className="absolute inset-0 blueprint-grid opacity-5 pointer-events-none" />
       
       <div className="max-w-7xl mx-auto relative z-10">
