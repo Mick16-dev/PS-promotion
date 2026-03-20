@@ -36,51 +36,37 @@ export default function Home() {
     <main className="min-h-screen bg-background selection:bg-red-600 selection:text-white">
       <Header onEmergencyClick={openModal} />
       
-      <HeroSection onCtaClick={openModal} />
-      
-      <StackingSection index={1}>
-        <TrustBadges />
+      <StackingSection index={0}>
+        <HeroSection onCtaClick={openModal} />
       </StackingSection>
+      
+      <TrustBadges />
 
       <StackingSection index={2}>
         <RotekMasterVisualService onCtaClick={openModal} />
       </StackingSection>
 
-      <StackingSection index={3}>
-        <ProblemSolution onCtaClick={openModal} />
-      </StackingSection>
+      <ProblemSolution onCtaClick={openModal} />
 
-      <StackingSection index={4}>
-        <Differentiator />
-      </StackingSection>
+      <Differentiator />
 
-      <StackingSection index={5}>
-        <MasterExpertSection />
-      </StackingSection>
+      <MasterExpertSection />
       
       <StackingSection index={6}>
         <ServicesSection onCtaClick={openModal} />
       </StackingSection>
 
-      <StackingSection index={7}>
-        <Einsatzgebiete />
-      </StackingSection>
+      <Einsatzgebiete />
       
-      <StackingSection index={8}>
-        <TestimonialsSection />
-      </StackingSection>
+      <TestimonialsSection />
       
       <StackingSection index={9}>
         <PricingSection onCtaClick={openModal} />
       </StackingSection>
       
-      <StackingSection index={10}>
-        <FaqSection />
-      </StackingSection>
+      <FaqSection />
       
-      <StackingSection index={11}>
-        <Footer onCtaClick={openModal} />
-      </StackingSection>
+      <Footer onCtaClick={openModal} />
       <JoinModal isOpen={isModalOpen} onClose={closeModal} />
       <StickyConversion onCtaClick={openModal} />
     </main>
