@@ -42,9 +42,7 @@ export default function Home() {
       
       <TrustBadges />
 
-      <StackingSection index={2}>
-        <RotekMasterVisualService onCtaClick={openModal} />
-      </StackingSection>
+      <RotekMasterVisualService onCtaClick={openModal} />
 
       <ProblemSolution onCtaClick={openModal} />
 
@@ -52,17 +50,13 @@ export default function Home() {
 
       <MasterExpertSection />
       
-      <StackingSection index={6}>
-        <ServicesSection onCtaClick={openModal} />
-      </StackingSection>
+      <ServicesSection onCtaClick={openModal} />
 
       <Einsatzgebiete />
       
       <TestimonialsSection />
       
-      <StackingSection index={9}>
-        <PricingSection onCtaClick={openModal} />
-      </StackingSection>
+      <PricingSection onCtaClick={openModal} />
       
       <FaqSection />
       
