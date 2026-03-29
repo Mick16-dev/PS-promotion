@@ -233,8 +233,8 @@ const translations: Record<Language, Record<string, string>> = {
     'faq.title': 'Technische Klärung.',
     'faq.badge': 'Rotek Wissensbasis',
     'faq.complex': 'Komplexere Fragestellung?',
-    'faq.complex.desc': 'Contact our operations lead for individual technical consulting.',
-    'faq.cta': 'Einsatzleitung kontaktieren',
+    'faq.complex.desc': 'Kontaktieren Sie unsere Einsatzleitung für eine individuelle Fachberatung.',
+    'faq.cta': 'Einsatzleitung kontaktieren',� 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
 
     // Services
     'services.kanal-tv.title': '3D Kanal-TV-Untersuchung',

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
+import { LanguageProvider } from './context/language-context'
 import './globals.css'
 
 const inter = Inter({ 
@@ -42,9 +43,11 @@ export default function RootLayout({
         {/* Ambient Lumina Effect Layer */}
         <div className="fixed inset-0 pointer-events-none lumina-glow opacity-50 z-0" />
         
-        <main className="relative z-10 flex min-h-screen flex-col">
-          {children}
-        </main>
+        <LanguageProvider>
+          <main className="relative z-10 flex min-h-screen flex-col">
+            {children}
+          </main>
+        </LanguageProvider>
       </body>
     </html>
   )

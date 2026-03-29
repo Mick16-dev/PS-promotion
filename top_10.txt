@@ -1,0 +1,10 @@
+'use client'
+
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
+
+type Language = 'en' | 'de'
+
+interface LanguageContextType {
+  language: Language
+  setLanguage: (lang: Language) => void
+  t: (key: string) => string
