@@ -19,7 +19,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select'
-import { Mic, User, Mail, Instagram, Music } from 'lucide-react'
+import { Mic, User, Mail, Music } from 'lucide-react'
 
 interface CreateArtistModalProps {
   isOpen: boolean
@@ -87,14 +87,15 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
               </div>
             </div>
 
-            {/* Social Link */}
+            {/* Direct Artist Email */}
             <div className="space-y-2">
-              <Label htmlFor="instagram" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Instagram Handle</Label>
+              <Label htmlFor="artistEmail" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Direct Artist Email</Label>
               <div className="relative">
-                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                 <Input 
-                  id="instagram" 
-                  placeholder="@handle" 
+                  id="artistEmail" 
+                  type="email"
+                  placeholder="artist@example.com" 
                   className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50"
                 />
               </div>
