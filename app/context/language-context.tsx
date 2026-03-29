@@ -26,7 +26,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Header
     'header.logo': 'Rotek',
     'header.emergency': 'Emergency Protocol',
-    'header.allServices': 'All Services →',
+    'header.allServices': 'All Services ->',
 
     // Hero Section
     'hero.badge': 'Industrial Precision Since 1972',
@@ -70,9 +70,9 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.accreditations': 'ACCREDITATIONS',
     'footer.certifiedMeister': 'MASTER CERTIFIED',
     'footer.emergency': '24/7 EMERGENCY',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
+    'footer.copyright': '(c) 2026 Rotek Rohrreinigungsdienst GmbH. Industrial Excellence since 1972.',
     'footer.address.walle': 'Zentrale Bremen-Walle',
-    'footer.address.verden': 'Büro Verden',
+    'footer.address.verden': 'Buero Verden',
 
     // Pricing
     'pricing.popular': 'Industry Standard',
@@ -96,7 +96,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Master Expert
     'master.title': 'Industrial Engineering.',
     'master.subtitle': 'Certified Validation',
-    'master.desc': 'Behind every mission stand our operations leads. Every diagnosis is validated by our technicians before the team dispatches – for 100% precision.',
+    'master.desc': 'Behind every mission stand our operations leads. Every diagnosis is validated by our technicians before the team dispatches - for 100% precision.',
     'master.pill.meister': 'Master Certified',
     'master.pill.vetted': 'Vetted Technicians',
     'master.pill.camera': 'Precision Systems',
@@ -126,35 +126,35 @@ const translations: Record<Language, Record<string, string>> = {
   },
   de: {
     // Navigation
-    'nav.overview': 'Übersicht',
+    'nav.overview': 'Uebersicht',
     'nav.services': 'Leistungen',
-    'nav.testimonials': 'Einsätze',
+    'nav.testimonials': 'Einsaetze',
     'nav.pricing': 'Preise',
     'nav.faq': 'FAQ',
     'nav.emergency': 'Notfall-Protokoll',
-    'nav.about': 'Über uns',
+    'nav.about': 'Ueber uns',
     'nav.team': 'Das Team',
     'nav.contact': 'Kontakt',
 
     // Header
     'header.logo': 'Rotek',
     'header.emergency': 'Havariemanagement',
-    'header.allServices': 'Alle Leistungen →',
+    'header.allServices': 'Alle Leistungen ->',
 
     // Hero Section
-    'hero.badge': 'Industrielle Präzision seit 1972',
+    'hero.badge': 'Industrielle Praezision seit 1972',
     'hero.title': 'ROTEK MASTER VISUAL SERVICE',
-    'hero.subtitle': 'Technische Diagnose & Experten-Engineering. Übermitteln Sie Ihre Störung für eine sofortige Meister-Validierung in der Zentrale Walle.',
+    'hero.subtitle': 'Technische Diagnose \u0026 Experten-Engineering. Uebermitteln Sie Ihre Stoerung fuer eine sofortige Meister-Validierung in der Zentrale Walle.',
     'hero.cta': 'Meister-Video-Diagnose starten',
     'hero.calculate': 'Meister-Video-Diagnose starten',
     'hero.diagnosisInProgress': 'Meister-Protokoll-Verifizierung',
     'hero.diagnosing': 'Synchronisierung mit Zentrale Walle...',
-    'hero.encrypted': 'AES-256 Verschlüsselt',
+    'hero.encrypted': 'AES-256 Verschluesselt',
     'hero.gdpr': 'DSGVO-Datenschutz',
     'hero.masterEstimate': 'Technisches Meister-Angebot',
     'hero.masterCertified': 'Meister-Zertifiziert',
-    'hero.priority': '24/7 Priorität',
-    'hero.nationwide': 'Region Bremen & Umzu',
+    'hero.priority': '24/7 Prioritaet',
+    'hero.nationwide': 'Region Bremen \u0026 Umzu',
 
     // Trust
     'trust.title': 'Industrielle Exzellenz',
@@ -163,43 +163,43 @@ const translations: Record<Language, Record<string, string>> = {
     'trust.guarantee': 'Zufriedenheitsgarantie',
     'trust.insurance': 'Vollversichert',
     'trust.badge': 'Der Goldstandard',
-    'trust.foundingYear': 'Gegründet in',
+    'trust.foundingYear': 'Gegruendet in',
     'trust.specializedTrucks': 'Spezial-Fahrzeuge',
     'trust.technicalDefect': 'Technischer Defekt',
     'trust.rotekProtocol': 'Rotek Protokoll',
 
     // Footer
-    'footer.readyFor': 'Bereit für Rotek ',
+    'footer.readyFor': 'Bereit fuer Rotek ',
     'footer.goldStandard': 'Industrie-Standard',
     'footer.fix': ' Sanierung?',
     'footer.experience': 'Erleben Sie die Zukunft der Rohrtechnik mit professioneller Meisterdiagnostik.',
     'footer.cta': 'Analyse starten',
     'footer.premiumPlumbing': 'Premium-Rohrtechnik',
-    'footer.redefining': 'Spezialisten für Sielsanierung und TV-Untersuchung. Seit über 50 Jahren in Bremen und Verden.',
+    'footer.redefining': 'Spezialisten fuer Sielsanierung und TV-Untersuchung. Seit ueber 50 Jahren in Bremen und Verden.',
     'footer.legal': 'RECHTLICHES',
-    'footer.privacy': 'Datenschutzerklärung',
+    'footer.privacy': 'Datenschutzerklaerung',
     'footer.terms': 'AGB / Nutzungsbedingungen',
     'footer.imprint': 'Impressum',
     'footer.accreditations': 'ZERTIFIZIERUNGEN',
     'footer.certifiedMeister': 'ZERTIFIZIERTER MEISTER',
     'footer.emergency': '24/7 NOTDIENST',
-    'footer.copyright': '© 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
+    'footer.copyright': '(c) 2026 Rotek Rohrreinigungsdienst GmbH. Industrielle Exzellenz seit 1972.',
     'footer.address.walle': 'Zentrale Bremen-Walle',
-    'footer.address.verden': 'Büro Verden',
+    'footer.address.verden': 'Buero Verden',
 
     // Pricing
     'pricing.popular': 'Industrie-Standard',
-    'pricing.description.basic': 'Grundlegende Unterstützung für lokale Rohrprobleme.',
-    'pricing.description.standard': 'Der industrielle Standard für Privat & Gewerbe.',
-    'pricing.description.premium': 'Maximale Präzision für komplexe Infrastruktur.',
+    'pricing.description.basic': 'Grundlegende Unterstuetzung fuer lokale Rohrprobleme.',
+    'pricing.description.standard': 'Der industrielle Standard fuer Privat \u0026 Gewerbe.',
+    'pricing.description.premium': 'Maximale Praezision fuer komplexe Infrastruktur.',
     'pricing.guarantee': 'Ihre Sicherheit, unser Auftrag.',
-    'pricing.guarantee.desc': 'Alle Preise sind verbindliche Festpreise nach technischer Diagnose. Keine versteckten Gebühren. Zertifiziert nach Rotek-Standard.',
+    'pricing.guarantee.desc': 'Alle Preise sind verbindliche Festpreise nach technischer Diagnose. Keine versteckten Gebuehren. Zertifiziert nach Rotek-Standard.',
 
     // Differentiator
     'diff.title': 'Der Rotek Standard.',
-    'diff.subtitle': 'Warum wir der industrielle Marktführer in Bremen und Verden sind. Qualität ist kein Zufall.',
+    'diff.subtitle': 'Warum wir der industrielle Marktfuehrer in Bremen und Verden sind. Qualitaet ist kein Zufall.',
     'diff.zeroRisk': 'Null Risiko',
-    'diff.zeroRisk.desc': 'Vollständiger Versicherungsschutz bei jedem Einsatz.',
+    'diff.zeroRisk.desc': 'Vollstaendiger Versicherungsschutz bei jedem Einsatz.',
     'diff.expertise': 'Echte Expertise',
     'diff.expertise.desc': 'Keine Subunternehmer. Nur festangestellte Profis.',
     'diff.table.feature': 'Feature / Protokoll',
@@ -209,18 +209,18 @@ const translations: Record<Language, Record<string, string>> = {
     // Master Expert
     'master.title': 'Ingenieurs-Expertise.',
     'master.subtitle': 'Zertifizierte Validierung',
-    'master.desc': 'Hinter jedem Einsatz stehen unsere Einsatzleiter. Jede Diagnose wird von unseren Technikern validiert, bevor das Team ausrückt – für 100%ige Präzision.',
+    'master.desc': 'Hinter jedem Einsatz stehen unsere Einsatzleiter. Jede Diagnose wird von unseren Technikern validiert, bevor das Team ausrueckt - fuer 100%ige Praezision.',
     'master.pill.meister': 'Meisterbetrieb',
-    'master.pill.vetted': 'Geprüfte Techniker',
-    'master.pill.camera': 'Präzisions-Systeme',
+    'master.pill.vetted': 'Gepruefte Techniker',
+    'master.pill.camera': 'Praezisions-Systeme',
     'master.pill.sewer': 'Siel-Experten',
 
     // Services General
-    'services.badge': 'INDUSTRIELLE PRÄZISION SEIT 1972',
+    'services.badge': 'INDUSTRIELLE PRAEZISION SEIT 1972',
     'services.title': 'Rotek Lumnar-Serie',
-    'services.subtitle': 'Der Goldstandard für Abwasser- & Rohrsystemtechnik in Bremen, Verden und Umzu.',
+    'services.subtitle': 'Der Goldstandard fuer Abwasser- \u0026 Rohrsystemtechnik in Bremen, Verden und Umzu.',
     'services.meisterCheck': 'Digitaler Meister-Check',
-    'services.meisterCheck.desc': 'Starten Sie den "Rotek Master Visual Service" für eine technische Ferndiagnose.',
+    'services.meisterCheck.desc': 'Starten Sie den "Rotek Master Visual Service" fuer eine technische Ferndiagnose.',
     'services.diagnoseProtocol': 'Diagnose Protokoll',
 
     // Issues
@@ -230,7 +230,7 @@ const translations: Record<Language, Record<string, string>> = {
     'issue.installation': 'Sanierung/Neuinstallation',
 
     // FAQ
-    'faq.title': 'Technische Klärung.',
+    'faq.title': 'Technische Klaerung.',
     'faq.badge': 'Rotek Wissensbasis',
     'faq.complex': 'Komplexere Fragestellung?',
     'faq.complex.desc': 'Contact our operations lead for individual technical consulting.',
@@ -238,15 +238,15 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Services
     'services.kanal-tv.title': '3D Kanal-TV-Untersuchung',
-    'services.kanal-tv.desc': 'Hochauflösende 360° Diagnostik für Rohre von DN 40 bis DN 2000. "Wir machen schmutzige Filme".',
-    'services.rohrreinigung.title': 'Hochdruckspülarbeiten (24/7)',
-    'services.rohrreinigung.desc': 'Mechanische oder hydrodynamische Reinigung von Entwässerungsleitungen rund um die Uhr.',
+    'services.kanal-tv.desc': 'Hochaufloesende 360 Grad Diagnostik fuer Rohre von DN 40 bis DN 2000. Wir machen schmutzige Filme.',
+    'services.rohrreinigung.title': 'Hochdruckspuelarbeiten (24/7)',
+    'services.rohrreinigung.desc': 'Mechanische oder hydrodynamische Reinigung von Entwaesserungsleitungen rund um die Uhr.',
     'services.fettabscheider.title': 'Fettabscheider-Service',
-    'services.fettabscheider.desc': 'Vorgeschriebene Entleerung und Wartung für Industrie & Gastronomie.',
+    'services.fettabscheider.desc': 'Vorgeschriebene Entleerung und Wartung fuer Industrie \u0026 Gastronomie.',
     'services.kanalsanierung.title': 'Inliner-Sanierung',
     'services.kanalsanierung.desc': 'Nachhaltige grabenlose Sanierung. Defekte Stellen reparieren ohne Aufgraben.',
-    'services.hebeanlagen.title': 'Hebeanlagen / Dichtheitsprüfung',
-    'services.hebeanlagen.desc': 'Amtliche Funktionsprüfung und Wartung nach DIN EN 1610 / 1986-30.'
+    'services.hebeanlagen.title': 'Hebeanlagen / Dichtheitspruefung',
+    'services.hebeanlagen.desc': 'Amtliche Funktionspruefung und Wartung nach DIN EN 1610 / 1986-30.'
   }
 }
 
@@ -256,11 +256,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
 
   useEffect(() => {
-    const stored = localStorage.getItem('rotek-industrial-lang') as Language | null
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('rotek-industrial-lang') as Language | null : null
     if (stored && (stored === 'en' || stored === 'de')) {
       setLanguageState(stored)
     } else {
-      const browserLang = navigator.language.toLowerCase()
+      const browserLang = typeof navigator !== 'undefined' ? navigator.language.toLowerCase() : 'en'
       if (browserLang.startsWith('de')) {
         setLanguageState('de')
       }
