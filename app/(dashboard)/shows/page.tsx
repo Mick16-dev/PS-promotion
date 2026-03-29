@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { 
   Plus, 
   Search, 
@@ -77,6 +79,7 @@ const mockShows = [
 ]
 
 export default function ShowsPage() {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -212,16 +215,26 @@ export default function ShowsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 bg-ebony-900/95 backdrop-blur-xl border-white/10">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem className="gap-2 cursor-pointer">
-                        <ExternalLink size={14} /> View Details
+                      <DropdownMenuLabel className="font-pro-data uppercase text-xs tracking-widest text-muted-foreground/60 py-3">Production Actions</DropdownMenuLabel>
+                      <DropdownMenuItem 
+                        className="gap-2 cursor-pointer h-10 px-4 group"
+                        onClick={() => router.push(`/shows/${show.id}`)}
+                      >
+                        <ExternalLink size={14} className="group-hover:text-primary transition-colors" /> 
+                        <span className="group-hover:translate-x-0.5 transition-transform">View Details</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2 cursor-pointer">
-                        Edit Production
+                      <DropdownMenuItem 
+                        className="gap-2 cursor-pointer h-10 px-4 group"
+                        onClick={() => toast.info('Production edit environment loading...')}
+                      >
+                        <span className="group-hover:translate-x-0.5 transition-transform">Edit Production</span>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-white/5" />
-                      <DropdownMenuItem className="gap-2 cursor-pointer text-red-400 focus:text-red-400">
-                        Delete Show
+                      <DropdownMenuSeparator className="bg-white/5 mx-2 my-1" />
+                      <DropdownMenuItem 
+                        className="gap-2 cursor-pointer h-10 px-4 group text-red-500/80 focus:text-red-400 focus:bg-red-500/10"
+                        onClick={() => toast.error('Authorized access required to delete production records.')}
+                      >
+                        <span className="group-hover:translate-x-0.5 transition-transform">Archive Show</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
