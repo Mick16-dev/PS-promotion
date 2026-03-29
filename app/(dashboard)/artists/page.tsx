@@ -19,6 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CreateArtistModal } from '@/components/dashboard/create-artist-modal'
 
 // Mock Data for Artists
 const mockArtists = [
@@ -74,6 +75,7 @@ const mockArtists = [
 
 export default function ArtistsPage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const getRiderStatusColor = (status: string) => {
     switch (status) {
@@ -109,7 +111,10 @@ export default function ArtistsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Artist Directory</h1>
           <p className="text-muted-foreground mt-1">Manage artist profiles, technical riders, and upcoming performance schedules.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white gap-2 h-11 px-6 shadow-lg shadow-primary/20 transition-all active:scale-95 leading-none">
+        <Button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-primary hover:bg-primary/90 text-white gap-2 h-11 px-6 shadow-lg shadow-primary/20 transition-all active:scale-95 leading-none"
+        >
           <Plus size={18} />
           <span>Add New Artist</span>
         </Button>
@@ -191,7 +196,10 @@ export default function ArtistsPage() {
         ))}
 
         {/* Create New Artist Placeholder Card */}
-        <button className="group relative rounded-2xl border-2 border-dashed border-white/5 hover:border-primary/40 p-6 flex flex-col items-center justify-center text-center gap-4 transition-all hover:bg-primary/5 hover:shadow-2xl">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="group relative rounded-2xl border-2 border-dashed border-white/5 hover:border-primary/40 p-6 flex flex-col items-center justify-center text-center gap-4 transition-all hover:bg-primary/5 hover:shadow-2xl"
+        >
           <div className="h-14 w-14 rounded-full bg-muted/30 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 scale-100 group-hover:scale-110">
             <Plus size={32} className="text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
@@ -201,6 +209,7 @@ export default function ArtistsPage() {
           </div>
         </button>
       </div>
+      <CreateArtistModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   )
 }
