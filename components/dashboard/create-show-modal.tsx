@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -19,7 +19,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select'
-import { CalendarIcon, MapPin, Music, User } from 'lucide-react'
+import { CalendarIcon, MapPin, Music, User, Zap } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface CreateShowModalProps {
   isOpen: boolean
@@ -27,103 +28,135 @@ interface CreateShowModalProps {
 }
 
 export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // In a real app, this would call an API
-    onClose()
+    setIsSubmitting(true)
+    
+    const formData = new FormData(e.currentTarget)
+    const venue = formData.get('venue')
+    const date = formData.get('date')
+
+    try {
+      // Simulate n8n webhook API call for Workflow 1
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      toast.success('Production workflow initiated via n8n.', {
+        description: `Show scheduled at ${venue || 'selected venue'} on ${date || 'selected date'}. Initial material requests have been dispatched.`
+      })
+      
+      onClose()
+    } catch (error) {
+      toast.error('Failed to trigger production workflow.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-ebony-900/95 backdrop-blur-2xl border-white/10 shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold tracking-tight">Create New Show</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Enter the details for the upcoming performance. This will initiate the production workflow.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[550px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden rounded-[2rem]">
+        {/* Luminous Header Gradient */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/20 to-transparent pointer-events-none" />
+        
+        <div className="p-8 pb-6 relative z-10 border-b border-white/5">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter">Initialize Production</DialogTitle>
+            <DialogDescription className="text-muted-foreground/80 font-medium mt-2">
+              Configure parameters for the upcoming performance. This will trigger <strong className="text-primary font-pro-data uppercase tracking-widest text-[10px]">n8n Workflow #1</strong> to dispatch initial material requests.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          <div className="grid gap-4">
+        <form onSubmit={handleSubmit} className="px-8 py-6 space-y-8 relative z-10 bg-black/20">
+          <div className="space-y-6">
             {/* Artist Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="artist" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Artist</Label>
-              <Select>
-                <SelectTrigger className="bg-muted/30 border-white/5 h-11 focus:ring-primary/50 text-foreground w-full">
-                  <div className="flex items-center gap-2">
-                    <User size={16} className="text-primary/60" />
+            <div className="space-y-3">
+              <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Territory Artist</Label>
+              <Select defaultValue="luna">
+                <SelectTrigger className="bg-white/5 border-white/10 h-14 focus:ring-primary/50 text-foreground w-full rounded-2xl px-5 text-lg font-bold">
+                  <div className="flex items-center gap-3">
+                    <User size={18} className="text-primary" />
                     <SelectValue placeholder="Select an artist" />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="bg-ebony-900 border-white/10">
-                  <SelectItem value="luna">Luna Shadows</SelectItem>
-                  <SelectItem value="echo">Echo Pulse</SelectItem>
-                  <SelectItem value="neon">Neon Dreams</SelectItem>
-                  <SelectItem value="midnight">The Midnight</SelectItem>
+                <SelectContent className="bg-ebony-900 border-white/10 rounded-2xl">
+                  <SelectItem value="luna" className="py-3 font-bold">Luna Shadows</SelectItem>
+                  <SelectItem value="echo" className="py-3 font-bold">Echo Pulse</SelectItem>
+                  <SelectItem value="neon" className="py-3 font-bold">Neon Dreams</SelectItem>
+                  <SelectItem value="midnight" className="py-3 font-bold">The Midnight</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Venue & Event Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="venue" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Venue</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -track-y-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="venue" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Venue & Location</Label>
+                <div className="relative group">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                   <Input 
                     id="venue" 
+                    name="venue"
+                    required
                     placeholder="e.g. O2 Academy" 
-                    className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50"
+                    className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="event" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Show Type</Label>
+              <div className="space-y-3">
+                <Label htmlFor="event" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Performance Type</Label>
                 <Select defaultValue="headline">
-                  <SelectTrigger className="bg-muted/30 border-white/5 h-11 focus:ring-primary/50 text-foreground w-full">
-                    <div className="flex items-center gap-2">
-                      <Music size={16} className="text-primary/60" />
+                  <SelectTrigger className="bg-white/5 border-white/10 h-14 focus:ring-primary/50 text-foreground w-full rounded-2xl px-5 font-bold text-lg">
+                    <div className="flex items-center gap-3">
+                      <Music size={18} className="text-primary" />
                       <SelectValue placeholder="Type" />
                     </div>
                   </SelectTrigger>
-                  <SelectContent className="bg-ebony-900 border-white/10">
-                    <SelectItem value="headline">Headline</SelectItem>
-                    <SelectItem value="festival">Festival</SelectItem>
-                    <SelectItem value="support">Support</SelectItem>
-                    <SelectItem value="club">Club Night</SelectItem>
+                  <SelectContent className="bg-ebony-900 border-white/10 rounded-2xl">
+                    <SelectItem value="headline" className="py-3 font-bold">Headline</SelectItem>
+                    <SelectItem value="festival" className="py-3 font-bold">Festival</SelectItem>
+                    <SelectItem value="support" className="py-3 font-bold">Support</SelectItem>
+                    <SelectItem value="club" className="py-3 font-bold">Club Night</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             {/* Date */}
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Date</Label>
-              <div className="relative">
-                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+            <div className="space-y-3">
+              <Label htmlFor="date" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Execution Date</Label>
+              <div className="relative group">
+                <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                 <Input 
                   id="date" 
+                  name="date"
                   type="date" 
-                  className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 text-foreground [color-scheme:dark]"
+                  required
+                  className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20"
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="pt-4 border-t border-white/5">
+          <DialogFooter className="pt-8 flex flex-row items-center justify-end gap-3 sm:gap-3 sm:justify-end">
             <Button 
               type="button" 
               variant="ghost" 
               onClick={onClose}
-              className="hover:bg-white/5"
+              className="hover:bg-white/5 h-12 px-6 rounded-xl font-pro-data uppercase tracking-widest text-[10px] sm:w-auto w-full"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
-              className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 px-8"
+              disabled={isSubmitting}
+              className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-12 px-8 rounded-xl font-pro-data uppercase tracking-widest text-[11px] gap-2 transition-all active:scale-95 sm:w-auto w-full"
             >
-              Create Show
+              {isSubmitting ? <Zap size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isSubmitting ? 'Triggering n8n...' : 'Deploy Workflow'}
             </Button>
           </DialogFooter>
         </form>
