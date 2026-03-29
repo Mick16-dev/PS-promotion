@@ -9,13 +9,10 @@ import {
   Search, 
   Filter, 
   MoreHorizontal, 
-  Calendar, 
   MapPin, 
   Music,
   ExternalLink,
-  CheckCircle2,
-  Clock,
-  AlertCircle
+  ChevronDown
 } from 'lucide-react'
 import { 
   Table, 
@@ -43,215 +40,248 @@ const mockShows = [
   {
     id: '1',
     artist: 'Luna Shadows',
-    venue: 'The Electric Ballroom',
-    date: '2024-05-15',
-    status: 'Upcoming',
-    materials: 'Pending',
-    type: 'Headline'
+    venue: 'O2 Academy',
+    city: 'London',
+    date: 'Oct 15, 2026',
+    time: '20:00',
+    status: 'Ready',
+    docsDelivered: 5,
+    docsTotal: 5
   },
   {
     id: '2',
     artist: 'Echo Pulse',
-    venue: 'O2 Academy Brixton',
-    date: '2024-05-18',
-    status: 'Active',
-    materials: 'Complete',
-    type: 'Festival'
+    venue: 'Printworks',
+    city: 'London',
+    date: 'Oct 18, 2026',
+    time: '21:30',
+    status: 'Awaiting Documents',
+    docsDelivered: 1,
+    docsTotal: 5
   },
   {
     id: '3',
     artist: 'Neon Dreams',
-    venue: 'Printworks London',
-    date: '2024-06-02',
-    status: 'Upcoming',
-    materials: 'Overdue',
-    type: 'Club Night'
+    venue: 'Lagerhaus',
+    city: 'Bremen',
+    date: 'Mar 29, 2026', // Use today's date context
+    time: '23:00',
+    status: 'Show Day',
+    docsDelivered: 4,
+    docsTotal: 5
   },
   {
     id: '4',
     artist: 'The Midnight',
     venue: 'Roundhouse',
-    date: '2024-04-20',
-    status: 'Finished',
-    materials: 'Complete',
-    type: 'Headline'
+    city: 'London',
+    date: 'Jan 20, 2026',
+    status: 'Complete',
+    time: '19:00',
+    docsDelivered: 5,
+    docsTotal: 5
+  },
+  {
+    id: '5',
+    artist: 'Daisy Chapman',
+    venue: 'The Electric Ballroom',
+    city: 'London',
+    date: 'Dec 05, 2026',
+    status: 'Upcoming',
+    time: '20:00',
+    docsDelivered: 5,
+    docsTotal: 5
   }
 ]
 
 export default function ShowsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All Shows')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Upcoming':
         return <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">Upcoming</Badge>
-      case 'Active':
-        return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Active</Badge>
-      case 'Finished':
-        return <Badge variant="outline" className="bg-muted text-muted-foreground border-border">Finished</Badge>
-      case 'Cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>
+      case 'Awaiting Documents':
+        return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20">Awaiting Documents</Badge>
+      case 'Ready':
+        return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Ready</Badge>
+      case 'Show Day':
+        return <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">Show Day</Badge>
+      case 'Complete':
+        return <Badge variant="outline" className="bg-muted text-muted-foreground border-border">Complete</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
   }
 
-  const getMaterialsBadge = (status: string) => {
-    switch (status) {
-      case 'Complete':
-        return (
-          <div className="flex items-center gap-1.5 text-emerald-400">
-            <CheckCircle2 size={14} />
-            <span className="text-xs font-medium">Complete</span>
-          </div>
-        )
-      case 'Pending':
-        return (
-          <div className="flex items-center gap-1.5 text-yellow-400">
-            <Clock size={14} />
-            <span className="text-xs font-medium">Pending</span>
-          </div>
-        )
-      case 'Overdue':
-        return (
-          <div className="flex items-center gap-1.5 text-red-400">
-            <AlertCircle size={14} />
-            <span className="text-xs font-medium">Overdue</span>
-          </div>
-        )
-      default:
-        return <span className="text-xs text-muted-foreground">{status}</span>
+  const getMaterialsBadge = (delivered: number, total: number) => {
+    const ratio = delivered / total;
+    if (ratio === 1) {
+      return <span className="text-emerald-400 font-bold">{delivered}/{total} delivered</span>
+    } else if (ratio > 0.5) {
+      return <span className="text-emerald-400 font-bold">{delivered}/{total} delivered</span>
+    } else {
+      return <span className="text-red-400 font-bold">{delivered}/{total} delivered</span>
     }
   }
 
+  const filteredShows = mockShows.filter(show => {
+    const matchesSearch = show.artist.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          show.venue.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = statusFilter === 'All Shows' || show.status === statusFilter;
+    return matchesSearch && matchesFilter;
+  });
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-20">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Shows Management</h1>
-          <p className="text-muted-foreground mt-1">Track and organize production details for all upcoming artist performances.</p>
+          <h1 className="text-4xl font-black uppercase tracking-tighter italic text-white">Manage Shows</h1>
+          <p className="text-muted-foreground mt-2 font-medium">Coordinate logistics and ensure your artists deliver the required documents.</p>
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-white gap-2 h-11 px-6 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          className="bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"
         >
           <Plus size={18} />
-          <span>Create New Show</span>
+          <span>Add Show</span>
         </Button>
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
           <Input 
-            placeholder="Search shows, artists, or venues..." 
-            className="pl-10 h-11 bg-muted/30 border-white/5 focus-visible:ring-primary/50"
+            placeholder="Search by artist or venue..." 
+            className="pl-12 h-14 bg-muted/20 border-white/5 focus-visible:ring-primary/50 text-base font-bold tracking-tight rounded-2xl"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="h-11 gap-2 border-white/10 bg-muted/20 hover:bg-muted/40">
-          <Filter size={16} />
-          <span>Filters</span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-14 px-6 gap-3 border-white/10 bg-muted/20 hover:bg-muted/40 font-pro-data uppercase tracking-widest text-xs rounded-2xl min-w-[200px] justify-between">
+              <div className="flex items-center gap-3">
+                <Filter size={18} />
+                <span>{statusFilter}</span>
+              </div>
+              <ChevronDown size={14} className="opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-ebony-900 border-white/10 rounded-2xl">
+            <DropdownMenuLabel className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground/60 px-4 py-3">Filter Status</DropdownMenuLabel>
+            {['All Shows', 'Awaiting Documents', 'Ready', 'Complete', 'Show Day'].map((status) => (
+              <DropdownMenuItem 
+                key={status} 
+                className={`font-semibold text-sm py-3 px-4 rounded-xl cursor-pointer ${statusFilter === status ? 'bg-primary/10 text-primary' : ''}`}
+                onClick={() => setStatusFilter(status)}
+              >
+                {status}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Shows Table Container */}
-      <div className="glass-card rounded-xl overflow-hidden border-white/5 shadow-2xl">
+      <div className="glass-card rounded-3xl overflow-hidden border-white/5 shadow-2xl bg-muted/5">
         <Table>
-          <TableHeader className="bg-muted/40 font-pro-data">
-            <TableRow className="hover:bg-transparent border-white/5">
-              <TableHead className="w-[300px] py-4">Artist & Event</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Materials</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader className="bg-muted/20">
+            <TableRow className="hover:bg-transparent border-white/5 font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-bold">
+              <TableHead className="w-[280px] py-6 px-8">Artist</TableHead>
+              <TableHead className="py-6">Venue</TableHead>
+              <TableHead className="py-6">City</TableHead>
+              <TableHead className="py-6">Show Date</TableHead>
+              <TableHead className="py-6">Show Time</TableHead>
+              <TableHead className="py-6">Documents</TableHead>
+              <TableHead className="py-6">Status</TableHead>
+              <TableHead className="text-right py-6 px-8">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {mockShows.map((show) => (
-              <TableRow key={show.id} className="group border-white/5 hover:bg-white/[0.02] transition-colors">
-                <TableCell className="py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      <Music size={18} />
+          <TableBody className="divide-y divide-white/5">
+            {filteredShows.length > 0 ? (
+              filteredShows.map((show) => (
+                <TableRow key={show.id} className="group border-0 hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => router.push(`/shows/${show.id}`)}>
+                  <TableCell className="py-5 px-8">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                        <Music size={20} />
+                      </div>
+                      <div className="font-bold text-white text-lg tracking-tight group-hover:text-primary transition-colors">
+                          {show.artist}
+                      </div>
                     </div>
-                    <div>
-                      <Link href={`/shows/${show.id}`} className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer">
-                        {show.artist}
-                      </Link>
-                      <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">{show.type}</div>
+                  </TableCell>
+                  <TableCell className="font-medium text-foreground">
+                    <div className="flex items-center gap-2">
+                        <MapPin size={16} className="text-muted-foreground/40" />
+                        {show.venue}
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin size={14} className="text-muted-foreground/60" />
-                    <span>{show.venue}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-sm text-pro-data">
-                    <Calendar size={14} className="text-muted-foreground/60" />
-                    <span>{show.date}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {getStatusBadge(show.status)}
-                </TableCell>
-                <TableCell>
-                  {getMaterialsBadge(show.materials)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-ebony-900/95 backdrop-blur-xl border-white/10">
-                      <DropdownMenuLabel className="font-pro-data uppercase text-xs tracking-widest text-muted-foreground/60 py-3">Production Actions</DropdownMenuLabel>
-                      <DropdownMenuItem 
-                        className="gap-2 cursor-pointer h-10 px-4 group"
-                        onClick={() => router.push(`/shows/${show.id}`)}
-                      >
-                        <ExternalLink size={14} className="group-hover:text-primary transition-colors" /> 
-                        <span className="group-hover:translate-x-0.5 transition-transform">View Details</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="gap-2 cursor-pointer h-10 px-4 group"
-                        onClick={() => toast.info('Production edit environment loading...')}
-                      >
-                        <span className="group-hover:translate-x-0.5 transition-transform">Edit Production</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-white/5 mx-2 my-1" />
-                      <DropdownMenuItem 
-                        className="gap-2 cursor-pointer h-10 px-4 group text-red-500/80 focus:text-red-400 focus:bg-red-500/10"
-                        onClick={() => toast.error('Authorized access required to delete production records.')}
-                      >
-                        <span className="group-hover:translate-x-0.5 transition-transform">Archive Show</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell className="font-medium text-muted-foreground">
+                    {show.city}
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold text-foreground">
+                      {show.date}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-pro-data font-bold tracking-widest text-muted-foreground">
+                      {show.time}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-[12px] font-pro-data uppercase tracking-widest">
+                      {getMaterialsBadge(show.docsDelivered, show.docsTotal)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(show.status)}
+                  </TableCell>
+                  <TableCell className="text-right px-8">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10 group">
+                          <MoreHorizontal className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-ebony-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2 shadow-2xl">
+                        <DropdownMenuLabel className="font-pro-data uppercase text-[10px] tracking-widest text-muted-foreground/50 py-2 px-3">Show Options</DropdownMenuLabel>
+                        <DropdownMenuItem 
+                          className="gap-3 cursor-pointer h-12 px-3 rounded-xl font-bold bg-primary/10 text-primary mb-1 hover:bg-primary/20"
+                          onClick={(e) => { e.stopPropagation(); router.push(`/shows/${show.id}`) }}
+                        >
+                          <ExternalLink size={16} /> 
+                          <span>View Details</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/5 mx-2 my-1" />
+                        <DropdownMenuItem 
+                          className="gap-3 cursor-pointer h-10 px-3 rounded-xl font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                          onClick={(e) => { e.stopPropagation(); toast.error('Account Settings required to delete shows.') }}
+                        >
+                          <span>Delete Show</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+                <TableRow>
+                    <TableCell colSpan={8} className="h-48 text-center">
+                        <p className="text-muted-foreground font-medium">No shows found matching your criteria.</p>
+                        <Button variant="link" onClick={() => { setSearchQuery(''); setStatusFilter('All Shows'); }} className="text-primary mt-2">Clear Filters</Button>
+                    </TableCell>
+                </TableRow>
+            )}
           </TableBody>
         </Table>
-        
-        {/* Pagination/Footer */}
-        <div className="px-6 py-4 border-t border-white/5 bg-muted/20 flex items-center justify-between text-xs text-muted-foreground font-pro-data uppercase tracking-widest">
-          <span>Showing 4 of 24 shows</span>
-          <div className="flex gap-4">
-            <button className="hover:text-primary transition-colors disabled:opacity-30" disabled>Previous</button>
-            <button className="hover:text-primary transition-colors">Next</button>
-          </div>
-        </div>
       </div>
 
       <CreateShowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
