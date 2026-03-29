@@ -4,87 +4,106 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Rotek Industrial Core - Traffic Red (#D70014) */
-  --primary: oklch(0.52 0.23 25.5);
-  --primary-foreground: oklch(0.98 0.01 25.5);
+  /* High-End Dark Base: Deep Ebony (#09090b equivalent) */
+  --background: oklch(0.12 0.015 250);
+  --foreground: oklch(0.92 0.01 250);
   
-  /* Rotek Secondary - Golden Yellow (#FFCC00) */
-  --secondary: oklch(0.85 0.20 85);
-  --secondary-foreground: oklch(0.10 0.01 85);
-  
-  /* Industrial Dark Palette - Rotek Base (#0A0B0D) */
-  --background: oklch(0.14 0.02 250);
-  --foreground: oklch(0.95 0.01 250);
+  /* Muted surfaces for professional layering */
   --muted: oklch(0.18 0.02 250);
-  --muted-foreground: oklch(0.55 0.01 250);
-  --card: oklch(0.16 0.02 250);
-  --card-foreground: oklch(0.98 0.01 250);
-  --border: oklch(0.25 0.02 250);
-  --input: oklch(0.25 0.02 250);
-  --ring: oklch(0.52 0.23 25.5);
+  --muted-foreground: oklch(0.65 0.01 250);
   
-  --radius: 0rem; /* Sharp industrial edges */
+  /* Indigo Accent: Highly refined, slightly desaturated for depth */
+  --primary: oklch(0.55 0.18 260);
+  --primary-foreground: oklch(0.98 0.01 260);
+  
+  /* Lumina Glow & Borders */
+  --lumina-accent: oklch(0.60 0.20 260 / 0.15);
+  --border: oklch(0.25 0.02 250 / 0.8);
+  --input: oklch(0.20 0.02 250);
+  --ring: oklch(0.55 0.18 260 / 0.5);
+  
+  /* Pro Chart Colors */
+  --chart-1: oklch(0.65 0.20 260);
+  --chart-2: oklch(0.75 0.15 180);
+  --chart-3: oklch(0.55 0.25 340);
+  
+  --radius: 0.625rem;
 }
 
 @theme inline {
-  --font-heading: 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-xl: var(--radius);
+  
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  
   html {
-    font-size: 12.5px;
-    @apply scroll-smooth bg-[#0A0B0D];
+    @apply scroll-smooth bg-background;
+    font-size: 16px; 
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-red-600 selection:text-white;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-white font-sans;
+    font-feature-settings: "ss01" 1, "ss03" 1, "cv01" 1;
   }
 }
 
 @layer utilities {
-  .blueprint-grid {
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+  /* Lumina Ambient Glow Effect */
+  .lumina-glow {
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      var(--lumina-accent),
+      transparent 70%
+    );
+  }
+
+  /* Data-centric text formatting */
+  .text-pro-data {
+    @apply font-mono tracking-tight;
+  }
+  
+  /* Subtle pro layering */
+  .glass-card {
+    @apply bg-muted/20 border border-white/5 backdrop-blur-md;
   }
 }
 
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Custom Scrollbar */
+/* Custom Pro Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted/30;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }
+
