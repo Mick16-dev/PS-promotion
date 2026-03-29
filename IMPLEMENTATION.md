@@ -25,9 +25,15 @@ The goal of Phase 1 is to establish a premium, custom design system that avoids 
 - [x] **Supabase Initializer**: Set up the client-side and server-side connection logic.
 - [x] **Environment Security**: Verify all project variables (n8n, Supabase) are managed correctly in `.env`.
 
+## 🛠 Phase 2: Shows & Artists Management
+- [x] **Shows Page**: List all upcoming and past shows with status badges and performance-at-a-glance.
+- [x] **Artist Directory**: Premium card-based grid for managing artist profiles and technical riders.
+- [x] **Create Show Modal**: Bespoke modal for initiating new show production workflows.
+- [ ] **Data Integration**: Connect mock views to Supabase tables (Shows, Artists).
+
 ---
 
 ## 🚦 Status Summary
-- **Current Phase:** 2 (Shows & Artists Management)
-- **Overall Progress:** 25%
-- **Current Blocker:** Ready to implement Shows Page and Create Show Modal.
+- **Current Phase:** 2 (Data Integration)
+- **Overall Progress:** 45%
+- **Current Blocker:** Need to establish Supabase schema for Shows and Artists.
