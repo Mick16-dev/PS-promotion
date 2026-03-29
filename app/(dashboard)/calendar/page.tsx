@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Calendar } from '@/components/ui/calendar'
+import { Calendar, CalendarDayButton } from '@/components/ui/calendar'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { 
@@ -11,7 +11,8 @@ import {
   ExternalLink,
   ChevronRight,
   FileText,
-  Send
+  Send,
+  AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -95,8 +96,9 @@ export default function CalendarPage() {
   }
 
   // Custom Day Rendering for Indicator Dots and Popups
-  const renderDay = (dayData: any) => {
-      const { date } = dayData
+  const CustomDayButton = (props: any) => {
+      const { day } = props
+      const date = day.date
       const isShow = upcomingShows.find(s => s.date.toDateString() === date.toDateString())
       const isDeadline = upcomingDeadlines.find(d => d.date.toDateString() === date.toDateString())
       
@@ -122,9 +124,9 @@ export default function CalendarPage() {
           return (
               <Popover>
                   <PopoverTrigger asChild>
-                      <button className="w-full h-full focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-2xl">
+                      <CalendarDayButton {...props} className={`${props.className || ''} focus:ring-2 focus:ring-primary/50`}>
                           {content}
-                      </button>
+                      </CalendarDayButton>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 bg-ebony-900 border-white/10 shadow-2xl p-6 rounded-3xl" align="start">
                       <h4 className="font-black text-2xl uppercase italic tracking-tighter text-white">{isShow.artist}</h4>
@@ -150,9 +152,9 @@ export default function CalendarPage() {
           return (
               <Popover>
                   <PopoverTrigger asChild>
-                      <button className="w-full h-full focus:outline-none focus:ring-2 focus:ring-red-500/50 rounded-2xl">
+                      <CalendarDayButton {...props} className={`${props.className || ''} focus:ring-2 focus:ring-red-500/50`}>
                           {content}
-                      </button>
+                      </CalendarDayButton>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 bg-red-500/10 border-red-500/20 shadow-2xl p-6 rounded-3xl" align="start">
                       <div className="flex items-center gap-3 text-red-500 font-bold">
@@ -172,7 +174,7 @@ export default function CalendarPage() {
           )
       }
 
-      return content
+      return <CalendarDayButton {...props}>{content}</CalendarDayButton>
   }
 
   return (
@@ -199,7 +201,7 @@ export default function CalendarPage() {
               selected={selectedDate}
               onSelect={handleDateSelect}
               components={{
-                  DayContent: renderDay
+                  DayButton: CustomDayButton
               }}
               className="w-full max-w-xl scale-125 origin-center z-10"
               classNames={{
