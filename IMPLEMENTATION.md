@@ -28,12 +28,14 @@ The goal of Phase 1 is to establish a premium, custom design system that avoids 
 ## 🛠 Phase 2: Shows & Artists Management
 - [x] **Shows Page**: List all upcoming and past shows with status badges and performance-at-a-glance.
 - [x] **Artist Directory**: Premium card-based grid for managing artist profiles and technical riders.
-- [x] **Create Show Modal**: Bespoke modal for initiating new show production workflows.
-- [ ] **Data Integration**: Connect mock views to Supabase tables (Shows, Artists).
+- [x] **Create Artist Modal**: Registration workflow for adding new talent to the roster.
+- [x] **Calendar View**: High-fidelity scheduling for production deadlines and live dates.
+- [x] **Settings Dashboard**: Profile management and platform configuration hub.
+- [ ] **Data Integration**: Connect mock views to Supabase tables (Shows, Artists, Teams).
 
 ---
 
 ## 🚦 Status Summary
-- **Current Phase:** 2 (Data Integration)
-- **Overall Progress:** 45%
-- **Current Blocker:** Need to establish Supabase schema for Shows and Artists.
+- **Current Phase:** 2 (Data Integration & Supabase Setup)
+- **Overall Progress:** 60%
+- **Current Blocker:** Ready to connect to Supabase for persistent data storage.
