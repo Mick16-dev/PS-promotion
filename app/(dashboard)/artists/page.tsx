@@ -29,6 +29,7 @@ const mockArtists = [
     genre: 'Electronic / Synthpop',
     shows: 3,
     riderStatus: 'Complete',
+    reliability: 98,
     socials: { twitter: '@lunashadows', instagram: '@lunashadows' }
   },
   {
@@ -37,6 +38,7 @@ const mockArtists = [
     genre: 'Techno / House',
     shows: 5,
     riderStatus: 'Complete',
+    reliability: 85,
     socials: { instagram: '@echopulse_live' }
   },
   {
@@ -45,6 +47,7 @@ const mockArtists = [
     genre: 'Future Funk',
     shows: 1,
     riderStatus: 'Pending',
+    reliability: 72,
     socials: { twitter: '@ne ondreams' }
   },
   {
@@ -53,6 +56,7 @@ const mockArtists = [
     genre: 'Retrowave',
     shows: 8,
     riderStatus: 'Complete',
+    reliability: 94,
     socials: { instagram: '@themidnightofficial' }
   },
   {
@@ -61,6 +65,7 @@ const mockArtists = [
     genre: 'Indie Dance',
     shows: 2,
     riderStatus: 'Overdue',
+    reliability: 45,
     socials: { twitter: '@vibrantpulse' }
   },
   {
@@ -69,6 +74,7 @@ const mockArtists = [
     genre: 'Alternative Rock',
     shows: 0,
     riderStatus: 'None',
+    reliability: 0,
     socials: { instagram: '@silverhawk_band' }
   }
 ]
@@ -179,18 +185,29 @@ export default function ArtistsPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/60">Rider Status</span>
-                  <div className={`flex items-center gap-1.5 font-medium text-sm mt-1.5 ${getRiderStatusColor(artist.riderStatus)}`}>
-                    {getRiderStatusIcon(artist.riderStatus)}
-                    {artist.riderStatus}
+                  <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/60">Reliability Score</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full ${
+                          artist.reliability >= 80 ? 'bg-emerald-500' : 
+                          artist.reliability >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${artist.reliability}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-pro-data font-bold text-white">{artist.reliability}%</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs font-pro-data uppercase tracking-wider relative z-10">
-              <span className="text-muted-foreground/60 group-hover:text-white transition-colors">Registered</span>
-              <span className="text-foreground/80 group-hover:text-primary transition-colors">March 2024</span>
+              <span className="text-muted-foreground/60 group-hover:text-white transition-colors">Rider Status</span>
+              <div className={`flex items-center gap-1.5 font-medium ${getRiderStatusColor(artist.riderStatus)}`}>
+                {getRiderStatusIcon(artist.riderStatus)}
+                {artist.riderStatus}
+              </div>
             </div>
           </div>
         ))}

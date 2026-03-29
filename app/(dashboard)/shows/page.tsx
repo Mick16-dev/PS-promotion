@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { 
   Plus, 
   Search, 
@@ -178,7 +179,9 @@ export default function ShowsPage() {
                       <Music size={18} />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground">{show.artist}</div>
+                      <Link href={`/shows/${show.id}`} className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer">
+                        {show.artist}
+                      </Link>
                       <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">{show.type}</div>
                     </div>
                   </div>

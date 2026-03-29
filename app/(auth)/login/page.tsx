@@ -5,20 +5,40 @@ import { useRouter } from 'next/navigation'
 import { Music, ArrowRight, Github } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+import { supabase } from '@/lib/supabase'
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Placeholder login logic
-    setTimeout(() => {
+    setError(null)
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        setError(error.message)
+        return
+      }
+
+      if (data.session) {
+        router.push('/')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
+      console.error(err)
+    } finally {
       setIsLoading(false)
-      router.push('/')
-    }, 1500)
+    }
   }
 
   return (
@@ -42,6 +62,11 @@ export default function LoginPage() {
 
         {/* Input Area */}
         <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="p-3 text-xs font-semibold text-red-500 bg-red-400/10 border border-red-500/20 rounded-lg text-center animate-in fade-in slide-in-from-top-2 duration-300">
+              {error}
+            </div>
+          )}
           <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">Email address</label>
             <input

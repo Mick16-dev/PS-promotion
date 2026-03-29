@@ -13,14 +13,35 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const stats = [
-  { name: 'Total Shows', value: '24', icon: Music, color: 'text-primary' },
-  { name: 'Pending Materials', value: '12', icon: Clock, color: 'text-yellow-500' },
-  { name: 'Submitted Materials', value: '45', icon: CheckCircle2, color: 'text-green-500' },
-  { name: 'Overdue Materials', value: '3', icon: AlertCircle, color: 'text-red-500' },
-]
+import { supabase } from '@/lib/supabase'
 
 export default function DashboardHome() {
+  const [stats, setStats] = React.useState([
+    { name: 'Total Shows', value: '--', icon: Music, color: 'text-primary' },
+    { name: 'Pending Materials', value: '--', icon: Clock, color: 'text-yellow-500' },
+    { name: 'Submitted Materials', value: '--', icon: CheckCircle2, color: 'text-green-500' },
+    { name: 'Overdue Materials', value: '--', icon: AlertCircle, color: 'text-red-500' },
+  ])
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    async function fetchStats() {
+      // In a real app, these would be separate counts from Supabase
+      // e.g. supabase.from('shows').select('*', { count: 'exact' })
+      
+      // Delaying for effect if needed, but in reality just set counts
+      setTimeout(() => {
+        setStats([
+          { name: 'Total Shows', value: '24', icon: Music, color: 'text-primary' },
+          { name: 'Pending Materials', value: '12', icon: Clock, color: 'text-yellow-500' },
+          { name: 'Submitted Materials', value: '45', icon: CheckCircle2, color: 'text-green-500' },
+          { name: 'Overdue Materials', value: '3', icon: AlertCircle, color: 'text-red-500' },
+        ])
+        setLoading(false)
+      }, 500)
+    }
+    fetchStats()
+  }, [])
   return (
     <div className="space-y-8">
       {/* Header Section */}

@@ -100,6 +100,21 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
                 />
               </div>
             </div>
+
+            {/* Reliability Score */}
+            <div className="space-y-2">
+              <Label htmlFor="reliability" className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground">Initial Reliability Score (0-100)</Label>
+              <div className="relative">
+                <Input 
+                  id="reliability" 
+                  type="number"
+                  min="0"
+                  max="100"
+                  defaultValue="75"
+                  className="bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 font-pro-data"
+                />
+              </div>
+            </div>
           </div>
 
           <DialogFooter className="pt-4 border-t border-white/5">
