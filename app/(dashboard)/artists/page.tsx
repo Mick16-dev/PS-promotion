@@ -12,70 +12,107 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { supabase } from '@/lib/supabase'
 import { CreateArtistModal } from '@/components/dashboard/create-artist-modal'
 
-// Mock Data for Artists
-const mockArtists = [
-  {
-    id: '1',
-    name: 'Daisy Chapman',
-    genre: 'Folk / Acoustic',
-    shows: 4,
-    reliability: 92,
-    docsOnTime: 18,
-    docsLate: 2,
-    firstShow: 'Mar 2024'
-  },
-  {
-    id: '2',
-    name: 'Echo Pulse',
-    genre: 'Techno / House',
-    shows: 5,
-    reliability: 85,
-    docsOnTime: 24,
-    docsLate: 4,
-    firstShow: 'Jan 2025'
-  },
-  {
-    id: '3',
-    name: 'Neon Dreams',
-    genre: 'Future Funk',
-    shows: 1,
-    reliability: 72,
-    docsOnTime: 3,
-    docsLate: 2,
-    firstShow: 'Feb 2026'
-  },
-  {
-    id: '4',
-    name: 'The Midnight',
-    genre: 'Retrowave',
-    shows: 8,
-    reliability: 98,
-    docsOnTime: 40,
-    docsLate: 0,
-    firstShow: 'Nov 2023'
-  },
-  {
-    id: '5',
-    name: 'Vibrant Pulse',
-    genre: 'Indie Dance',
-    shows: 2,
-    reliability: 45,
-    docsOnTime: 4,
-    docsLate: 6,
-    firstShow: 'Mar 2026'
-  }
-]
+// Removed Mock Data. Pulling natively from DB
 
 export default function ArtistsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [artists, setArtists] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredArtists = mockArtists.filter(artist => 
-    artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    artist.genre.toLowerCase().includes(searchQuery.toLowerCase())
+  React.useEffect(() => {
+     async function fetchArtists() {
+       try {
+         setIsLoading(true)
+         const { data, error } = await supabase.from('artist').select(`
+            id,
+            name,
+            genre,
+            shows (
+              id,
+              date,
+              materials (
+                status,
+                deadline
+              )
+            )
+         `)
+         
+         if (data && !error) {
+            const formattedArtists = data.map(artist => {
+               const showsList = Array.isArray(artist.shows) ? artist.shows : (artist.shows ? [artist.shows] : [])
+               const showCount = showsList.length
+               let earliestShowDate: Date | null = null
+               
+               let totalDocs = 0
+               let deliveredOnTime = 0
+               let lateDocs = 0
+               
+               showsList.forEach((s: any) => {
+                  if (s.date) {
+                    const sDate = new Date(s.date)
+                    if (!earliestShowDate || sDate < earliestShowDate) {
+                       earliestShowDate = sDate
+                    }
+                  }
+                  
+                  if (s.materials) {
+                     const mats = Array.isArray(s.materials) ? s.materials : [s.materials]
+                     mats.forEach((m: any) => {
+                        totalDocs++
+                        if (m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted') {
+                           deliveredOnTime++ 
+                        } else if (m.deadline && new Date(m.deadline) < new Date()) {
+                           lateDocs++
+                        }
+                     })
+                  }
+               })
+               
+               let reliability = 100 // baseline if no docs
+               if (totalDocs > 0) {
+                  reliability = Math.round((deliveredOnTime / totalDocs) * 100)
+               }
+               
+               let firstShowStr = 'N/A'
+               if (earliestShowDate) {
+                  firstShowStr = earliestShowDate.toLocaleDateString(undefined, {
+                     month: 'short',
+                     year: 'numeric'
+                  })
+               }
+               
+               return {
+                 id: artist.id,
+                 name: artist.name || 'Unknown Artist',
+                 genre: artist.genre || 'Various',
+                 shows: showCount,
+                 reliability: reliability,
+                 docsOnTime: deliveredOnTime,
+                 docsLate: lateDocs,
+                 firstShow: firstShowStr
+               }
+            })
+            
+            setArtists(formattedArtists)
+         }
+       } catch (err) {
+         console.error('Failed to load artists:', err)
+       } finally {
+         setIsLoading(false)
+       }
+     }
+     
+     fetchArtists()
+  }, [])
+
+  const filteredArtists = artists.filter(artist => 
+    (artist.name && artist.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (artist.genre && artist.genre.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   const getReliabilityUI = (score: number) => {
