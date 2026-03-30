@@ -15,15 +15,9 @@ import {
   FileText
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase'
 
-const mockOverdue = [
-  { id: 'o1', artist: 'Daisy Chapman', venue: 'Lagerhaus Bremen', document: 'Technical Rider', daysLate: 3 }
-]
-
-const mockRecentActivity = [
-  { id: 'r1', artist: 'Luna Shadows', document: 'Technical Rider', venue: 'O2 Academy', time: '2 hours ago' },
-  { id: 'r2', artist: 'Echo Pulse', document: 'Stage Plot', venue: 'Printworks', time: '5 hours ago' }
-]
+// Removed mock arrays to rely on state
 
 export default function DashboardHome() {
   const router = useRouter()
@@ -36,17 +30,110 @@ export default function DashboardHome() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
 
+  const [overdueDocs, setOverdueDocs] = useState<any[]>([])
+  const [recentActivity, setRecentActivity] = useState<any[]>([])
+
   useEffect(() => {
-    // Simulated fetching for the dashboard stats
-    setTimeout(() => {
-      setStats([
-        { name: 'Total Shows', value: '24', icon: Music, color: 'text-primary' },
-        { name: 'Documents Awaiting', value: '12', icon: Clock, color: 'text-amber-500' },
-        { name: 'Documents Delivered', value: '45', icon: CheckCircle2, color: 'text-emerald-500' },
-        { name: 'Documents Late', value: '1', icon: AlertCircle, color: 'text-red-500' },
-      ])
-      setIsLoading(false)
-    }, 500)
+    async function fetchDashboardData() {
+      try {
+        setIsLoading(true)
+        
+        // Fetch shows count
+        const { count: showsCount } = await supabase.from('shows').select('*', { count: 'exact', head: true })
+        
+        // Fetch materials with relations
+        const { data: materials, error } = await supabase.from('materials').select(`
+          id,
+          status,
+          deadline,
+          submitted_at,
+          document_name,
+          shows (
+            venue_name,
+            artist ( name )
+          )
+        `)
+        
+        let awaitingCount = 0
+        let deliveredCount = 0
+        let lateCount = 0
+        let overdueList: any[] = []
+        let activityList: any[] = []
+        
+        const now = new Date()
+        
+        if (materials && !error) {
+           materials.forEach(mat => {
+             // Extract relational data safely
+             const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
+             const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
+             
+             const artistName = artistData?.name || 'Unknown Artist'
+             const venueName = showData?.venue_name || 'Unknown Venue'
+             const docName = mat.document_name || 'Document'
+             
+             if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
+               deliveredCount++
+               if (mat.submitted_at) {
+                 activityList.push({
+                   id: mat.id,
+                   artist: artistName,
+                   document: docName,
+                   venue: venueName,
+                   time: new Date(mat.submitted_at)
+                 })
+               }
+             } else {
+               // Pending or Awaiting
+               if (mat.deadline && new Date(mat.deadline) < now) {
+                 lateCount++
+                 const daysLate = Math.floor((now.getTime() - new Date(mat.deadline).getTime()) / (1000 * 3600 * 24))
+                 overdueList.push({
+                   id: mat.id,
+                   artist: artistName,
+                   venue: venueName,
+                   document: docName,
+                   daysLate: daysLate > 0 ? daysLate : 1
+                 })
+               } else {
+                 awaitingCount++
+               }
+             }
+           })
+        }
+        
+        // Sort activity list (newest first)
+        activityList.sort((a, b) => b.time.getTime() - a.time.getTime())
+        
+        setStats([
+          { name: 'Total Shows', value: (showsCount || 0).toString(), icon: Music, color: 'text-primary' },
+          { name: 'Documents Awaiting', value: awaitingCount.toString(), icon: Clock, color: 'text-amber-500' },
+          { name: 'Documents Delivered', value: deliveredCount.toString(), icon: CheckCircle2, color: 'text-emerald-500' },
+          { name: 'Documents Late', value: lateCount.toString(), icon: AlertCircle, color: 'text-red-500' },
+        ])
+        
+        setOverdueDocs(overdueList)
+        
+        // Format time strings
+        const formattedActivity = activityList.slice(0, 5).map(item => {
+           const hours = Math.floor((now.getTime() - item.time.getTime()) / (1000 * 3600))
+           let timeStr = `${hours} hours ago`
+           if (hours < 1) timeStr = 'Just now'
+           else if (hours >= 24) timeStr = `${Math.floor(hours / 24)} days ago`
+           
+           return { ...item, time: timeStr }
+        })
+        setRecentActivity(formattedActivity)
+        
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        // Fallback or leave as '--'
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchDashboardData()
   }, [])
 
   const handleSendReminder = (id: string, artist: string, document: string) => {
@@ -110,16 +197,16 @@ export default function DashboardHome() {
 
       <div className="space-y-10">
         {/* OVERDUE ALERT */}
-        {mockOverdue.length > 0 && (
+        {overdueDocs.length > 0 && (
           <div className="glass-card rounded-3xl overflow-hidden border-red-500/20 shadow-2xl shadow-red-500/5">
             <div className="bg-red-500/10 border-b border-red-500/20 px-6 py-4 flex items-center gap-3">
               <AlertTriangle className="text-red-500 h-5 w-5" />
               <h3 className="text-red-500 font-bold uppercase font-pro-data tracking-widest text-sm">
-                ⚠ {mockOverdue.length} documents are late
+                ⚠ {overdueDocs.length} documents are late
               </h3>
             </div>
             <div className="divide-y divide-white/5 bg-muted/5">
-              {mockOverdue.map((item) => (
+              {overdueDocs.map((item) => (
                 <div key={item.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
                   <div className="flex items-center gap-6">
                     <div className="h-12 w-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
@@ -164,8 +251,8 @@ export default function DashboardHome() {
             </Link>
           </div>
           <div className="divide-y divide-white/5">
-            {mockRecentActivity.length > 0 ? (
-              mockRecentActivity.map((activity) => (
+            {recentActivity.length > 0 ? (
+              recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors group">
                   <div className="flex items-center gap-5">
                     <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">

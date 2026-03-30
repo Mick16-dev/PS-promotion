@@ -141,7 +141,7 @@ export default function ShowsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black uppercase tracking-tighter italic text-white">Manage Shows</h1>
-          <p className="text-muted-foreground mt-2 font-medium">Coordinate logistics and ensure your artists deliver the required documents.</p>
+          <p className="text-muted-foreground mt-2 font-medium">Manage your shows and ensure your artists deliver the required documents.</p>
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
