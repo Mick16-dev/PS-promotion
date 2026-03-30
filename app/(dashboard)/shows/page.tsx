@@ -93,7 +93,7 @@ export default function ShowsPage() {
              return {
                id: show.id,
                artist: artistName,
-               venue: show.venue_name || show.venue || 'Unknown Venue',
+               venue: show.venue_name || 'Unknown Venue',
                city: show.city || '',
                date: dateStr || 'TBD',
                time: show.time || 'TBD',

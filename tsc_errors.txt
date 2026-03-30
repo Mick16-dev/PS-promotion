@@ -1,0 +1,2 @@
+app/(dashboard)/artists/page.tsx(83,51): error TS2339: Property 'toLocaleDateString' does not exist on type 'never'.
+app/(dashboard)/shows/page.tsx(96,47): error TS2339: Property 'venue' does not exist on type '{ id: any; venue_name: any; city: any; date: any; time: any; status: any; artist: { name: any; }[]; materials: { status: any; }[]; }'.

@@ -80,7 +80,7 @@ export default function ArtistsPage() {
                
                let firstShowStr = 'N/A'
                if (earliestShowDate) {
-                  firstShowStr = earliestShowDate.toLocaleDateString(undefined, {
+                  firstShowStr = (earliestShowDate as Date).toLocaleDateString(undefined, {
                      month: 'short',
                      year: 'numeric'
                   })
