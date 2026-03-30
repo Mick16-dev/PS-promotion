@@ -34,71 +34,85 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
+import { supabase } from '@/lib/supabase'
 
-// Mock Data for Shows
-const mockShows = [
-  {
-    id: '1',
-    artist: 'Luna Shadows',
-    venue: 'O2 Academy',
-    city: 'London',
-    date: 'Oct 15, 2026',
-    time: '20:00',
-    status: 'Ready',
-    docsDelivered: 5,
-    docsTotal: 5
-  },
-  {
-    id: '2',
-    artist: 'Echo Pulse',
-    venue: 'Printworks',
-    city: 'London',
-    date: 'Oct 18, 2026',
-    time: '21:30',
-    status: 'Awaiting Documents',
-    docsDelivered: 1,
-    docsTotal: 5
-  },
-  {
-    id: '3',
-    artist: 'Neon Dreams',
-    venue: 'Lagerhaus',
-    city: 'Bremen',
-    date: 'Mar 29, 2026', // Use today's date context
-    time: '23:00',
-    status: 'Show Day',
-    docsDelivered: 4,
-    docsTotal: 5
-  },
-  {
-    id: '4',
-    artist: 'The Midnight',
-    venue: 'Roundhouse',
-    city: 'London',
-    date: 'Jan 20, 2026',
-    status: 'Complete',
-    time: '19:00',
-    docsDelivered: 5,
-    docsTotal: 5
-  },
-  {
-    id: '5',
-    artist: 'Daisy Chapman',
-    venue: 'The Electric Ballroom',
-    city: 'London',
-    date: 'Dec 05, 2026',
-    status: 'Upcoming',
-    time: '20:00',
-    docsDelivered: 5,
-    docsTotal: 5
-  }
-]
+// Removed static mock array format in favor of Supabase fetching
 
 export default function ShowsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('All Shows')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [shows, setShows] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  React.useEffect(() => {
+    async function fetchShows() {
+      try {
+        setIsLoading(true)
+        const { data, error } = await supabase
+          .from('shows')
+          .select(`
+            id,
+            venue_name,
+            city,
+            date,
+            time,
+            status,
+            artist:artist_id ( name ),
+            materials ( status )
+          `)
+          
+        if (data && !error) {
+           const formattedShows = data.map(show => {
+             const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
+             const artistName = artistInfo?.name || 'Unknown Artist'
+             
+             let delivered = 0
+             let total = show.materials?.length || 0
+             
+             if (show.materials) {
+                show.materials.forEach((mat: any) => {
+                   if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
+                      delivered++
+                   }
+                })
+             }
+             
+             let dateStr = show.date
+             if (show.date) {
+               try {
+                 dateStr = new Date(show.date).toLocaleDateString(undefined, {
+                   year: 'numeric',
+                   month: 'short',
+                   day: 'numeric'
+                 })
+               } catch(e) {}
+             }
+             
+             return {
+               id: show.id,
+               artist: artistName,
+               venue: show.venue_name || show.venue || 'Unknown Venue',
+               city: show.city || '',
+               date: dateStr || 'TBD',
+               time: show.time || 'TBD',
+               status: show.status || 'Upcoming',
+               docsDelivered: delivered,
+               docsTotal: total
+             }
+           })
+           
+           setShows(formattedShows)
+        }
+      } catch (err) {
+        console.error("Failed to fetch shows:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchShows()
+  }, [])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -128,9 +142,10 @@ export default function ShowsPage() {
     }
   }
 
-  const filteredShows = mockShows.filter(show => {
+  const filteredShows = shows.filter(show => {
+    const venueName = show.venue || ''
     const matchesSearch = show.artist.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          show.venue.toLowerCase().includes(searchQuery.toLowerCase());
+                          venueName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = statusFilter === 'All Shows' || show.status === statusFilter;
     return matchesSearch && matchesFilter;
   });
