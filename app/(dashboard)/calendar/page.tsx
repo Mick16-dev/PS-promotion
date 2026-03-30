@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Calendar, CalendarDayButton } from '@/components/ui/calendar'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -21,65 +21,81 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { supabase } from '@/lib/supabase'
 
-// Mock Events for Calendar
-const upcomingShows = [
-  {
-    id: '1',
-    artist: 'Luna Shadows',
-    venue: 'O2 Academy',
-    date: new Date(2026, 9, 15), // Oct 15
-    time: '20:00',
-    type: 'Headline',
-    docsDelivered: 5,
-    docsTotal: 5
-  },
-  {
-    id: '2',
-    artist: 'Echo Pulse',
-    venue: 'Printworks',
-    date: new Date(2026, 9, 18), // Oct 18
-    time: '21:30',
-    type: 'Festival Slot',
-    docsDelivered: 1,
-    docsTotal: 5
-  },
-  {
-    id: '3',
-    artist: 'Daisy Chapman',
-    venue: 'Lagerhaus Bremen',
-    date: new Date(), // Today
-    time: '20:00',
-    type: 'Headline',
-    docsDelivered: 3,
-    docsTotal: 5
-  }
-]
-
-// Mock Deadlines
-const upcomingDeadlines = [
-  {
-    id: 'd1',
-    artist: 'Daisy Chapman',
-    venue: 'Lagerhaus Bremen',
-    document: 'Technical Rider',
-    date: new Date() // Today
-  },
-  {
-    id: 'd2',
-    artist: 'Echo Pulse',
-    venue: 'Printworks',
-    document: 'Contract',
-    date: new Date(2026, 9, 16) // Oct 16
-  }
-]
+// Shows and deadlines are loaded from Supabase in state below.
 
 export default function CalendarPage() {
   const router = useRouter()
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+  const [upcomingShows, setUpcomingShows] = useState<any[]>([])
+  const [upcomingDeadlines, setUpcomingDeadlines] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Combine events for unified display sorting
-  const sortedShows = upcomingShows.sort((a, b) => a.date.getTime() - b.date.getTime())
+  useEffect(() => {
+    async function fetchCalendarData() {
+      try {
+        // Fetch shows with artist and materials
+        const { data: shows } = await supabase
+          .from('shows')
+          .select(`
+            id,
+            venue_name,
+            date,
+            time,
+            artist:artist_id ( name ),
+            materials ( status, deadline, document_name )
+          `)
+          .order('date', { ascending: true })
+        
+        if (shows) {
+          const formattedShows = shows.map((show: any) => {
+            const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
+            const mats = show.materials || []
+            const delivered = mats.filter((m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
+            
+            return {
+              id: show.id,
+              artist: artistInfo?.name || 'Unknown Artist',
+              venue: show.venue_name || 'Unknown Venue',
+              date: show.date ? new Date(show.date) : null,
+              time: show.time || '',
+              docsDelivered: delivered,
+              docsTotal: mats.length
+            }
+          }).filter((s: any) => s.date !== null)
+          
+          setUpcomingShows(formattedShows)
+          
+          // Extract deadlines from materials
+          const deadlines: any[] = []
+          shows.forEach((show: any) => {
+            const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
+            const mats = show.materials || []
+            mats.forEach((mat: any) => {
+              if (mat.deadline && mat.status?.toLowerCase() !== 'delivered' && mat.status?.toLowerCase() !== 'submitted') {
+                deadlines.push({
+                  id: `${show.id}-${mat.document_name}`,
+                  artist: artistInfo?.name || 'Unknown',
+                  venue: show.venue_name || 'Unknown Venue',
+                  document: mat.document_name || 'Document',
+                  date: new Date(mat.deadline)
+                })
+              }
+            })
+          })
+          
+          setUpcomingDeadlines(deadlines)
+        }
+      } catch (err) {
+        console.error('Failed to load calendar data:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchCalendarData()
+  }, [])
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date)
@@ -231,12 +247,12 @@ export default function CalendarPage() {
           <div className="flex items-center justify-between px-2">
             <h3 className="text-xl font-black tracking-tighter uppercase text-white italic">Upcoming Shows</h3>
             <Badge variant="outline" className="font-pro-data bg-primary/10 text-primary border-primary/20 tracking-widest uppercase text-[10px]">
-              {sortedShows.length} Shows
+              {[...upcomingShows].sort((a, b) => a.date.getTime() - b.date.getTime()).length} Shows
             </Badge>
           </div>
 
           <div className="space-y-6 flex-1 pr-2">
-            {sortedShows.map((show) => (
+            {[...upcomingShows].sort((a, b) => a.date.getTime() - b.date.getTime()).map((show) => (
               <div 
                 key={show.id} 
                 className="group glass-card p-6 rounded-3xl border-white/5 hover:border-indigo-500/30 transition-all duration-500 hover:bg-indigo-500/[0.02] relative overflow-hidden cursor-pointer shadow-lg"
