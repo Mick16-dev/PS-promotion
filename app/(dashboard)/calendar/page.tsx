@@ -56,8 +56,8 @@ export default function CalendarPage() {
             
             return {
               id: show.id,
-              artist: artistInfo?.name || 'Unknown Artist',
-              venue: show.venue_name || 'Unknown Venue',
+              artist: artistInfo?.name || 'Unnamed Artist',
+              venue: show.venue_name || 'Venue TBD',
               date: show.date ? new Date(show.date) : null,
               time: show.time || '',
               docsDelivered: delivered,
@@ -77,7 +77,7 @@ export default function CalendarPage() {
                 deadlines.push({
                   id: `${show.id}-${mat.document_name}`,
                   artist: artistInfo?.name || 'Unknown',
-                  venue: show.venue_name || 'Unknown Venue',
+                  venue: show.venue_name || 'Venue TBD',
                   document: mat.document_name || 'Document',
                   date: new Date(mat.deadline)
                 })

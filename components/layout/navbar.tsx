@@ -74,7 +74,7 @@ export function Navbar() {
              return {
                id: mat.id,
                type,
-               artist: artistData?.name || 'Unknown Artist',
+              artist: artistData?.name || 'Unnamed Artist',
                document: mat.document_name || 'Document',
                venue: showData?.venue_name || 'Venue',
                time: timeStr
