@@ -56,7 +56,13 @@ export async function middleware(request: NextRequest) {
   )
 
   // 2. Refresh the session if it exists (very important for JWT/Cookie sync)
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (error) {
+    console.error('Middleware Auth Error:', error)
+  }
 
   // 3. Auth Guard Logic
   const isLoginPage = request.nextUrl.pathname.startsWith('/login')
