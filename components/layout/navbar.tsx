@@ -1,9 +1,11 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, Search, User, LogOut, CheckCircle2, AlertCircle, Clock3 } from 'lucide-react'
+import { Bell, Search, User, LogOut, CheckCircle2, AlertCircle, Clock3, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +18,77 @@ import { supabase } from '@/lib/supabase'
 
 export function Navbar() {
   const router = useRouter()
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        setIsLoadingNotifications(true)
+        const { data, error } = await supabase
+          .from('materials')
+          .select(`
+            id,
+            status,
+            document_name,
+            submitted_at,
+            deadline,
+            shows (
+              venue_name,
+              artist ( name )
+            )
+          `)
+          .order('submitted_at', { ascending: false })
+          .limit(3)
+        
+        if (data && !error) {
+           const formatted = data.map(mat => {
+             const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
+             const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
+             
+             const now = new Date()
+             const submissionDate = mat.submitted_at ? new Date(mat.submitted_at) : null
+             const deadlineDate = mat.deadline ? new Date(mat.deadline) : null
+             
+             let timeStr = 'Recently'
+             if (submissionDate) {
+               const diffHours = Math.floor((now.getTime() - submissionDate.getTime()) / (1000 * 3600))
+               if (diffHours < 1) timeStr = 'Just now'
+               else if (diffHours < 24) timeStr = `${diffHours} hours ago`
+               else timeStr = `${Math.floor(diffHours / 24)} days ago`
+             }
+             
+             let type: 'delivered' | 'late' | 'upcoming' = 'upcoming'
+             if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
+               type = 'delivered'
+             } else if (deadlineDate && deadlineDate < now) {
+               type = 'late'
+             }
+             
+             return {
+               id: mat.id,
+               type,
+               artist: artistData?.name || 'Unknown Artist',
+               document: mat.document_name || 'Document',
+               venue: showData?.venue_name || 'Venue',
+               time: timeStr
+             }
+           })
+           setNotifications(formatted)
+        }
+      } catch (err) {
+        console.error("Error fetching notifications:", err)
+      } finally {
+        setIsLoadingNotifications(false)
+      }
+    }
+    fetchNotifications()
+  }, [])
 
   return (
     <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-white/5 bg-background/80 backdrop-blur-xl px-10">
@@ -49,44 +117,41 @@ export function Navbar() {
           <DropdownMenuContent align="end" className="w-96 bg-ebony-900/95 backdrop-blur-3xl border-white/10 p-2 rounded-3xl shadow-2xl">
               <DropdownMenuLabel className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground/60 px-4 py-3 border-b border-white/5 mb-2">Recent Notifications</DropdownMenuLabel>
               
-              <DropdownMenuItem className="p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex gap-4 items-start mb-1 transition-all">
-                  <div className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mt-0.5">
-                      <CheckCircle2 size={18} />
-                  </div>
-                  <div>
+              {isLoadingNotifications ? (
+                <div className="p-12 flex flex-col items-center justify-center">
+                  <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                  <p className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground mt-4">Syncing...</p>
+                </div>
+              ) : notifications.length > 0 ? (
+                notifications.map((notif) => (
+                  <DropdownMenuItem key={notif.id} className="p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex gap-4 items-start mb-1 transition-all">
+                    <div className={cn(
+                      "h-10 w-10 shrink-0 rounded-xl flex items-center justify-center mt-0.5",
+                      notif.type === 'delivered' ? "bg-emerald-500/10 text-emerald-400" : 
+                      notif.type === 'late' ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-400"
+                    )}>
+                      {notif.type === 'delivered' ? <CheckCircle2 size={18} /> : 
+                       notif.type === 'late' ? <AlertCircle size={18} /> : <Clock3 size={18} />}
+                    </div>
+                    <div>
                       <p className="font-medium text-sm leading-snug">
-                          <strong className="text-white">Daisy Chapman</strong> delivered <strong className="text-emerald-400">EPK</strong><br/>
-                          for Lagerhaus Bremen
+                        <strong className="text-white">{notif.artist}</strong> 
+                        {notif.type === 'delivered' ? ' delivered ' : ' hasn\'t sent '}
+                        <strong className={notif.type === 'delivered' ? "text-emerald-400" : "text-red-400"}>
+                          {notif.document}
+                        </strong><br/>
+                        for {notif.venue}
                       </p>
-                      <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/40 font-bold mt-2 block">2 hours ago</span>
-                  </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem className="p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex gap-4 items-start mb-1 transition-all">
-                  <div className="h-10 w-10 shrink-0 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 mt-0.5">
-                      <AlertCircle size={18} />
-                  </div>
-                  <div>
-                      <p className="font-medium text-sm leading-snug">
-                          <strong className="text-red-400">Technical Rider</strong> is 3 days late<br/>
-                          <strong className="text-white">Luna Shadows</strong> — O2 Academy
-                      </p>
-                      <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/40 font-bold mt-2 block">1 day ago</span>
-                  </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem className="p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex gap-4 items-start transition-all">
-                  <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 mt-0.5">
-                      <Clock3 size={18} />
-                  </div>
-                  <div>
-                      <p className="font-medium text-sm leading-snug">
-                          <strong className="text-amber-400">Contract</strong> due in 2 days<br/>
-                          <strong className="text-white">Echo Pulse</strong> — Printworks
-                      </p>
-                      <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/40 font-bold mt-2 block">2 days ago</span>
-                  </div>
-              </DropdownMenuItem>
+                      <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/40 font-bold mt-2 block">{notif.time}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <div className="p-12 text-center">
+                  <Bell className="h-8 w-8 text-muted-foreground/20 mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground font-medium">No recent notifications</p>
+                </div>
+              )}
 
           </DropdownMenuContent>
         </DropdownMenu>
