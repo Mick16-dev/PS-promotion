@@ -12,9 +12,10 @@ export default async function proxy(request: NextRequest) {
   let supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
   let supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim()
 
-  // FORCE FIX: If your key is unusually long, we truncate it to standard length.
-  if (supabaseAnonKey.length > 200) {
-    supabaseAnonKey = supabaseAnonKey.substring(0, 193)
+  // INTELLIGENT FIX: Capture only the valid part of the JWT key.
+  const keyStart = supabaseAnonKey.indexOf('eyJhbGci')
+  if (keyStart !== -1) {
+    supabaseAnonKey = supabaseAnonKey.substring(keyStart)
   }
 
   // 1. Create a Supabase client for the middleware
