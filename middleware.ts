@@ -1,24 +1,76 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co'
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
-  
-  // We use Supabase JS directly here if auth-helpers are not available/preferred
-  // But usually, we'd use the dedicated middleware helper if installed.
-  // Since only supabase-js is in package.json, we'll suggest using a simpler layout-level check or installing helpers.
-  
-  // For now, let's create a placeholder middleware that can be easily updated.
-  const response = NextResponse.next()
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
 
-  // This is where you would usually check the session token from cookies
-  // const { data: { session } } = await supabase.auth.getSession()
+  // 1. Create a Supabase client for the middleware
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // 2. Refresh the session if it exists (very important for JWT/Cookie sync)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // 3. Auth Guard Logic
+  const isLoginPage = request.nextUrl.pathname.startsWith('/login')
   
-  // Logic: if path is NOT /login and no session exists -> redirect to /login
-  // Since we don't have the auth-helpers installed yet (only supabase-js),
-  // most people do this check in a Root Layout or a high-level component.
-  
+  if (!user && !isLoginPage) {
+    // Not logged in and not on login page -> Redirect to login
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  if (user && isLoginPage) {
+    // Already logged in and on login page -> Redirect to dashboard
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   return response
 }
 
@@ -30,8 +82,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - login (auth routes)
+     * - public (public static files like images)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|login|auth).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.svg|public).*)',
   ],
 }
