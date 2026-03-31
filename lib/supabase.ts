@@ -9,7 +9,7 @@ if (supabaseAnonKey.length > 200) {
   supabaseAnonKey = supabaseAnonKey.substring(0, 193)
 }
 
-console.log('Supabase Connection Debug:', {
+console.log('Supabase FINAL FIX Check:', {
   urlExists: !!supabaseUrl,
   urlStart: supabaseUrl.substring(0, 10),
   keyExists: !!supabaseAnonKey,
