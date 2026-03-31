@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export default async function proxy(request: NextRequest) {
+  console.log('Proxy handling:', request.nextUrl.pathname)
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -87,9 +88,10 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.ico, favicon.png, etc (favicon files)
      * - public (public static files like images)
+     * - all common image/font extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.png|.*\\.jpg|.*\\.svg|public).*)',
+    '/((?!api|_next/static|_next/image|favicon|robots|sitemap|.*\\..*|public).*)',
   ],
 }
