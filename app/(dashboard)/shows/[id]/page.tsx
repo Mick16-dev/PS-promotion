@@ -18,11 +18,14 @@ import {
   Eye,
   Send,
   AlertTriangle,
-  Music
+  Music,
+  Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
+
+const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
 
 interface ShowDetailPageProps {
   params: { id: string }
@@ -34,9 +37,24 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [reliability, setReliability] = useState<any>(null)
+  const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
   const id = params.id
 
   useEffect(() => {
+    // Load lockouts from local storage
+    const savedLockouts = localStorage.getItem('reminder_lockouts')
+    if (savedLockouts) {
+      try {
+        const parsed = JSON.parse(savedLockouts)
+        const now = Date.now()
+        const activeLockouts: Record<string, boolean> = {}
+        Object.keys(parsed).forEach(lid => {
+          if (now < parsed[lid]) activeLockouts[lid] = true
+        })
+        setLockouts(activeLockouts)
+      } catch (e) {}
+    }
+
     async function fetchShowDetail() {
       try {
         setIsLoading(true)
@@ -158,6 +176,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             name: mat.document_name || 'Document',
             status: docStatus,
             deadline: deadlineStr,
+            rawDeadline: mat.deadline,
             submittedAt: submittedStr,
             daysInfo,
             fileUrl: mat.file_url || ''
@@ -218,14 +237,49 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     fetchShowDetail()
   }, [id])
 
-  const handleReminder = (docId: string, docName: string) => {
-    setIsSendingReminder(docId)
-    setTimeout(() => {
-      toast.success(`Reminder sent to ${showInfo?.artist}`, {
-        description: `Requested ${docName} update.`
+  const handleReminder = async (doc: any) => {
+    if (lockouts[doc.id]) return
+
+    setIsSendingReminder(doc.id)
+    
+    try {
+      const payload = {
+        material_id: doc.id,
+        artist_email: showInfo?.artistEmail,
+        artist_name: showInfo?.artist,
+        item_name: doc.name,
+        deadline: doc.rawDeadline,
+        show_name: showInfo?.venue,
+        portal_token: showInfo?.artistId // fallback to artist id if portal token not explicit
+      }
+
+      const response = await fetch(REMINDER_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       })
+
+      if (!response.ok) throw new Error('Reminder failed')
+
+      toast.success('Reminder Sent', {
+        description: `Requested ${doc.name} update.`
+      })
+
+      // Set 24h lockout
+      const expiry = Date.now() + 24 * 60 * 60 * 1000
+      const newLockouts = { ...lockouts, [doc.id]: true }
+      setLockouts(newLockouts)
+
+      const savedLockouts = localStorage.getItem('reminder_lockouts')
+      const parsed = savedLockouts ? JSON.parse(savedLockouts) : {}
+      parsed[doc.id] = expiry
+      localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
+
+    } catch (error) {
+      toast.error('Failed to send reminder. Try again later.')
+    } finally {
       setIsSendingReminder(null)
-    }, 1500)
+    }
   }
 
   const handleCopyLink = () => {
@@ -383,22 +437,22 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                         ) : isLate ? (
                           <Button
                             variant="default"
-                            onClick={() => handleReminder(doc.id, doc.name)}
-                            disabled={isSendingReminder === doc.id}
-                            className="bg-red-500 text-white hover:bg-red-600 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-11 px-6 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95"
+                            onClick={() => handleReminder(doc)}
+                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
+                            className="bg-red-500 text-white hover:bg-red-600 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-11 px-6 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95 min-w-[170px]"
                           >
-                            {isSendingReminder === doc.id ? <AlertCircle size={14} className="animate-spin" /> : <AlertTriangle size={14} />}
-                            Send Urgent Reminder
+                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />)}
+                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Urgent Reminder')}
                           </Button>
                         ) : (
                           <Button
                             variant="outline"
-                            onClick={() => handleReminder(doc.id, doc.name)}
-                            disabled={isSendingReminder === doc.id}
-                            className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-400 border-amber-500/20 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-5 rounded-xl transition-colors"
+                            onClick={() => handleReminder(doc)}
+                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
+                            className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-400 border-amber-500/20 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-5 rounded-xl transition-colors min-w-[150px]"
                           >
-                            {isSendingReminder === doc.id ? <Clock size={14} className="animate-spin" /> : <Send size={14} />}
-                            Send Reminder
+                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <Send size={14} />)}
+                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Reminder')}
                           </Button>
                         )}
                       </div>

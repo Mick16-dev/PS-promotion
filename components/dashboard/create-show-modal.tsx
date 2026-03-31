@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -20,8 +20,9 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, MapPin, Music, User, Send } from 'lucide-react'
+import { CalendarIcon, MapPin, Music, User, Send, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { supabase } from '@/lib/supabase'
 
 interface CreateShowModalProps {
   isOpen: boolean
@@ -36,14 +37,39 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
+const N8N_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/create show'
+
 export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [artists, setArtists] = useState<any[]>([])
+  const [isLoadingArtists, setIsLoadingArtists] = useState(false)
+  
+  // Form state
+  const [selectedArtistId, setSelectedArtistId] = useState<string>('')
+  const [venue, setVenue] = useState('')
+  const [city, setCity] = useState('')
+  const [showDate, setShowDate] = useState('')
   
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
     epk: true, bio: true, photos: true, rider: true, contract: true
   })
   const [docDates, setDocDates] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (isOpen) {
+      async function fetchArtists() {
+        setIsLoadingArtists(true)
+        const { data, error } = await supabase.from('artist').select('id, name')
+        if (data && !error) {
+          setArtists(data)
+          if (data.length > 0) setSelectedArtistId(data[0].id)
+        }
+        setIsLoadingArtists(false)
+      }
+      fetchArtists()
+    }
+  }, [isOpen])
 
   const handleDocToggle = (id: string, checked: boolean) => {
     setSelectedDocs(prev => ({ ...prev, [id]: checked }))
@@ -63,22 +89,55 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       return
     }
 
+    if (!selectedArtistId) {
+      toast.error('Validation Error', { description: 'Please select an artist.' })
+      return
+    }
+
     setIsSubmitting(true)
     
     try {
-      // Simulate API call to create show / trigger n8n
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Prepare data for n8n
+      const payload = {
+        artist_id: selectedArtistId,
+        venue_name: venue,
+        city: city,
+        date: showDate,
+        required_documents: defaultDocs
+          .filter(doc => selectedDocs[doc.id])
+          .map(doc => ({
+            name: doc.label,
+            deadline: docDates[doc.id] || showDate // Default to show date if not set
+          })),
+        timestamp: new Date().toISOString()
+      }
+
+      // POST to n8n
+      const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`)
+      }
       
       toast.success('Show created.', {
-        description: `Portal link sent to artist's email. They'll receive an email with everything they need to submit.`
+        description: `Portal link sent to the artist. They'll receive an email shortly.`
       })
       
       onClose()
       
-      // Reset form state for next open (optional but good practice)
+      // Reset form
+      setVenue('')
+      setCity('')
+      setShowDate('')
       setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
+      setDocDates({})
     } catch (error) {
-      toast.error('Failed to create show. Please try again.')
+      console.error('Submission error:', error)
+      toast.error('Failed to create show. Please try again or check n8n connection.')
     } finally {
       setIsSubmitting(false)
     }
@@ -104,33 +163,54 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
             {/* Context Fields */}
             <div className="space-y-3">
               <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist</Label>
-              <Select defaultValue="luna">
+              <Select 
+                value={selectedArtistId} 
+                onValueChange={setSelectedArtistId}
+                disabled={isLoadingArtists}
+              >
                 <SelectTrigger className="bg-white/5 border-white/10 h-14 focus:ring-primary/50 text-foreground w-full rounded-2xl px-5 text-lg font-bold">
                   <div className="flex items-center gap-3">
                     <User size={18} className="text-primary" />
-                    <SelectValue placeholder="Select an artist" />
+                    <SelectValue placeholder={isLoadingArtists ? "Loading artists..." : "Select an artist"} />
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-ebony-900 border-white/10 rounded-2xl">
-                  <SelectItem value="luna" className="py-3 font-bold">Luna Shadows</SelectItem>
-                  <SelectItem value="echo" className="py-3 font-bold">Echo Pulse</SelectItem>
-                  <SelectItem value="neon" className="py-3 font-bold">Neon Dreams</SelectItem>
+                  {artists.map(artist => (
+                    <SelectItem key={artist.id} value={artist.id} className="py-3 font-bold">
+                      {artist.name}
+                    </SelectItem>
+                  ))}
+                  {artists.length === 0 && !isLoadingArtists && (
+                    <SelectItem value="none" disabled className="py-3 font-bold">No artists found</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <Label htmlFor="venue" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Venue & Location</Label>
+                <Label htmlFor="venue" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Venue & City</Label>
                 <div className="relative group">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    id="venue" 
-                    name="venue"
-                    required
-                    placeholder="e.g. O2 Academy" 
-                    className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30"
-                  />
+                  <div className="flex gap-2">
+                    <Input 
+                      id="venue" 
+                      name="venue"
+                      value={venue}
+                      onChange={(e) => setVenue(e.target.value)}
+                      required
+                      placeholder="Venue Name" 
+                      className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30"
+                    />
+                    <Input 
+                      id="city" 
+                      name="city"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="City" 
+                      className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30 w-32"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="space-y-3">
@@ -141,6 +221,8 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
                     id="date" 
                     name="date"
                     type="date" 
+                    value={showDate}
+                    onChange={(e) => setShowDate(e.target.value)}
                     required
                     className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20"
                   />
@@ -206,7 +288,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
               disabled={isSubmitting}
               className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-12 px-8 rounded-xl font-pro-data uppercase tracking-widest text-[11px] gap-2 transition-all active:scale-95 sm:w-auto w-full"
             >
-              {isSubmitting ? <Send size={16} className="animate-spin" /> : <Send size={16} />}
+              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               {isSubmitting ? 'Creating Show...' : 'Create Show & Send Artist Portal'}
             </Button>
           </DialogFooter>

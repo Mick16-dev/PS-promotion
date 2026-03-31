@@ -12,10 +12,13 @@ import {
   ArrowRight,
   Send,
   AlertTriangle,
-  FileText
+  FileText,
+  Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
+
+const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
 
 // Removed mock arrays to rely on state
 
@@ -29,11 +32,38 @@ export default function DashboardHome() {
   ])
   const [isLoading, setIsLoading] = useState(true)
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
+  const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
 
   const [overdueDocs, setOverdueDocs] = useState<any[]>([])
   const [recentActivity, setRecentActivity] = useState<any[]>([])
 
   useEffect(() => {
+    // Load lockouts from local storage
+    const savedLockouts = localStorage.getItem('reminder_lockouts')
+    if (savedLockouts) {
+      try {
+        const parsed = JSON.parse(savedLockouts)
+        const now = Date.now()
+        const activeLockouts: Record<string, boolean> = {}
+        let cleanupNeeded = false
+        
+        Object.keys(parsed).forEach(id => {
+          if (now < parsed[id]) {
+            activeLockouts[id] = true
+          } else {
+            cleanupNeeded = true
+          }
+        })
+        
+        if (cleanupNeeded) {
+          localStorage.setItem('reminder_lockouts', JSON.stringify(
+            Object.fromEntries(Object.entries(parsed).filter(([_, expiry]) => now < (expiry as number)))
+          ))
+        }
+        setLockouts(activeLockouts)
+      } catch (e) {}
+    }
+
     async function fetchDashboardData() {
       try {
         setIsLoading(true)
@@ -41,7 +71,7 @@ export default function DashboardHome() {
         // Fetch shows count
         const { count: showsCount } = await supabase.from('shows').select('*', { count: 'exact', head: true })
         
-        // Fetch materials with relations
+        // Fetch materials with full relations for reminders
         const { data: materials, error } = await supabase.from('materials').select(`
           id,
           status,
@@ -49,8 +79,10 @@ export default function DashboardHome() {
           submitted_at,
           document_name,
           shows (
+            id,
             venue_name,
-            artist ( name )
+            portal_url,
+            artist ( name, email )
           )
         `)
         
@@ -64,13 +96,14 @@ export default function DashboardHome() {
         
         if (materials && !error) {
            materials.forEach(mat => {
-             // Extract relational data safely
              const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
              const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
              
              const artistName = artistData?.name || 'Unknown Artist'
+             const artistEmail = artistData?.email || ''
              const venueName = showData?.venue_name || 'Unknown Venue'
              const docName = mat.document_name || 'Document'
+             const portalToken = showData?.id || ''
              
              if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
                deliveredCount++
@@ -84,15 +117,17 @@ export default function DashboardHome() {
                  })
                }
              } else {
-               // Pending or Awaiting
                if (mat.deadline && new Date(mat.deadline) < now) {
                  lateCount++
                  const daysLate = Math.floor((now.getTime() - new Date(mat.deadline).getTime()) / (1000 * 3600 * 24))
                  overdueList.push({
                    id: mat.id,
                    artist: artistName,
+                   artistEmail: artistEmail,
                    venue: venueName,
                    document: docName,
+                   deadline: mat.deadline,
+                   portalToken: portalToken,
                    daysLate: daysLate > 0 ? daysLate : 1
                  })
                } else {
@@ -102,7 +137,6 @@ export default function DashboardHome() {
            })
         }
         
-        // Sort activity list (newest first)
         activityList.sort((a, b) => b.time.getTime() - a.time.getTime())
         
         setStats([
@@ -114,7 +148,6 @@ export default function DashboardHome() {
         
         setOverdueDocs(overdueList)
         
-        // Format time strings
         const formattedActivity = activityList.slice(0, 5).map(item => {
            const hours = Math.floor((now.getTime() - item.time.getTime()) / (1000 * 3600))
            let timeStr = `${hours} hours ago`
@@ -127,7 +160,6 @@ export default function DashboardHome() {
         
       } catch (error) {
         console.error("Error fetching data:", error)
-        // Fallback or leave as '--'
       } finally {
         setIsLoading(false)
       }
@@ -136,14 +168,49 @@ export default function DashboardHome() {
     fetchDashboardData()
   }, [])
 
-  const handleSendReminder = (id: string, artist: string, document: string) => {
-    setIsSendingReminder(id)
-    setTimeout(() => {
-      toast.success(`Reminder sent to ${artist}`, {
-        description: `Manual reminder for ${document} dispatched.`
+  const handleSendReminder = async (item: any) => {
+    if (lockouts[item.id]) return
+
+    setIsSendingReminder(item.id)
+    
+    try {
+      const payload = {
+        material_id: item.id,
+        artist_email: item.artistEmail,
+        artist_name: item.artist,
+        item_name: item.document,
+        deadline: item.deadline,
+        show_name: item.venue,
+        portal_token: item.portalToken
+      }
+
+      const response = await fetch(REMINDER_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       })
+
+      if (!response.ok) throw new Error('Reminder failed')
+
+      toast.success('Reminder Sent', {
+        description: `Manual reminder for ${item.document} confirmation received.`
+      })
+
+      // Set 24h lockout
+      const expiry = Date.now() + 24 * 60 * 60 * 1000
+      const newLockouts = { ...lockouts, [item.id]: true }
+      setLockouts(newLockouts)
+
+      const savedLockouts = localStorage.getItem('reminder_lockouts')
+      const parsed = savedLockouts ? JSON.parse(savedLockouts) : {}
+      parsed[item.id] = expiry
+      localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
+
+    } catch (error) {
+      toast.error('Failed to send reminder. Try again later.')
+    } finally {
       setIsSendingReminder(null)
-    }, 1000)
+    }
   }
 
   if (isLoading) {
@@ -225,12 +292,12 @@ export default function DashboardHome() {
                     </span>
                     <Button 
                       variant="outline" 
-                      onClick={() => handleSendReminder(item.id, item.artist, item.document)}
-                      disabled={isSendingReminder === item.id}
-                      className="border-white/10 hover:bg-white/10 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl gap-2"
+                      onClick={() => handleSendReminder(item)}
+                      disabled={isSendingReminder === item.id || lockouts[item.id]}
+                      className="border-white/10 hover:bg-white/10 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl gap-2 min-w-[140px]"
                     >
-                      {isSendingReminder === item.id ? <Clock size={14} className="animate-spin" /> : <Send size={14} />}
-                      {isSendingReminder === item.id ? 'Sending...' : 'Send Reminder'}
+                      {isSendingReminder === item.id ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                      {isSendingReminder === item.id ? 'Sending...' : (lockouts[item.id] ? 'Reminder Sent' : 'Send Reminder')}
                     </Button>
                   </div>
                 </div>
