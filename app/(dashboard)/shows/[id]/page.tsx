@@ -59,7 +59,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       try {
         setIsLoading(true)
 
-        // Fetch the show with related artist and materials
+        // Fetch the show with related artist and documents
         const { data: show, error } = await supabase
           .from('shows')
           .select(`
@@ -138,7 +138,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           portalUrl: show.portal_url || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/portal/${id}`
         })
 
-        // Process documents/materials
+        // Process show documents
         const mats = show.materials || []
         const now2 = new Date()
         const formattedDocs = mats.map((mat: any) => {

@@ -71,7 +71,7 @@ export default function DashboardHome() {
         // Fetch shows count
         const { count: showsCount } = await supabase.from('shows').select('*', { count: 'exact', head: true })
         
-        // Fetch materials with full relations for reminders
+        // Fetch documents with full relations for reminders
         const { data: materials, error } = await supabase.from('materials').select(`
           id,
           status,

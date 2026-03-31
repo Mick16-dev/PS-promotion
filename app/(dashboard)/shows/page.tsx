@@ -131,7 +131,7 @@ export default function ShowsPage() {
     }
   }
 
-  const getMaterialsBadge = (delivered: number, total: number) => {
+  const getDocumentsBadge = (delivered: number, total: number) => {
     const ratio = delivered / total;
     if (ratio === 1) {
       return <span className="text-emerald-400 font-bold">{delivered}/{total} delivered</span>
@@ -253,7 +253,7 @@ export default function ShowsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="text-[12px] font-pro-data uppercase tracking-widest">
-                      {getMaterialsBadge(show.docsDelivered, show.docsTotal)}
+                      {getDocumentsBadge(show.docsDelivered, show.docsTotal)}
                     </div>
                   </TableCell>
                   <TableCell>

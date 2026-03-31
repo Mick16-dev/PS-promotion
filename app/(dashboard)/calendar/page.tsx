@@ -35,7 +35,7 @@ export default function CalendarPage() {
   useEffect(() => {
     async function fetchCalendarData() {
       try {
-        // Fetch shows with artist and materials
+        // Fetch shows with artist and documents
         const { data: shows } = await supabase
           .from('shows')
           .select(`
@@ -67,7 +67,7 @@ export default function CalendarPage() {
           
           setUpcomingShows(formattedShows)
           
-          // Extract deadlines from materials
+          // Extract document deadlines
           const deadlines: any[] = []
           shows.forEach((show: any) => {
             const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
