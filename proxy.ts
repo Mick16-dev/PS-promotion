@@ -9,11 +9,16 @@ export default async function proxy(request: NextRequest) {
     },
   })
 
+  let supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
+  let supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim()
+
+  // FORCE FIX: If your key is unusually long, we truncate it to standard length.
+  if (supabaseAnonKey.length > 200) {
+    supabaseAnonKey = supabaseAnonKey.substring(0, 193)
+  }
+
   // 1. Create a Supabase client for the middleware
-  const supabase = createServerClient(
-    (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim(),
-    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim(),
-    {
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value
