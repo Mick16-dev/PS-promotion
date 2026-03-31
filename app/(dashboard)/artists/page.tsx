@@ -15,8 +15,6 @@ import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 import { CreateArtistModal } from '@/components/dashboard/create-artist-modal'
 
-// Removed Mock Data. Pulling natively from DB
-
 export default function ArtistsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,75 +26,20 @@ export default function ArtistsPage() {
      async function fetchArtists() {
        try {
          setIsLoading(true)
-         const { data, error } = await supabase.from('artist').select(`
-            id,
-            name,
-            genre,
-            shows (
-              id,
-              date,
-              materials (
-                status,
-                deadline
-              )
-            )
-         `)
+         // Fetch reliability directly as it's calculated in the backend/n8n
+         const { data, error } = await supabase.from('artist').select('id, name, genre, reliability')
          
          if (data && !error) {
-            const formattedArtists = data.map(artist => {
-               const showsList = Array.isArray(artist.shows) ? artist.shows : (artist.shows ? [artist.shows] : [])
-               const showCount = showsList.length
-               let earliestShowDate: Date | null = null
-               
-               let totalDocs = 0
-               let deliveredOnTime = 0
-               let lateDocs = 0
-               
-               showsList.forEach((s: any) => {
-                  if (s.date) {
-                    const sDate = new Date(s.date)
-                    if (!earliestShowDate || sDate < earliestShowDate) {
-                       earliestShowDate = sDate
-                    }
-                  }
-                  
-                  if (s.materials) {
-                     const mats = Array.isArray(s.materials) ? s.materials : [s.materials]
-                     mats.forEach((m: any) => {
-                        totalDocs++
-                        if (m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted') {
-                           deliveredOnTime++ 
-                        } else if (m.deadline && new Date(m.deadline) < new Date()) {
-                           lateDocs++
-                        }
-                     })
-                  }
-               })
-               
-               let reliability = 100 // baseline if no docs
-               if (totalDocs > 0) {
-                  reliability = Math.round((deliveredOnTime / totalDocs) * 100)
-               }
-               
-               let firstShowStr = 'N/A'
-               if (earliestShowDate) {
-                  firstShowStr = (earliestShowDate as Date).toLocaleDateString(undefined, {
-                     month: 'short',
-                     year: 'numeric'
-                  })
-               }
-               
-               return {
-                 id: artist.id,
-                 name: artist.name || 'Unknown Artist',
-                 genre: artist.genre || 'Various',
-                 shows: showCount,
-                 reliability: reliability,
-                 docsOnTime: deliveredOnTime,
-                 docsLate: lateDocs,
-                 firstShow: firstShowStr
-               }
-            })
+            const formattedArtists = data.map(artist => ({
+              id: artist.id,
+              name: artist.name || 'Unknown Artist',
+              genre: artist.genre || 'Various',
+              shows: '--', 
+              reliability: artist.reliability ?? 100,
+              docsOnTime: '--',
+              docsLate: '--',
+              firstShow: '--'
+            }))
             
             setArtists(formattedArtists)
          }
@@ -174,32 +117,26 @@ export default function ArtistsPage() {
 
                   <div className="mt-10 py-6 border-y border-white/5 space-y-6 flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground font-medium">Shows: <strong className="text-white">{artist.shows}</strong></span>
+                      <span className="text-muted-foreground font-medium">Reliability:</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-muted-foreground font-medium">Reliability: <strong className="text-white font-pro-data">{artist.reliability}/100</strong></span>
+                        <strong className="text-white font-pro-data text-2xl">{artist.reliability}/100</strong>
                       </div>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground font-medium">Documents: <strong className="text-emerald-400 font-bold">{artist.docsOnTime} delivered on time</strong></span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground font-medium"><span className="invisible">Documents:</span> <strong className="text-red-500 font-bold">{artist.docsLate} late</strong></span>
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Reliability is calculated by the backend based on historical document submission performance.
+                    </p>
                   </div>
 
                   <div className="mt-6 flex items-center justify-between relative z-10 pt-2">
                     <Badge variant="outline" className={`${relUI.bg} ${relUI.color} uppercase tracking-widest text-[10px] font-bold px-3 py-1.5`}>{relUI.label}</Badge>
-                    <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/40 font-bold">First show: {artist.firstShow}</span>
                   </div>
 
                   <Button 
                     className="w-full mt-8 bg-white/5 hover:bg-white/10 text-white gap-3 h-12 rounded-xl border border-white/5 group-hover:bg-primary group-hover:text-white transition-all font-pro-data uppercase tracking-widest text-xs"
                     onClick={() => router.push(`/shows`)}
                   >
-                    View Artist <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    View Shows <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
               </div>
@@ -212,7 +149,7 @@ export default function ArtistsPage() {
                 <UserRound size={40} className="text-muted-foreground/30" />
               </div>
               <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists yet.</h3>
-              <p className="text-muted-foreground font-medium max-w-md">Agents and Managers appear here automatically when you create a show.</p>
+              <p className="text-muted-foreground font-medium max-w-md">Artists appear here automatically when they are added to the roster.</p>
               <Button 
                 onClick={() => router.push('/shows')}
                 className="mt-8 bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"

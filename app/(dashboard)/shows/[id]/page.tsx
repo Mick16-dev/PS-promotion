@@ -74,7 +74,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             artist:artist_id (
               id,
               name,
-              email
+              email,
+              reliability
             ),
             materials (
               id,
@@ -185,45 +186,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         setDocuments(formattedDocs)
 
-        // Calculate artist reliability across ALL their shows
-        if (artistInfo?.id || show.artist_id) {
-          const artistId = artistInfo?.id || show.artist_id
-          const { data: allShows } = await supabase
-            .from('shows')
-            .select(`
-              id,
-              date,
-              materials ( status, deadline )
-            `)
-            .eq('artist_id', artistId)
-
-          let completedShows = 0
-          let totalDocs = 0
-          let deliveredOnTime = 0
-          let lateDocs = 0
-
-          if (allShows) {
-            allShows.forEach((s: any) => {
-              if (s.date && new Date(s.date) < now) completedShows++
-              const sMats = s.materials || []
-              sMats.forEach((m: any) => {
-                totalDocs++
-                if (m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted') {
-                  deliveredOnTime++
-                } else if (m.deadline && new Date(m.deadline) < now) {
-                  lateDocs++
-                }
-              })
-            })
-          }
-
-          const score = totalDocs > 0 ? Math.round((deliveredOnTime / totalDocs) * 100) : 100
-
+        // Fetch reliability directly from the artist table (populated by n8n)
+        if (artistInfo) {
           setReliability({
-            score,
-            completedShows,
-            docsDeliveredOnTime: deliveredOnTime,
-            docsLate: lateDocs
+            score: artistInfo.reliability ?? 100
           })
         }
 
@@ -518,19 +484,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                   />
                 </div>
 
-                <div className="mt-8 space-y-5">
-                  <div className="flex items-center justify-between text-sm font-medium border-b border-white/5 pb-5">
-                    <span className="text-muted-foreground">Shows completed</span>
-                    <span className="text-white font-bold">{reliability.completedShows}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm font-medium border-b border-white/5 pb-5">
-                    <span className="text-muted-foreground">Documents delivered <strong className="text-emerald-400 font-normal">on time</strong></span>
-                    <span className="text-white font-bold">{reliability.docsDeliveredOnTime}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm font-medium">
-                    <span className="text-muted-foreground">Documents <strong className="text-red-500 font-normal">late</strong></span>
-                    <span className="text-white font-bold">{reliability.docsLate}</span>
-                  </div>
+                <div className="mt-8">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Reliability is pulled directly from the backend as verified by automated submission monitoring.
+                  </p>
                 </div>
               </div>
             </div>
