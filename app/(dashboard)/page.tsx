@@ -99,9 +99,9 @@ export default function DashboardHome() {
              const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
              const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
              
-             const artistName = artistData?.name || 'Unknown Artist'
+            const artistName = artistData?.name || 'Unnamed Artist'
              const artistEmail = artistData?.email || ''
-             const venueName = showData?.venue_name || 'Unknown Venue'
+            const venueName = showData?.venue_name || 'Venue TBD'
              const docName = mat.document_name || 'Document'
              const portalToken = showData?.id || ''
              
@@ -218,7 +218,7 @@ export default function DashboardHome() {
       <div className="flex h-[50vh] items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
           <Music className="h-8 w-8 animate-bounce text-primary/50" />
-          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading Dashboard...</p>
+          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading your data...</p>
         </div>
       </div>
     )

@@ -126,10 +126,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         }
 
         setShowInfo({
-          artist: artistInfo?.name || 'Unknown Artist',
+          artist: artistInfo?.name || 'Unnamed Artist',
           artistEmail: artistInfo?.email || '',
           artistId: artistInfo?.id || show.artist_id,
-          venue: show.venue_name || 'Unknown Venue',
+          venue: show.venue_name || 'Venue TBD',
           city: show.city || '',
           date: dateStr,
           rawDate: show.date,

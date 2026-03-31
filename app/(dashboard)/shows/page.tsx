@@ -66,7 +66,7 @@ export default function ShowsPage() {
         if (data && !error) {
            const formattedShows = data.map(show => {
              const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
-             const artistName = artistInfo?.name || 'Unknown Artist'
+            const artistName = artistInfo?.name || 'Unnamed Artist'
              
              let delivered = 0
              let total = show.materials?.length || 0
@@ -93,7 +93,7 @@ export default function ShowsPage() {
              return {
                id: show.id,
                artist: artistName,
-               venue: show.venue_name || 'Unknown Venue',
+              venue: show.venue_name || 'Venue TBD',
                city: show.city || '',
                date: dateStr || 'TBD',
                time: show.time || 'TBD',

@@ -32,7 +32,7 @@ export default function ArtistsPage() {
          if (data && !error) {
             const formattedArtists = data.map(artist => ({
               id: artist.id,
-              name: artist.name || 'Unknown Artist',
+             name: artist.name || 'Unnamed Artist',
               genre: artist.genre || 'Various',
               shows: '--', 
               reliability: artist.reliability ?? 100,
@@ -148,13 +148,13 @@ export default function ArtistsPage() {
               <div className="h-24 w-24 rounded-full bg-muted/20 border border-white/10 flex items-center justify-center mb-6 shadow-inner">
                 <UserRound size={40} className="text-muted-foreground/30" />
               </div>
-              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists yet.</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists available.</h3>
               <p className="text-muted-foreground font-medium max-w-md">Artists appear here automatically when they are added to the roster.</p>
               <Button 
                 onClick={() => router.push('/shows')}
                 className="mt-8 bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"
               >
-                Go to Shows
+                View Shows
               </Button>
             </div>
           </div>
