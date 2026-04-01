@@ -1,0 +1,144 @@
+diff --git a/app/(dashboard)/artists/page.tsx b/app/(dashboard)/artists/page.tsx
+index 5f12fd1..8ff366a 100644
+--- a/app/(dashboard)/artists/page.tsx
++++ b/app/(dashboard)/artists/page.tsx
+@@ -2,10 +2,10 @@
+ 
+ import React, { useState } from 'react'
+ import { useRouter } from 'next/navigation'
+-import { 
+-  Search, 
+-  Filter, 
+-  Music, 
++import {
++  Search,
++  Filter,
++  Music,
+   ArrowRight,
+   UserRound
+ } from 'lucide-react'
+@@ -23,37 +23,37 @@ export default function ArtistsPage() {
+   const [isLoading, setIsLoading] = useState(true)
+ 
+   React.useEffect(() => {
+-     async function fetchArtists() {
+-       try {
+-         setIsLoading(true)
+-         // Fetch reliability directly as it's calculated in the backend/n8n
+-         const { data, error } = await supabase.from('artist').select('id, name, genre, reliability')
+-         
+-         if (data && !error) {
+-            const formattedArtists = data.map(artist => ({
+-              id: artist.id,
+-              name: artist.name || 'Unknown Artist',
+-              genre: artist.genre || 'Various',
+-              shows: '--', 
+-              reliability: artist.reliability ?? 100,
+-              docsOnTime: '--',
+-              docsLate: '--',
+-              firstShow: '--'
+-            }))
+-            
+-            setArtists(formattedArtists)
+-         }
+-       } catch (err) {
+-         console.error('Failed to load artists:', err)
+-       } finally {
+-         setIsLoading(false)
+-       }
+-     }
+-     
+-     fetchArtists()
++    async function fetchArtists() {
++      try {
++        setIsLoading(true)
++        // Fetch reliability directly as it's calculated in the backend/n8n
++        const { data, error } = await supabase.from('artist').select('id, name, genre, reliability')
++
++        if (data && !error) {
++          const formattedArtists = data.map(artist => ({
++            id: artist.id,
++            name: artist.name || 'Unknown Artist',
++            genre: artist.genre || 'Various',
++            shows: '--',
++            reliability: artist.reliability ?? 100,
++            docsOnTime: '--',
++            docsLate: '--',
++            firstShow: '--'
++          }))
++
++          setArtists(formattedArtists)
++        }
++      } catch (err) {
++        console.error('Failed to load artists:', err)
++      } finally {
++        setIsLoading(false)
++      }
++    }
++
++    fetchArtists()
+   }, [])
+ 
+-  const filteredArtists = artists.filter(artist => 
++  const filteredArtists = artists.filter(artist =>
+     (artist.name && artist.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+     (artist.genre && artist.genre.toLowerCase().includes(searchQuery.toLowerCase()))
+   )
+@@ -78,8 +78,8 @@ export default function ArtistsPage() {
+       <div className="flex flex-col sm:flex-row gap-4">
+         <div className="relative flex-1">
+           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
+-          <Input 
+-            placeholder="Search roster by artist..." 
++          <Input
++            placeholder="Search roster by artist..."
+             className="pl-12 h-14 bg-muted/20 border-white/5 focus-visible:ring-primary/50 text-base rounded-2xl font-bold tracking-tight"
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+@@ -97,15 +97,15 @@ export default function ArtistsPage() {
+           filteredArtists.map((artist) => {
+             const relUI = getReliabilityUI(artist.reliability)
+             return (
+-              <div 
+-                key={artist.id} 
++              <div
++                key={artist.id}
+                 className="group glass-card rounded-3xl p-8 border-white/5 hover:border-primary/30 transition-all duration-500 relative overflow-hidden flex flex-col justify-between h-full hover:shadow-2xl hover:bg-white/[0.02]"
+               >
+                 {/* Background Aesthetics */}
+                 <div className="absolute -top-12 -right-12 p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-700 rotate-12 pointer-events-none">
+-                    <UserRound size={160} className="text-primary" />
++                  <UserRound size={160} className="text-primary" />
+                 </div>
+-                
++
+                 <div className="relative z-10 flex flex-col h-full">
+                   <div>
+                     <h3 className="text-3xl font-black tracking-tighter text-white group-hover:text-primary transition-colors uppercase italic leading-none">{artist.name}</h3>
+@@ -122,7 +122,7 @@ export default function ArtistsPage() {
+                         <strong className="text-white font-pro-data text-2xl">{artist.reliability}/100</strong>
+                       </div>
+                     </div>
+-                    
++
+                     <p className="text-sm text-muted-foreground leading-relaxed">
+                       Reliability is calculated by the backend based on historical document submission performance.
+                     </p>
+@@ -132,7 +132,7 @@ export default function ArtistsPage() {
+                     <Badge variant="outline" className={`${relUI.bg} ${relUI.color} uppercase tracking-widest text-[10px] font-bold px-3 py-1.5`}>{relUI.label}</Badge>
+                   </div>
+ 
+-                  <Button 
++                  <Button
+                     className="w-full mt-8 bg-white/5 hover:bg-white/10 text-white gap-3 h-12 rounded-xl border border-white/5 group-hover:bg-primary group-hover:text-white transition-all font-pro-data uppercase tracking-widest text-xs"
+                     onClick={() => router.push(`/shows`)}
+                   >
+@@ -150,7 +150,7 @@ export default function ArtistsPage() {
+               </div>
+               <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists yet.</h3>
+               <p className="text-muted-foreground font-medium max-w-md">Artists appear here automatically when they are added to the roster.</p>
+-              <Button 
++              <Button
+                 onClick={() => router.push('/shows')}
+                 className="mt-8 bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"
+               >
