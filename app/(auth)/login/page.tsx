@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Music, ArrowRight, Github } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -9,13 +9,13 @@ import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
   const [isCheckingSession, setIsCheckingSession] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = React.useState<number | null>(null)
+  const [redirectedFrom, setRedirectedFrom] = React.useState<string>('/')
   const failedAttemptsRef = React.useRef(0)
   const cooldownTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -42,7 +42,12 @@ export default function LoginPage() {
     }
   }, [router])
 
-  const redirectedFrom = searchParams.get('redirectedFrom') || '/'
+  React.useEffect(() => {
+    // Avoid useSearchParams() prerender constraints by reading from window on client.
+    const params = new URLSearchParams(window.location.search)
+    setRedirectedFrom(params.get('redirectedFrom') || '/')
+  }, [])
+
   const safeRedirect =
     redirectedFrom.startsWith('/') && !redirectedFrom.startsWith('//')
       ? redirectedFrom
