@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
+const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
 
 interface ShowDetailPageProps {
   params: { id: string }
@@ -209,6 +209,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     setIsSendingReminder(doc.id)
     
     try {
+      if (!REMINDER_WEBHOOK_URL) {
+        throw new Error('Reminder webhook is not configured.')
+      }
+
       const payload = {
         material_id: doc.id,
         artist_email: showInfo?.artistEmail,

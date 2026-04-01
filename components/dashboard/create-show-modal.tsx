@@ -37,7 +37,7 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
-const N8N_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/create show'
+const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK || ''
 
 export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -97,6 +97,10 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     setIsSubmitting(true)
     
     try {
+      if (!N8N_WEBHOOK_URL) {
+        throw new Error('Create-show webhook is not configured.')
+      }
+
       // Prepare data for n8n
       const payload = {
         artist_id: selectedArtistId,

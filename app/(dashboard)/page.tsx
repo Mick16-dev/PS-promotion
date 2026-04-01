@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
+const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
 
 // Removed mock arrays to rely on state
 
@@ -174,6 +174,10 @@ export default function DashboardHome() {
     setIsSendingReminder(item.id)
     
     try {
+      if (!REMINDER_WEBHOOK_URL) {
+        throw new Error('Reminder webhook is not configured.')
+      }
+
       const payload = {
         material_id: item.id,
         artist_email: item.artistEmail,
