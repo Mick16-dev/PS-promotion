@@ -27,7 +27,7 @@ export default function ArtistsPage() {
        try {
          setIsLoading(true)
          // Fetch reliability directly as it's calculated in the backend/n8n
-         const { data, error } = await supabase.from('artist').select('id, name, genre, reliability')
+         const { data, error } = await supabase.from('artists').select('id, name, genre, reliability')
          
          if (data && !error) {
             const formattedArtists = data.map(artist => ({

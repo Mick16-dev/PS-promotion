@@ -61,24 +61,16 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
         try {
-          // Support either `artist` or `artists` table naming.
-          const primary = await supabase.from('artist').select('id, name')
-          const fallback = primary.error
-            ? await supabase.from('artists').select('id, name')
-            : null
-
-          const data = (fallback?.data ?? primary.data) as any[] | null
-          const error = fallback?.error ?? primary.error
+          const { data, error } = await supabase.from('artists').select('id, name')
 
           if (error) {
             console.error('Failed to fetch artists:', error)
-            const usedTable = primary.error ? 'artists' : 'artist'
             const urlHint =
               typeof window !== 'undefined'
                 ? (process.env.NEXT_PUBLIC_SUPABASE_URL || '').split('.supabase.co')[0].slice(-12)
                 : ''
             toast.error('Could not load artists.', {
-              description: `Supabase query failed (table: ${usedTable}${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
+              description: `Supabase query failed (table: artists${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
             })
           } else if (data) {
             setArtists(data)
