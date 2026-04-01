@@ -75,7 +75,14 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
             toast.error('Could not load artists.', { description: 'Check your Supabase tables and RLS policies.' })
           } else if (data) {
             setArtists(data)
-            if (data.length > 0) setSelectedArtistId((prev) => prev || data[0].id)
+            if (data.length > 0) {
+              setSelectedArtistId((prev) => prev || data[0].id)
+            } else {
+              toast.error('No artists available.', {
+                description:
+                  'Your artist table returned 0 rows. This is usually caused by Row Level Security (RLS) blocking reads, or the row being in a different table (artist vs artists).',
+              })
+            }
           }
         } finally {
           setIsLoadingArtists(false)
