@@ -72,7 +72,14 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
 
           if (error) {
             console.error('Failed to fetch artists:', error)
-            toast.error('Could not load artists.', { description: 'Check your Supabase tables and RLS policies.' })
+            const usedTable = primary.error ? 'artists' : 'artist'
+            const urlHint =
+              typeof window !== 'undefined'
+                ? (process.env.NEXT_PUBLIC_SUPABASE_URL || '').split('.supabase.co')[0].slice(-12)
+                : ''
+            toast.error('Could not load artists.', {
+              description: `Supabase query failed (table: ${usedTable}${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
+            })
           } else if (data) {
             setArtists(data)
             if (data.length > 0) {
