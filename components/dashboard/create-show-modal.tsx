@@ -37,8 +37,6 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK || ''
-
 export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [artists, setArtists] = useState<any[]>([])
@@ -117,10 +115,6 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     setIsSubmitting(true)
     
     try {
-      if (!N8N_WEBHOOK_URL) {
-        throw new Error('Create-show webhook is not configured.')
-      }
-
       // Prepare data for n8n
       const payload = {
         artist_id: selectedArtistId,
@@ -136,15 +130,20 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         timestamp: new Date().toISOString()
       }
 
-      // POST to n8n
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
+      const response = await fetch('/api/n8n/create-show', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
 
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`)
+        let details = ''
+        try {
+          const json = await response.json()
+          details = json?.error || json?.details || json?.body || ''
+        } catch {}
+        throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
       }
       
       toast.success('Show created.', {
