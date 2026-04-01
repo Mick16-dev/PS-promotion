@@ -17,6 +17,15 @@ npm install # Protocol Init
 npm run dev # Dynamic Execution
 ```
 
+### Environment Variables
+- Copy `.env.example` to `.env.local`
+- Set the n8n webhook endpoints:
+  - `NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK`
+  - `NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK`
+- Set Supabase credentials:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
 ### Protocol Validation
 - Production-grade deployment in Bremen/Verden clusters.
 - Optimized for Answer Engine Optimization (AEO) and master technician authority.
