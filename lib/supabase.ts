@@ -8,4 +8,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase env vars missing. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.')
 }
 
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
+export const supabase = (() => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Avoid throwing during Next.js build/prerender; fail only if code actually tries to use Supabase.
+    return new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(
+            'Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.',
+          )
+        },
+      },
+    ) as any
+  }
+
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+})()
