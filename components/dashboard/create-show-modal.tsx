@@ -60,12 +60,26 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     if (isOpen) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
-        const { data, error } = await supabase.from('artist').select('id, name')
-        if (data && !error) {
-          setArtists(data)
-          if (data.length > 0) setSelectedArtistId(data[0].id)
+        try {
+          // Support either `artist` or `artists` table naming.
+          const primary = await supabase.from('artist').select('id, name')
+          const fallback = primary.error
+            ? await supabase.from('artists').select('id, name')
+            : null
+
+          const data = (fallback?.data ?? primary.data) as any[] | null
+          const error = fallback?.error ?? primary.error
+
+          if (error) {
+            console.error('Failed to fetch artists:', error)
+            toast.error('Could not load artists.', { description: 'Check your Supabase tables and RLS policies.' })
+          } else if (data) {
+            setArtists(data)
+            if (data.length > 0) setSelectedArtistId((prev) => prev || data[0].id)
+          }
+        } finally {
+          setIsLoadingArtists(false)
         }
-        setIsLoadingArtists(false)
       }
       fetchArtists()
     }
@@ -170,7 +184,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         <form onSubmit={handleSubmit} className="px-8 py-6 space-y-8 relative z-10 bg-black/20">
           <div className="space-y-6">
             {/* Context Fields */}
-            <div className="space-y-3">
+            <div className="space-y-3 pb-2">
               <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist</Label>
               <Select 
                 value={selectedArtistId} 
