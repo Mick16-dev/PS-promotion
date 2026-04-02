@@ -78,21 +78,19 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             status,
             portal_url,
             artist_name,
-            artist_email,
-            materials (
-              id,
-              document_name,
-              status,
-              deadline,
-              submitted_at,
-              file_url
-            )
+            artist_email
           `)
           .eq('id', id)
           .single()
 
-        if (error || !show) {
-          console.error('Failed to load show:', error)
+        if (error) {
+          console.error('Supabase Detail Error:', error)
+          toast.error("Database Error", { description: error.message })
+          setIsLoading(false)
+          return
+        }
+
+        if (!show) {
           setIsLoading(false)
           return
         }
@@ -492,6 +490,20 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
               </div>
             </div>
           )}
+        </div>
+      </div>
+      {/* Development Debug View */}
+      <div className="mt-20 p-8 glass-card border-red-500/20 bg-red-500/5 rounded-3xl">
+        <h3 className="text-red-500 font-bold uppercase font-pro-data tracking-widest text-xs mb-4">DEBUG: Detail Page Connection</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/60">
+          <div className="space-y-2">
+            <p>Show ID: <span className="text-white">{id}</span></p>
+            <p>Data Status: <span className="text-white">{isLoading ? 'Loading...' : (showInfo ? 'Found' : 'Empty')}</span></p>
+          </div>
+          <div className="space-y-2">
+            <p>Columns Requested: <span className="text-white">venue, show_date, show_time, artist_name, artist_email</span></p>
+            <p>Raw JSON: <span className="text-white lowercase font-normal">{JSON.stringify(showInfo).slice(0, 100)}...</span></p>
+          </div>
         </div>
       </div>
     </div>
