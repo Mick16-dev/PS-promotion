@@ -148,7 +148,10 @@ export default function ShowsPage() {
     const venueName = show.venue || ''
     const matchesSearch = show.artist.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           venueName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = statusFilter === 'All Shows' || show.status === statusFilter;
+    
+    // Map 'Awaiting Documents' filter to also match raw 'pending' status from Supabase
+    const normalizedStatus = (show.status === 'pending') ? 'Awaiting Documents' : show.status
+    const matchesFilter = statusFilter === 'All Shows' || normalizedStatus === statusFilter;
     return matchesSearch && matchesFilter;
   });
 
