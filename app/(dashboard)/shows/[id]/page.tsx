@@ -71,14 +71,15 @@ export default function ShowDetailPage() {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({
-              artistName: show.artist_name,
-              artistEmail: show.artist_email,
-              showId: show.id,
+              show_id: show.id,
+              artist_id: show.artist_id,
+              artist_name: show.artist_name,
+              artist_email: show.artist_email,
               venue: show.venue,
               city: show.city,
               date: show.show_date,
-              itemName: itemName || 'Production Deliverables',
-              portalToken: show.id // Using show ID as the portal token for now
+              item_name: itemName || 'Production Deliverables',
+              portal_token: show.id // Standardizing as show ID for now
            })
         })
 
