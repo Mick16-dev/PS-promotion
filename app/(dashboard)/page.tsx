@@ -34,7 +34,6 @@ export default function DashboardHome() {
   const [recentActivity, setRecentActivity] = useState<any[]>([])
 
   useEffect(() => {
-    // Load lockouts
     const savedLockouts = localStorage.getItem('reminder_lockouts')
     if (savedLockouts) {
       try {
@@ -48,7 +47,6 @@ export default function DashboardHome() {
       try {
         setIsLoading(true)
         
-        // Fetch shows and materials separately to avoid Join errors
         const { data: shows, count: showsCount } = await supabase.from('shows').select('id, venue, artist_name, artist_email', { count: 'exact' })
         const { data: materials } = await supabase.from('materials').select('id, show_id, status, deadline, submitted_at, item_name')
         
@@ -59,46 +57,51 @@ export default function DashboardHome() {
         let activityList: any[] = []
         
         const now = new Date()
-        
-        if (materials) {
-           materials.forEach(mat => {
-             const show = shows?.find(s => s.id === mat.show_id)
-             const artistName = show?.artist_name || 'Unnamed Artist'
-             const artistEmail = show?.artist_email || ''
-             const venueName = show?.venue || 'Venue TBD'
-             const docName = mat.item_name || 'Document'
-             
-             if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
-               deliveredCount++
-               if (mat.submitted_at) {
-                 activityList.push({
-                   id: mat.id,
-                   artist: artistName,
-                   document: docName,
-                   venue: venueName,
-                   time: new Date(mat.submitted_at)
-                 })
-               }
-             } else {
-               if (mat.deadline && new Date(mat.deadline) < now) {
-                 lateCount++
-                 const daysLate = Math.floor((now.getTime() - new Date(mat.deadline).getTime()) / (1000 * 3600 * 24))
-                 overdueList.push({
-                   id: mat.id,
-                   artist: artistName,
-                   artistEmail: artistEmail,
-                   venue: venueName,
-                   document: docName,
-                   deadline: mat.deadline,
-                   portalToken: mat.show_id || '',
-                   daysLate: daysLate > 0 ? daysLate : 1
-                 })
-               } else {
-                 awaitingCount++
-               }
-             }
-           })
-        }
+
+        // Iterate through each show to ensure consistent 6-doc default counting
+        shows?.forEach(show => {
+          const showMats = materials?.filter(m => m.show_id === show.id) || []
+          
+          // If no materials in DB yet, assume 6 are "Awaiting"
+          if (showMats.length === 0) {
+            awaitingCount += 6
+          } else {
+            showMats.forEach(mat => {
+              const docName = mat.item_name || 'Document'
+              const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
+              
+              if (isDelivered) {
+                deliveredCount++
+                if (mat.submitted_at) {
+                  activityList.push({
+                    id: mat.id,
+                    artist: show.artist_name || 'Unnamed Artist',
+                    document: docName,
+                    venue: show.venue || 'Venue TBD',
+                    time: new Date(mat.submitted_at)
+                  })
+                }
+              } else {
+                const isLate = mat.deadline && new Date(mat.deadline) < now
+                if (isLate) {
+                  lateCount++
+                  overdueList.push({
+                    id: mat.id,
+                    artist: show.artist_name || 'Unnamed Artist',
+                    artistEmail: show.artist_email || '',
+                    venue: show.venue || 'Venue TBD',
+                    document: docName,
+                    deadline: mat.deadline,
+                    portalToken: show.id || '',
+                    daysLate: Math.max(1, Math.floor((now.getTime() - new Date(mat.deadline).getTime()) / (1000 * 3600 * 24)))
+                  })
+                } else {
+                  awaitingCount++
+                }
+              }
+            })
+          }
+        })
         
         activityList.sort((a, b) => b.time.getTime() - a.time.getTime())
         
@@ -125,7 +128,6 @@ export default function DashboardHome() {
     
     fetchDashboardData()
 
-    // Real-time updates for shows and materials
     const showSub = supabase.channel('show-stats').on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, () => fetchDashboardData()).subscribe()
     const matSub = supabase.channel('mat-stats').on('postgres_changes', { event: '*', schema: 'public', table: 'materials' }, () => fetchDashboardData()).subscribe()
 

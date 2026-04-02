@@ -51,7 +51,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           show_date,
           show_time,
           status,
-          portal_url,
           artist_name,
           artist_email
         `)
@@ -69,7 +68,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       if (showData) {
         setShow({
           ...showData,
-          portalUrl: showData.portal_url || (typeof window !== 'undefined' ? `${window.location.origin}/portal/${id}` : `/portal/${id}`)
+          portalUrl: typeof window !== 'undefined' ? `${window.location.origin}/portal/${id}` : `/portal/${id}`
         })
         
         const mats = matsData || []
