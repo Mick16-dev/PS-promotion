@@ -16,7 +16,9 @@ import {
   Paperclip,
   ArrowRight,
   User,
-  FileWarning
+  FileWarning,
+  Loader2,
+  Mail
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -30,6 +32,7 @@ export default function ShowDetailPage() {
   const [show, setShow] = useState<any>(null)
   const [materials, setMaterials] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isSending, setIsSending] = useState(false)
 
   async function fetchShowDetails() {
     try {
@@ -59,6 +62,38 @@ export default function ShowDetailPage() {
     }
   }
 
+  async function handleSendReminder() {
+     if (!show) return
+     
+     try {
+        setIsSending(true)
+        const response = await fetch('/api/n8n/send-reminder', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+              artistName: show.artist_name,
+              artistEmail: show.artist_email,
+              showId: show.id,
+              venue: show.venue,
+              city: show.city,
+              date: show.show_date
+           })
+        })
+
+        if (!response.ok) throw new Error('Reminder Failed')
+        
+        toast.success('Reminder Dispatched', { 
+           description: `Advancement notification sent to ${show.artist_name}.` 
+        })
+     } catch (err: any) {
+        toast.error('Dispatch Failure', { 
+           description: 'Could not reach the automated notification system.' 
+        })
+     } finally {
+        setIsSending(false)
+     }
+  }
+
   useEffect(() => {
     if (id) fetchShowDetails()
   }, [id])
@@ -71,7 +106,7 @@ export default function ShowDetailPage() {
     )
   }
 
-  if (!show) return <div className="p-20 text-center text-zinc-500">Show not found or access denied.</div>
+  if (!show) return <div className="p-20 text-center text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Show metadata not found</div>
 
   const deliveredCount = materials.filter(m => m.status === 'delivered' || m.status === 'submitted').length
   const totalCount = materials.length > 0 ? materials.length : 5
@@ -82,7 +117,7 @@ export default function ShowDetailPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.04] pb-10 mb-10 gap-6">
         <div>
            <div className="flex items-center gap-2 mb-3">
-              <Link href="/shows" className="text-zinc-500 hover:text-zinc-300 text-xs font-medium transition-colors">Shows</Link>
+              <Link href="/shows" className="text-zinc-500 hover:text-zinc-300 text-xs font-medium transition-colors">Advancement Pipeline</Link>
               <ChevronRight size={10} className="text-zinc-700" />
               <span className="text-zinc-300 text-xs font-bold truncate max-w-[200px]">{show.artist_name}</span>
            </div>
@@ -95,7 +130,7 @@ export default function ShowDetailPage() {
               <div className="h-1 w-1 rounded-full bg-zinc-800" />
               <div className="flex items-center gap-2 text-zinc-400">
                  <CalendarIcon size={14} className="text-zinc-600" />
-                 <span className="text-sm font-bold tracking-tight">{show.show_date}</span>
+                 <span className="text-sm font-bold tracking-tight italic">{show.show_date}</span>
               </div>
            </div>
         </div>
@@ -103,8 +138,17 @@ export default function ShowDetailPage() {
            <Button variant="outline" className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-100 font-semibold text-sm px-4 rounded-lg gap-2">
              <ExternalLink size={14} /> Artist Portal
            </Button>
-           <Button className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-6 rounded-lg shadow-xl shadow-white/5">
-             Send Reminders
+           <Button 
+             disabled={isSending}
+             onClick={handleSendReminder}
+             className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-6 rounded-lg shadow-xl shadow-white/5 gap-2 transition-all active:scale-95 disabled:opacity-50"
+           >
+             {isSending ? (
+               <Loader2 size={16} className="animate-spin" />
+             ) : (
+               <Mail size={16} strokeWidth={2.5} />
+             )}
+             {isSending ? 'Dispatching...' : 'Send Reminders'}
            </Button>
         </div>
       </div>
@@ -161,8 +205,8 @@ export default function ShowDetailPage() {
                       </div>
                       
                       <div className="flex items-center gap-10">
-                         <div className="flex flex-col items-end">
-                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Deadline</span>
+                         <div className="flex items-center gap-3">
+                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Deadline</span>
                             <div className={`px-3 py-1 rounded-md text-[11px] font-black border ${isOverdue ? 'bg-rose-500/5 text-rose-500 border-rose-500/10' : 'bg-zinc-900 text-zinc-400 border-white/[0.03]'}`}>
                                {doc.deadline}
                             </div>
@@ -182,25 +226,25 @@ export default function ShowDetailPage() {
         <div className="lg:col-span-4 space-y-6">
            <div className="bg-[#151618] border border-white/[0.04] p-8 rounded-xl space-y-8">
               <div>
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4">Contact Info</h3>
+                 <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-6">Contractual Point of Contact</h3>
                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                       <div className="h-8 w-8 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-500 border border-white/5">
+                    <div className="flex items-center gap-4">
+                       <div className="h-8 w-8 rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-600 border border-white/[0.04] shadow-inner">
                           <User size={14} />
                        </div>
                        <div>
-                          <p className="text-xs font-bold text-zinc-100 tracking-tight">Artist Contact</p>
-                          <p className="text-[11px] text-zinc-500">{show.artist_email || 'No email provided'}</p>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Primary Contact</p>
+                          <p className="text-xs font-semibold text-zinc-100 mt-0.5">{show.artist_email || 'No records provided'}</p>
                        </div>
                     </div>
                  </div>
               </div>
 
               <div className="pt-8 border-t border-white/[0.04]">
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4">Production Assets</h3>
-                 <div className="bg-zinc-900/50 border border-white/[0.02] rounded-lg p-4 text-center">
-                    <Paperclip size={20} className="mx-auto text-zinc-700 mb-2" />
-                    <p className="text-[11px] text-zinc-600 font-medium">Drag assets here to upload and notify promoter automatically.</p>
+                 <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-6">Engagement Milestones</h3>
+                 <div className="bg-zinc-900/40 border border-white/[0.03] rounded-xl p-6 text-center shadow-inner">
+                    <Paperclip size={18} className="mx-auto text-zinc-800 mb-3" />
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest leading-relaxed">Drop tour assets here to trigger automatic promoter notification.</p>
                  </div>
               </div>
            </div>
