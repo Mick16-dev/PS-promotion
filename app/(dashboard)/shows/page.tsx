@@ -53,12 +53,12 @@ export default function ShowsPage() {
         .from('shows')
         .select(`
           id,
-          venue_name,
+          venue,
           city,
-          date,
-          time,
+          show_date,
+          show_time,
           status,
-          artist_id
+          artist_name
         `)
         
       if (error) {
@@ -72,24 +72,15 @@ export default function ShowsPage() {
       if (data) {
          console.log('Fetched raw data:', data)
          const formattedShows = data.map((show: any) => {
-           // Temporarily showing the ID or a placeholder since the join is failing
-           const artistName = 'Artist (ID: ' + (show.artist_id?.slice(0, 4) || 'TBD') + ')'
+           const artistName = show.artist_name || 'Unnamed Artist'
            
            let delivered = 0
-           let total = show.materials?.length || 0
+           let total = 0 // Materials handled separately if needed
            
-           if (show.materials) {
-              show.materials.forEach((mat: any) => {
-                 if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
-                    delivered++
-                 }
-              })
-           }
-           
-           let dateStr = show.date
-           if (show.date) {
+           let dateStr = show.show_date
+           if (show.show_date) {
              try {
-               dateStr = new Date(show.date).toLocaleDateString(undefined, {
+               dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
                  year: 'numeric',
                  month: 'short',
                  day: 'numeric'
@@ -100,10 +91,10 @@ export default function ShowsPage() {
            return {
              id: show.id,
              artist: artistName,
-            venue: show.venue_name || 'Venue TBD',
+             venue: show.venue || 'Venue TBD',
              city: show.city || '',
              date: dateStr || 'TBD',
-             time: show.time || 'TBD',
+             time: show.show_time || 'TBD',
              status: show.status || 'Upcoming',
              docsDelivered: delivered,
              docsTotal: total
