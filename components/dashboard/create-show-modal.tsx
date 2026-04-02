@@ -20,7 +20,7 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, MapPin, Music, User, Send, Loader2 } from 'lucide-react'
+import { CalendarIcon, MapPin, Music, User, Send, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 
@@ -190,9 +190,17 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         if (!open) onClose()
       }}
     >
-      <DialogContent className="sm:max-w-[600px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-y-auto max-h-[90vh] rounded-[2rem]">
+      <DialogContent className="sm:max-w-[600px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-y-auto max-h-[90vh] rounded-[2rem] [&>button]:hidden">
         {/* Luminous Header Gradient */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+        
+        {/* Manual Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-6 top-6 z-50 h-8 w-8 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/60 transition-all"
+        >
+          <X size={16} />
+        </button>
         
         <div className="p-8 pb-6 relative z-10 border-b border-white/5">
           <DialogHeader>
