@@ -58,8 +58,7 @@ export default function ShowsPage() {
           date,
           time,
           status,
-          artist_id,
-          artists:artist_id ( name )
+          artist_id
         `)
         
       if (error) {
@@ -71,11 +70,10 @@ export default function ShowsPage() {
       }
 
       if (data) {
-         console.log('Fetched data:', data)
+         console.log('Fetched raw data:', data)
          const formattedShows = data.map((show: any) => {
-           // Standard Supabase join handling for one-to-one
-           const artistInfo = show.artists;
-           const artistName = artistInfo?.name || 'Unnamed Artist'
+           // Temporarily showing the ID or a placeholder since the join is failing
+           const artistName = 'Artist (ID: ' + (show.artist_id?.slice(0, 4) || 'TBD') + ')'
            
            let delivered = 0
            let total = show.materials?.length || 0
