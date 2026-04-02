@@ -17,7 +17,8 @@ import {
   User,
   ExternalLink,
   MapPin,
-  Clock4
+  Clock4,
+  Plus
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
