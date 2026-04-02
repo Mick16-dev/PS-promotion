@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Filter,
   Layers,
-  ArrowRight
+  ArrowRight,
+  FileWarning
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
