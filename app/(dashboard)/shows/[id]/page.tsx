@@ -207,6 +207,27 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     }
 
     fetchShowDetail()
+
+    // Real-time listener for materials updates
+    const subscription = supabase
+      .channel(`material-updates-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'materials',
+          filter: `show_id=eq.${id}`
+        },
+        () => {
+          fetchShowDetail() // Re-fetch all data when a document changes
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(subscription)
+    }
   }, [id])
 
   const handleReminder = async (doc: any) => {
