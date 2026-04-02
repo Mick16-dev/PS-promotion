@@ -77,7 +77,15 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             show_time,
             status,
             artist_name,
-            artist_email
+            artist_email,
+            materials (
+              id,
+              item_name,
+              status,
+              deadline,
+              submitted_at,
+              file_url
+            )
           `)
           .eq('id', id)
           .single()
@@ -172,7 +180,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
           return {
             id: mat.id,
-            name: mat.document_name || 'Document',
+            name: mat.item_name || 'Document',
             status: docStatus,
             deadline: deadlineStr,
             rawDeadline: mat.deadline,

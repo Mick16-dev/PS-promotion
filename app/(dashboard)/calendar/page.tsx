@@ -40,26 +40,25 @@ export default function CalendarPage() {
           .from('shows')
           .select(`
             id,
-            venue_name,
-            date,
-            time,
-            artist:artist_id ( name ),
-            materials ( status, deadline, document_name )
+            venue,
+            show_date,
+            show_time,
+            artist_name,
+            materials ( status, deadline, item_name )
           `)
-          .order('date', { ascending: true })
+          .order('show_date', { ascending: true })
         
         if (shows) {
           const formattedShows = shows.map((show: any) => {
-            const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
             const mats = show.materials || []
             const delivered = mats.filter((m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
             
             return {
               id: show.id,
-              artist: artistInfo?.name || 'Unnamed Artist',
-              venue: show.venue_name || 'Venue TBD',
-              date: show.date ? new Date(show.date) : null,
-              time: show.time || '',
+              artist: show.artist_name || 'Unnamed Artist',
+              venue: show.venue || 'Venue TBD',
+              date: show.show_date ? new Date(show.show_date) : null,
+              time: show.show_time || '',
               docsDelivered: delivered,
               docsTotal: mats.length
             }
@@ -70,15 +69,14 @@ export default function CalendarPage() {
           // Extract document deadlines
           const deadlines: any[] = []
           shows.forEach((show: any) => {
-            const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
             const mats = show.materials || []
             mats.forEach((mat: any) => {
               if (mat.deadline && mat.status?.toLowerCase() !== 'delivered' && mat.status?.toLowerCase() !== 'submitted') {
                 deadlines.push({
-                  id: `${show.id}-${mat.document_name}`,
-                  artist: artistInfo?.name || 'Unknown',
-                  venue: show.venue_name || 'Venue TBD',
-                  document: mat.document_name || 'Document',
+                  id: `${show.id}-${mat.item_name}`,
+                  artist: show.artist_name || 'Unknown',
+                  venue: show.venue || 'Venue TBD',
+                  document: mat.item_name || 'Document',
                   date: new Date(mat.deadline)
                 })
               }
