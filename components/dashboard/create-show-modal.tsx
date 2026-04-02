@@ -127,6 +127,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         show_id,
         show_name: `${selectedArtist?.name || 'Show'} @ ${venue}`,
         show_time: showTime || null,
+        status: 'pending',
         artist_id: selectedArtistId,
         artist_name: selectedArtist?.name || 'Unknown Artist',
         artist_email: selectedArtist?.email || '',
