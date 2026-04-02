@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
+const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
 
 interface ShowDetailPageProps {
   params: { id: string }
@@ -59,7 +59,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       try {
         setIsLoading(true)
 
-        // Fetch the show with related artist and materials
+        // Fetch the show with related artist and documents
         const { data: show, error } = await supabase
           .from('shows')
           .select(`
@@ -126,10 +126,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         }
 
         setShowInfo({
-          artist: artistInfo?.name || 'Unknown Artist',
+          artist: artistInfo?.name || 'Unnamed Artist',
           artistEmail: artistInfo?.email || '',
           artistId: artistInfo?.id || show.artist_id,
-          venue: show.venue_name || 'Unknown Venue',
+          venue: show.venue_name || 'Venue TBD',
           city: show.city || '',
           date: dateStr,
           rawDate: show.date,
@@ -138,7 +138,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           portalUrl: show.portal_url || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/portal/${id}`
         })
 
-        // Process documents/materials
+        // Process show documents
         const mats = show.materials || []
         const now2 = new Date()
         const formattedDocs = mats.map((mat: any) => {
@@ -209,6 +209,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     setIsSendingReminder(doc.id)
     
     try {
+      if (!REMINDER_WEBHOOK_URL) {
+        throw new Error('Reminder webhook is not configured.')
+      }
+
       const payload = {
         material_id: doc.id,
         artist_email: showInfo?.artistEmail,

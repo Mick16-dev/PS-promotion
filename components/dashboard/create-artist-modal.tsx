@@ -36,7 +36,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
     setIsSubmitting(true)
     
     try {
-      const { error } = await (supabase as any).from('artist').insert([
+      const { error } = await (supabase as any).from('artists').insert([
         {
           name: formData.name,
           genre: formData.genre,
@@ -84,7 +84,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
                   id="name" 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Luna Shadows" 
+                  placeholder="Artist name" 
                   className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 text-white font-bold"
                   required
                 />
@@ -100,7 +100,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
                   id="genre" 
                   value={formData.genre}
                   onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                  placeholder="e.g. Electronic Pop" 
+                  placeholder="Genre" 
                   className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 text-white font-bold"
                 />
               </div>
@@ -116,7 +116,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="manager@artist.com" 
+                  placeholder="manager@domain.com" 
                   className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 text-white font-bold"
                   required
                 />
@@ -133,7 +133,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
                   type="email"
                   value={formData.artistEmail}
                   onChange={(e) => setFormData({ ...formData, artistEmail: e.target.value })}
-                  placeholder="artist@example.com" 
+                  placeholder="artist@domain.com"
                   className="pl-10 bg-muted/30 border-white/5 h-11 focus-visible:ring-primary/50 text-white font-bold"
                 />
               </div>

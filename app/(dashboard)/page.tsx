@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = 'http://n8n-a4c84s8ogs0048s08gkgcw0c.34.41.73.152.sslip.io/webhook-test/send-reminder'
+const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
 
 // Removed mock arrays to rely on state
 
@@ -71,7 +71,7 @@ export default function DashboardHome() {
         // Fetch shows count
         const { count: showsCount } = await supabase.from('shows').select('*', { count: 'exact', head: true })
         
-        // Fetch materials with full relations for reminders
+        // Fetch documents with full relations for reminders
         const { data: materials, error } = await supabase.from('materials').select(`
           id,
           status,
@@ -99,9 +99,9 @@ export default function DashboardHome() {
              const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
              const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
              
-             const artistName = artistData?.name || 'Unknown Artist'
+            const artistName = artistData?.name || 'Unnamed Artist'
              const artistEmail = artistData?.email || ''
-             const venueName = showData?.venue_name || 'Unknown Venue'
+            const venueName = showData?.venue_name || 'Venue TBD'
              const docName = mat.document_name || 'Document'
              const portalToken = showData?.id || ''
              
@@ -174,6 +174,10 @@ export default function DashboardHome() {
     setIsSendingReminder(item.id)
     
     try {
+      if (!REMINDER_WEBHOOK_URL) {
+        throw new Error('Reminder webhook is not configured.')
+      }
+
       const payload = {
         material_id: item.id,
         artist_email: item.artistEmail,
@@ -218,7 +222,7 @@ export default function DashboardHome() {
       <div className="flex h-[50vh] items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
           <Music className="h-8 w-8 animate-bounce text-primary/50" />
-          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading Dashboard...</p>
+          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading your data...</p>
         </div>
       </div>
     )

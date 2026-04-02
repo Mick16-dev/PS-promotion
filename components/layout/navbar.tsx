@@ -20,6 +20,7 @@ export function Navbar() {
   const router = useRouter()
   const [notifications, setNotifications] = useState<any[]>([])
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
+  const notificationCount = notifications.length
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -73,7 +74,7 @@ export function Navbar() {
              return {
                id: mat.id,
                type,
-               artist: artistData?.name || 'Unknown Artist',
+              artist: artistData?.name || 'Unnamed Artist',
                document: mat.document_name || 'Document',
                venue: showData?.venue_name || 'Venue',
                time: timeStr
@@ -109,9 +110,11 @@ export function Navbar() {
           <DropdownMenuTrigger asChild>
             <button className="relative p-3 rounded-2xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group">
               <Bell className="h-5 w-5 text-muted-foreground group-hover:text-white" />
-              <span className="absolute top-2 right-2 h-4 w-4 rounded-full bg-red-500 border-[3px] border-background animate-pulse flex items-center justify-center text-[8px] font-black text-white">
-                 3
-              </span>
+              {notificationCount > 0 && (
+                <span className="absolute top-2 right-2 h-4 min-w-4 px-1 rounded-full bg-red-500 border-[3px] border-background animate-pulse flex items-center justify-center text-[8px] font-black text-white">
+                  {notificationCount > 9 ? '9+' : notificationCount}
+                </span>
+              )}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-96 bg-ebony-900/95 backdrop-blur-3xl border-white/10 p-2 rounded-3xl shadow-2xl">

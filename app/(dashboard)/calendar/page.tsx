@@ -35,7 +35,7 @@ export default function CalendarPage() {
   useEffect(() => {
     async function fetchCalendarData() {
       try {
-        // Fetch shows with artist and materials
+        // Fetch shows with artist and documents
         const { data: shows } = await supabase
           .from('shows')
           .select(`
@@ -56,8 +56,8 @@ export default function CalendarPage() {
             
             return {
               id: show.id,
-              artist: artistInfo?.name || 'Unknown Artist',
-              venue: show.venue_name || 'Unknown Venue',
+              artist: artistInfo?.name || 'Unnamed Artist',
+              venue: show.venue_name || 'Venue TBD',
               date: show.date ? new Date(show.date) : null,
               time: show.time || '',
               docsDelivered: delivered,
@@ -67,7 +67,7 @@ export default function CalendarPage() {
           
           setUpcomingShows(formattedShows)
           
-          // Extract deadlines from materials
+          // Extract document deadlines
           const deadlines: any[] = []
           shows.forEach((show: any) => {
             const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
@@ -77,7 +77,7 @@ export default function CalendarPage() {
                 deadlines.push({
                   id: `${show.id}-${mat.document_name}`,
                   artist: artistInfo?.name || 'Unknown',
-                  venue: show.venue_name || 'Unknown Venue',
+                  venue: show.venue_name || 'Venue TBD',
                   document: mat.document_name || 'Document',
                   date: new Date(mat.deadline)
                 })

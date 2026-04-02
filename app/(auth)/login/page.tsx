@@ -12,7 +12,30 @@ export default function LoginPage() {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isCheckingSession, setIsCheckingSession] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    let isMounted = true
+
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession()
+      if (!isMounted) return
+
+      if (data.session) {
+        router.replace('/')
+        return
+      }
+
+      setIsCheckingSession(false)
+    }
+
+    checkSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,7 +44,7 @@ export default function LoginPage() {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       })
 
@@ -31,7 +54,8 @@ export default function LoginPage() {
       }
 
       if (data.session) {
-        router.push('/')
+        router.replace('/')
+        router.refresh()
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.')
@@ -61,6 +85,13 @@ export default function LoginPage() {
         </div>
 
         {/* Input Area */}
+        {isCheckingSession ? (
+          <div className="space-y-6">
+            <div className="h-12 rounded-xl bg-muted/30 animate-pulse" />
+            <div className="h-12 rounded-xl bg-muted/30 animate-pulse" />
+            <div className="h-12 rounded-xl bg-primary/30 animate-pulse" />
+          </div>
+        ) : (
         <form onSubmit={handleLogin} className="space-y-6">
           {error && (
             <div className="p-3 text-xs font-semibold text-red-500 bg-red-400/10 border border-red-500/20 rounded-lg text-center animate-in fade-in slide-in-from-top-2 duration-300">
@@ -109,12 +140,13 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+        )}
 
         {/* Footer Area */}
         <div className="text-center pt-8 border-t border-border/50">
-           <button className="flex items-center justify-center w-full space-x-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-all mb-4">
+           <button disabled className="flex items-center justify-center w-full space-x-2 text-xs font-medium text-muted-foreground/50 cursor-not-allowed mb-4">
              <Github size={14} />
-             <span>Continue with GitHub</span>
+             <span>GitHub sign-in unavailable</span>
            </button>
            <p className="text-[11px] text-muted-foreground/60 leading-relaxed px-4">
              Access is restricted to authorized music promoters. By continuing, you agree to our professional terms.

@@ -109,7 +109,8 @@ export default function SettingsPage() {
                     <Label htmlFor="fullname" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Full Name</Label>
                     <Input 
                       id="fullname" 
-                      defaultValue="Michael Promoter" 
+                      defaultValue="" 
+                      placeholder="Enter your full name"
                       className="bg-white/5 border-white/10 h-16 focus-visible:ring-primary/50 text-xl font-bold tracking-tight rounded-3xl p-6 transition-all hover:border-white/20"
                       onChange={() => setHasUnsavedChanges(true)}
                     />
@@ -120,7 +121,7 @@ export default function SettingsPage() {
                     <Input 
                       id="email" 
                       readOnly
-                      defaultValue="michael@promoter.example.com" 
+                      defaultValue="Signed-in email"
                       className="bg-black/40 border-white/5 h-16 text-xl tracking-tight rounded-3xl p-6 focus-visible:ring-0 select-none shadow-inner text-muted-foreground"
                     />
                   </div>
@@ -129,7 +130,8 @@ export default function SettingsPage() {
                     <Label htmlFor="role" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Your Role</Label>
                     <Input 
                       id="role" 
-                      defaultValue="Independent Promoter" 
+                      defaultValue="" 
+                      placeholder="Promoter, manager, or coordinator"
                       className="bg-white/5 border-white/10 h-16 focus-visible:ring-primary/50 text-xl font-bold tracking-tight rounded-3xl p-6 transition-all hover:border-white/20"
                       onChange={() => setHasUnsavedChanges(true)}
                     />
@@ -140,7 +142,7 @@ export default function SettingsPage() {
                     <textarea 
                       id="bio"
                       className="w-full h-40 rounded-[2rem] bg-white/5 border-white/10 border p-6 focus:ring-2 focus:ring-primary/50 focus:outline-none focus:border-primary/50 text-white font-medium placeholder:text-muted-foreground/30 transition-all text-lg leading-relaxed hover:border-white/20 shadow-inner"
-                      placeholder="Write a brief introduction..."
+                      placeholder="Add a short profile bio"
                       onChange={() => setHasUnsavedChanges(true)}
                     />
                   </div>

@@ -27,7 +27,7 @@ export default function ArtistsPage() {
       try {
         setIsLoading(true)
         // Fetch reliability directly as it's calculated in the backend/n8n
-        const { data, error } = await supabase.from('artist').select('id, name, genre, reliability')
+        const { data, error } = await supabase.from('artists').select('id, name, genre, reliability')
 
         if (data && !error) {
           const formattedArtists = data.map(artist => ({
@@ -148,13 +148,13 @@ export default function ArtistsPage() {
               <div className="h-24 w-24 rounded-full bg-muted/20 border border-white/10 flex items-center justify-center mb-6 shadow-inner">
                 <UserRound size={40} className="text-muted-foreground/30" />
               </div>
-              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists yet.</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-2">No artists available.</h3>
               <p className="text-muted-foreground font-medium max-w-md">Artists appear here automatically when they are added to the roster.</p>
               <Button
                 onClick={() => router.push('/shows')}
                 className="mt-8 bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"
               >
-                Go to Shows
+                View Shows
               </Button>
             </div>
           </div>
