@@ -59,7 +59,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
         try {
-          const { data, error } = await supabase.from('artists').select('id, name')
+          const { data, error } = await supabase.from('artists').select('id, name, email')
 
           if (error) {
             console.error('Failed to fetch artists:', error)
@@ -115,9 +115,15 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     setIsSubmitting(true)
     
     try {
+      // Find full artist details
+      const selectedArtist = artists.find(a => a.id === selectedArtistId)
+
       // Prepare data for n8n
       const payload = {
         artist_id: selectedArtistId,
+        artist_name: selectedArtist?.name || 'Unknown Artist',
+        artist_email: selectedArtist?.email || '',
+        venue: venue,
         venue_name: venue,
         city: city,
         date: showDate,
