@@ -6,65 +6,56 @@ import {
   Plus, 
   MapPin, 
   Calendar, 
-  User, 
   ChevronRight, 
   Filter,
-  CheckCircle2,
-  Clock4,
-  AlertCircle,
+  Layers,
+  ArrowUpRight,
   MoreVertical,
-  ArrowRight
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import { supabase } from '@/lib/supabase'
 
 export default function ShowsPage() {
-  const router = useRouter()
   const [shows, setShows] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
 
   async function fetchShows() {
     try {
       setIsLoading(true)
-      const { data: showsData, error: showsError } = await supabase
+      const { data: showsData, error: showsErr } = await supabase
         .from('shows')
         .select('*')
         .order('show_date', { ascending: true })
-
-      if (showsError) throw showsError
 
       const { data: materialsData } = await supabase
         .from('materials')
         .select('show_id, status')
 
-      if (showsData) {
-        const formattedShows = showsData.map((show: any) => {
-          const showMaterials = materialsData?.filter((m: any) => m.show_id === show.id) || []
-          const delivered = showMaterials.filter((m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
-          // Consistent 5-doc human standard
-          const total = showMaterials.length > 0 ? showMaterials.length : 5
-          
-          return {
-            id: show.id,
-            artist: show.artist_name,
-            venue: show.venue,
-            city: show.city,
-            date: show.show_date,
-            status: show.status || 'Planned',
-            progress: delivered,
-            totalItems: total
-          }
-        })
-        setShows(formattedShows)
-      }
-    } catch (err: any) {
-      console.error('Error loading shows:', err)
-      toast.error('Sync Error', { description: 'Could not reach the show database.' })
+      if (showsErr) throw showsErr
+
+      const processedShows = showsData.map(show => {
+        const showMats = materialsData?.filter(m => m.show_id === show.id) || []
+        const delivered = showMats.filter(m => m.status === 'delivered' || m.status === 'submitted').length
+        const total = showMats.length > 0 ? showMats.length : 5
+        
+        return {
+          id: show.id,
+          artist: show.artist_name || 'TBA',
+          venue: show.venue || 'TBA',
+          city: show.city || '',
+          date: show.show_date || 'TBA',
+          progress: delivered,
+          totalItems: total,
+          status: show.status || 'active'
+        }
+      })
+
+      setShows(processedShows)
     } finally {
       setIsLoading(false)
     }
@@ -72,116 +63,104 @@ export default function ShowsPage() {
 
   useEffect(() => {
     fetchShows()
-
-    const sub = supabase.channel('shows-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, () => fetchShows())
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(sub)
-    }
   }, [])
-
-  const filteredShows = shows.filter(show => 
-    show.artist?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    show.venue?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <div className="animate-spin h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-7xl mx-auto pb-20 pt-4">
-      {/* Human-Centric Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="max-w-[1200px] mx-auto pt-10 pb-20 px-8 animate-in fade-in duration-700">
+      {/* Precision Header */}
+      <div className="flex items-center justify-between border-b border-white/[0.04] pb-10 mb-10">
         <div>
-          <h1 className="text-5xl font-bold tracking-tight text-white leading-none">Your Shows</h1>
-          <p className="text-muted-foreground mt-4 font-medium text-sm max-w-lg leading-relaxed">
-            Track document progress and manage artist deliverables for upcoming performances.
-          </p>
+           <div className="flex items-center gap-2 mb-3">
+              <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-medium transition-colors">Dashboard</Link>
+              <ChevronRight size={10} className="text-zinc-700" />
+              <span className="text-zinc-300 text-xs font-bold">Manage Shows</span>
+           </div>
+           <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
+             Production <span className="text-zinc-600 font-medium">Pipeline</span>
+           </h1>
         </div>
-        <Button className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-white/90 gap-3 font-bold text-sm tracking-tight transition-transform active:scale-95 shadow-2xl shadow-white/10">
-          <Plus size={20} /> Create New Show
-        </Button>
+        <div className="flex items-center gap-3">
+           <div className="relative group mr-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-zinc-300 transition-colors" size={16} />
+              <input 
+                placeholder="Find show or artist..." 
+                className="bg-zinc-900 border border-white/[0.05] rounded-lg h-10 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20 transition-all w-[240px]"
+              />
+           </div>
+           <Button className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2">
+             <Plus size={16} strokeWidth={3} /> Import Show
+           </Button>
+        </div>
       </div>
 
-      {/* Modern Search & Search */}
-      <div className="flex flex-col md:flex-row gap-4 items-center">
-        <div className="relative flex-1 group w-full">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-white transition-colors h-4 w-4" />
-          <Input 
-            placeholder="Search by artist or venue..." 
-            className="h-14 pl-14 bg-white/[0.02] border-white/5 rounded-2xl focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-all font-medium text-white placeholder:text-muted-foreground/30 shadow-inner"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <Button variant="outline" className="h-14 px-8 rounded-2xl bg-white/[0.02] border-white/5 hover:bg-white/5 gap-3 font-bold text-xs uppercase tracking-widest w-full md:w-auto text-muted-foreground hover:text-white">
-          <Filter size={16} /> Filters
-        </Button>
-      </div>
-
-      {/* Shows List - Clean & Professional */}
-      <div className="grid grid-cols-1 gap-4">
-        {filteredShows.length > 0 ? (
-          filteredShows.map((show) => (
-            <div 
-              key={show.id} 
-              onClick={() => router.push(`/shows/${show.id}`)}
-              className="group glass-card p-4 rounded-[2rem] border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500 cursor-pointer flex flex-col md:flex-row items-center gap-6"
-            >
-              <div className="h-16 w-16 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <User size={24} className="text-white/20 group-hover:text-white transition-colors" />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-4 mb-1">
-                   <h3 className="text-xl font-bold text-white tracking-tight truncate">{show.artist}</h3>
-                   <div className="h-1 w-1 rounded-full bg-white/20" />
-                   <div className="flex items-center gap-2 text-zinc-300">
-                      <MapPin size={12} />
-                      <span className="text-xs font-bold uppercase tracking-widest">{show.venue}</span>
-                   </div>
-                </div>
-                <p className="text-sm font-medium text-zinc-400">{show.date} • {show.city}</p>
-              </div>
-
-              <div className="flex items-center gap-10 w-full md:w-auto px-4">
-                <div className="flex flex-col items-end gap-2 pr-6 border-r border-white/5">
-                   <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Materials</span>
-                      <span className="text-lg font-bold text-white leading-none">{show.progress}/{show.totalItems}</span>
-                   </div>
-                   <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-white transition-all duration-1000 shadow-[0_0_10px_rgba(255,255,255,0.3)]"
-                        style={{ width: `${(show.progress / show.totalItems) * 100}%` }}
-                      />
-                   </div>
-                </div>
-                
-                <div className="h-12 w-12 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                   <ArrowRight size={18} />
-                </div>
-              </div>
+      {/* Row-Based High Density Feed - Precision Style */}
+      <div className="bg-[#151618] border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl">
+         <div className="px-8 py-4 border-b border-white/[0.04] flex items-center justify-between bg-white/[0.01]">
+            <div className="flex items-center gap-10">
+               <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Artist & Venue</span>
+               <span className="hidden md:block text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-32">Status & Progress</span>
             </div>
-          ))
-        ) : (
-          <div className="py-40 flex flex-col items-center justify-center text-center opacity-30 gap-6">
-             <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center">
-                <Calendar size={32} />
-             </div>
-             <div>
-                <h3 className="text-xl font-bold">No shows found.</h3>
-                <p className="text-sm font-medium mt-2">Try adjusting your search or create a new show.</p>
-             </div>
-          </div>
-        )}
+            <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-white gap-2">
+               <Filter size={14} /> Filter
+            </Button>
+         </div>
+
+         <div className="divide-y divide-white/[0.02]">
+            {shows.map((show) => (
+              <Link key={show.id} href={`/shows/${show.id}`} className="group flex flex-col md:flex-row md:items-center justify-between px-8 py-5 hover:bg-white/[0.02] cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-primary">
+                <div className="flex items-center gap-6 min-w-0">
+                   <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-zinc-600 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
+                      {show.artist[0]}
+                   </div>
+                   <div className="min-w-0">
+                      <div className="flex items-center gap-3">
+                         <span className="text-lg font-bold text-white tracking-tight group-hover:text-primary transition-colors">{show.artist}</span>
+                         <Badge className="bg-emerald-500/10 text-emerald-500 border-none text-[9px] font-black uppercase px-2 py-0">ACTIVE</Badge>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 underline decoration-zinc-800 underline-offset-4">
+                         <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">{show.venue}</span>
+                         <span className="h-1 w-1 rounded-full bg-zinc-700" />
+                         <span className="text-[11px] font-medium text-zinc-500">{show.date} • {show.city}</span>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="flex items-center gap-12 mt-4 md:mt-0">
+                   <div className="flex flex-col items-end gap-2 pr-10 border-r border-white/5">
+                      <div className="flex items-center gap-3">
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Materials</span>
+                         <span className="text-sm font-bold text-white">{show.progress}/{show.totalItems}</span>
+                      </div>
+                      <div className="w-32 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                         <div 
+                           className="h-full bg-emerald-500 transition-all duration-1000" 
+                           style={{ width: `${(show.progress / show.totalItems) * 100}%` }}
+                         />
+                      </div>
+                   </div>
+                   <div className="h-10 w-10 rounded-lg bg-zinc-900/50 flex items-center justify-center text-zinc-600 group-hover:text-white transition-colors border border-white/[0.02] group-hover:border-white/10 shadow-inner">
+                      <ChevronRight size={18} />
+                   </div>
+                </div>
+              </Link>
+            ))}
+         </div>
+
+         {shows.length === 0 && (
+           <div className="py-32 text-center flex flex-col items-center justify-center opacity-40">
+              <Layers size={40} className="mb-4 text-zinc-600" />
+              <p className="text-lg font-bold text-white">No active shows scheduled</p>
+              <p className="text-sm text-zinc-500 mt-1">Import your first show booking to begin tracking deliverables.</p>
+           </div>
+         )}
       </div>
     </div>
   )

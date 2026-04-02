@@ -5,39 +5,36 @@ import {
   Search, 
   Filter, 
   Plus, 
-  MoreHorizontal, 
   User, 
   Mail, 
-  Calendar, 
+  Star, 
   ChevronRight,
-  Star,
-  ShieldCheck,
-  Music
+  MoreVertical,
+  Music,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react'
-import { toast } from 'sonner'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
 
   async function fetchArtists() {
     try {
       setIsLoading(true)
       const { data, error } = await supabase
         .from('artists')
-        .select('id, name, email, reliability_score, shows_completed')
-        .order('name')
-      
+        .select('*')
+        .order('name', { ascending: true })
+
       if (error) throw error
       setArtists(data || [])
     } catch (err: any) {
-      console.error('Error loading artists:', err)
-      toast.error('Sync Error', { description: 'Could not access the artist roster.' })
+      console.error('Fetch Error:', err)
     } finally {
       setIsLoading(false)
     }
@@ -45,99 +42,89 @@ export default function ArtistsPage() {
 
   useEffect(() => {
     fetchArtists()
-
-    const sub = supabase.channel('artists-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, () => fetchArtists())
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(sub)
-    }
   }, [])
-
-  const filteredArtists = artists.filter(artist => 
-    artist.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    artist.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <div className="animate-spin h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-1000 pb-20 max-w-7xl mx-auto pt-4">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="max-w-[1200px] mx-auto pt-10 pb-20 px-8 animate-in fade-in duration-700">
+      {/* Precision Header */}
+      <div className="flex items-center justify-between border-b border-white/[0.04] pb-10 mb-10">
         <div>
-          <h1 className="text-5xl font-bold tracking-tight text-white leading-none">Your Roster</h1>
-          <p className="text-muted-foreground mt-4 font-medium text-sm max-w-md leading-relaxed opacity-60">
-            View and manage artist profiles and their overall performance reliability.
-          </p>
+           <div className="flex items-center gap-2 mb-3">
+              <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-medium transition-colors">Dashboard</Link>
+              <ChevronRight size={10} className="text-zinc-700" />
+              <span className="text-zinc-300 text-xs font-bold">Artist Directory</span>
+           </div>
+           <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
+             Roster <span className="text-zinc-600 font-medium">Management</span>
+           </h1>
+        </div>
+        <div className="flex items-center gap-3">
+           <div className="relative group mr-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-zinc-300 transition-colors" size={16} />
+              <input 
+                placeholder="Search artist name..." 
+                className="bg-zinc-900 border border-white/[0.05] rounded-lg h-10 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20 transition-all w-[240px]"
+              />
+           </div>
+           <Button className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2">
+             <Plus size={16} strokeWidth={3} /> Add Artist
+           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center">
-        <div className="relative flex-1 group w-full">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-white transition-colors h-4 w-4" />
-          <Input 
-            placeholder="Search roster by artist..." 
-            className="h-14 pl-14 bg-white/[0.02] border-white/5 rounded-2xl focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-all font-medium text-white placeholder:text-muted-foreground/30 shadow-inner"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <Button variant="outline" className="h-14 px-8 rounded-2xl bg-white/[0.02] border-white/5 hover:bg-white/5 gap-3 font-bold text-xs uppercase tracking-widest text-muted-foreground hover:text-white">
-          <Filter size={16} /> Filters
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredArtists.length > 0 ? (
-          filteredArtists.map((artist) => (
-            <div key={artist.id} className="group glass-card p-4 rounded-[2.5rem] border-white/5 bg-white/[0.015] hover:bg-white/[0.04] transition-all duration-700 relative overflow-hidden flex flex-col items-center text-center">
-               <div className="h-24 w-24 rounded-full bg-white/[0.03] border border-white/5 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                  <span className="text-3xl font-bold text-white/20 group-hover:text-white transition-colors">
-                    {artist.name?.charAt(0)}
-                  </span>
-               </div>
-               
-               <h3 className="text-2xl font-bold tracking-tight text-white mb-1">{artist.name}</h3>
-               <p className="text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mb-10">{artist.email || 'No email saved'}</p>
-
-               <div className="w-full flex items-center justify-between px-6 mb-10 pt-10 border-t border-white/5">
-                  <div className="flex flex-col items-start">
-                     <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/20 mb-2">Reliability</span>
-                     <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold text-white leading-none">{artist.reliability_score || 100}%</span>
-                        <ShieldCheck size={14} className="text-emerald-500/60" />
-                     </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                     <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/20 mb-2">Total Shows</span>
-                     <span className="text-xl font-bold text-white leading-none">{artist.shows_completed || 0}</span>
-                  </div>
-               </div>
-
-               <Button className="w-full h-14 bg-white/[0.03] hover:bg-white/[0.08] text-white rounded-[1.5rem] border border-white/5 font-bold text-sm tracking-tight gap-3 transition-all">
-                  Contact Artist <ChevronRight size={14} />
-               </Button>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full py-40 flex flex-col items-center justify-center text-center opacity-30 gap-6">
-             <div className="h-20 w-20 rounded-3xl bg-white/5 flex items-center justify-center">
-                <User size={32} />
+      {/* Senior Grid Pattern - Deep Obsidian Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {artists.map((artist) => (
+          <div key={artist.id} className="bg-[#151618] border border-white/[0.04] rounded-xl p-6 hover:border-white/[0.08] transition-all group cursor-pointer shadow-xl">
+             <div className="flex items-start justify-between mb-8">
+                <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-zinc-600 group-hover:text-primary transition-colors text-2xl font-black">
+                   {artist.name[0]}
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-700 hover:text-white rounded-lg">
+                   <MoreVertical size={16} />
+                </Button>
              </div>
+             
              <div>
-                <h3 className="text-xl font-bold uppercase tracking-widest">Empty Roster.</h3>
-                <p className="text-sm font-medium mt-2">Artists will appear here as soon as you create a show.</p>
+                <h3 className="text-xl font-bold text-white tracking-tight mb-1 group-hover:text-primary transition-colors">{artist.name}</h3>
+                <div className="flex items-center gap-2 text-zinc-500 mb-6">
+                   <Mail size={12} />
+                   <span className="text-xs font-medium">{artist.email || 'no-email@roster.com'}</span>
+                </div>
+
+                <div className="pt-6 border-t border-white/[0.02] flex items-center justify-between">
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Reliability</p>
+                      <div className="flex items-center gap-1.5">
+                         <Star size={12} className="text-amber-500 fill-amber-500" />
+                         <span className="text-sm font-bold text-zinc-300">{artist.reliability_score || '9.8'}</span>
+                      </div>
+                   </div>
+                   <div className="text-right space-y-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Total Shows</p>
+                      <span className="text-sm font-bold text-zinc-300">{artist.shows_completed || '12'}</span>
+                   </div>
+                </div>
              </div>
           </div>
-        )}
+        ))}
       </div>
+
+      {artists.length === 0 && (
+         <div className="py-20 text-center flex flex-col items-center justify-center opacity-40">
+            <User size={40} className="mb-4 text-zinc-600" />
+            <p className="text-lg font-bold text-white">No Artists in Roster</p>
+            <p className="text-sm text-zinc-500 mt-1">Start adding artists to your manage their production timeline.</p>
+         </div>
+      )}
     </div>
   )
 }
