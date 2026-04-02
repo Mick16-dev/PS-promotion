@@ -62,7 +62,7 @@ export default function ShowDetailPage() {
     }
   }
 
-  async function handleSendReminder() {
+  async function handleSendReminder(itemName?: string) {
      if (!show) return
      
      try {
@@ -76,14 +76,18 @@ export default function ShowDetailPage() {
               showId: show.id,
               venue: show.venue,
               city: show.city,
-              date: show.show_date
+              date: show.show_date,
+              itemName: itemName || 'Production Deliverables',
+              portalToken: show.id // Using show ID as the portal token for now
            })
         })
 
         if (!response.ok) throw new Error('Reminder Failed')
         
         toast.success('Reminder Dispatched', { 
-           description: `Advancement notification sent to ${show.artist_name}.` 
+           description: itemName 
+             ? `Specific notification for "${itemName}" sent to ${show.artist_name}.`
+             : `General advancement notification sent to ${show.artist_name}.` 
         })
      } catch (err: any) {
         toast.error('Dispatch Failure', { 
@@ -140,7 +144,7 @@ export default function ShowDetailPage() {
            </Button>
            <Button 
              disabled={isSending}
-             onClick={handleSendReminder}
+             onClick={() => handleSendReminder()}
              className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-6 rounded-lg shadow-xl shadow-white/5 gap-2 transition-all active:scale-95 disabled:opacity-50"
            >
              {isSending ? (
@@ -148,7 +152,7 @@ export default function ShowDetailPage() {
              ) : (
                <Mail size={16} strokeWidth={2.5} />
              )}
-             {isSending ? 'Dispatching...' : 'Send Reminders'}
+             {isSending ? 'Dispatching...' : 'Send All Reminders'}
            </Button>
         </div>
       </div>
@@ -184,6 +188,7 @@ export default function ShowDetailPage() {
 
              <div className="divide-y divide-white/[0.01]">
                 {materials.map((doc) => {
+                  const name = doc.name || doc.item_name
                   const isDone = doc.status === 'delivered' || doc.status === 'submitted'
                   const deadlineDate = doc.deadline ? new Date(doc.deadline) : null
                   const isOverdue = !isDone && deadlineDate && deadlineDate < new Date()
@@ -195,7 +200,7 @@ export default function ShowDetailPage() {
                            {isDone && <CheckCircle2 size={14} strokeWidth={4} />}
                         </div>
                         <div>
-                           <p className={`text-sm font-bold tracking-tight ${isDone ? 'text-zinc-500 line-through' : 'text-zinc-100'}`}>{doc.name || doc.item_name}</p>
+                           <p className={`text-sm font-bold tracking-tight ${isDone ? 'text-zinc-500 line-through' : 'text-zinc-100'}`}>{name}</p>
                            <div className="flex items-center gap-2 mt-1">
                               <Badge className={`text-[9px] font-black uppercase px-2 py-0 border-none ${isDone ? 'bg-emerald-500/10 text-emerald-500' : (isOverdue ? 'bg-rose-500/10 text-rose-500' : 'bg-zinc-800 text-zinc-500')}`}>
                                  {isDone ? 'Delivered' : (isOverdue ? 'Overdue' : 'Awaiting')}
@@ -205,6 +210,16 @@ export default function ShowDetailPage() {
                       </div>
                       
                       <div className="flex items-center gap-10">
+                         {!isDone && (
+                           <Button 
+                             onClick={() => handleSendReminder(name)}
+                             disabled={isSending}
+                             variant="ghost" 
+                             className="h-8 bg-zinc-900 text-zinc-500 hover:text-white border border-white/[0.05] text-[10px] font-bold uppercase tracking-widest px-3 gap-2 opacity-0 group-hover:opacity-100 transition-all"
+                           >
+                            <Mail size={12} /> Ping
+                           </Button>
+                         )}
                          <div className="flex items-center gap-3">
                             <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Deadline</span>
                             <div className={`px-3 py-1 rounded-md text-[11px] font-black border ${isOverdue ? 'bg-rose-500/5 text-rose-500 border-rose-500/10' : 'bg-zinc-900 text-zinc-400 border-white/[0.03]'}`}>
