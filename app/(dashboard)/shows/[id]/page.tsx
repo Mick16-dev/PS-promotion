@@ -76,7 +76,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             show_date,
             show_time,
             status,
-            portal_url,
             artist_name,
             artist_email
           `)
