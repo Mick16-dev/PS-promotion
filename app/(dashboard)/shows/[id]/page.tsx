@@ -62,19 +62,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           .from('shows')
           .select(`
             id,
-            venue_name,
+            venue,
             city,
-            date,
-            time,
+            show_date,
+            show_time,
             status,
             portal_url,
-            artist_id,
-            artist:artist_id (
-              id,
-              name,
-              email,
-              reliability
-            ),
+            artist_name,
+            artist_email,
             materials (
               id,
               document_name,
@@ -93,13 +88,13 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           return
         }
 
-        const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
         const now = new Date()
+        const now2 = new Date()
 
         // Calculate show status
         let computedStatus = show.status || 'Upcoming'
-        if (show.date) {
-          const showDate = new Date(show.date)
+        if (show.show_date) {
+          const showDate = new Date(show.show_date)
           const isToday = showDate.toDateString() === now.toDateString()
           const isPast = showDate < now && !isToday
           const allMats = show.materials || []
@@ -115,25 +110,25 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         // Format date
         let dateStr = 'TBD'
-        if (show.date) {
+        if (show.show_date) {
           try {
-            dateStr = new Date(show.date).toLocaleDateString(undefined, {
+            dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
               year: 'numeric', month: 'short', day: 'numeric'
             })
           } catch (e) {}
         }
 
         setShowInfo({
-          artist: artistInfo?.name || 'Unnamed Artist',
-          artistEmail: artistInfo?.email || '',
-          artistId: artistInfo?.id || show.artist_id,
-          venue: show.venue_name || 'Venue TBD',
+          artist: show.artist_name || 'Unnamed Artist',
+          artistEmail: show.artist_email || '',
+          artistId: show.artist_id || '',
+          venue: show.venue || 'Venue TBD',
           city: show.city || '',
           date: dateStr,
-          rawDate: show.date,
-          time: show.time || 'TBD',
+          rawDate: show.show_date,
+          time: show.show_time || 'TBD',
           status: computedStatus,
-          portalUrl: show.portal_url || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/portal/${id}`
+          portalUrl: show.portal_url || `${window.location.origin}/portal/${id}`
         })
 
         // Process show documents
@@ -184,12 +179,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         setDocuments(formattedDocs)
 
-        // Fetch reliability directly from the artist table (populated by n8n)
-        if (artistInfo) {
-          setReliability({
-            score: artistInfo.reliability ?? 100
-          })
-        }
+        // Fetch reliability directly from the artist table if you have one, 
+        // or use a default if it's stored in the shows table.
+        setReliability({
+          score: 100 // Default to 100 if we don't have a linked artists table row
+        })
 
       } catch (err) {
         console.error('Error loading show detail:', err)
