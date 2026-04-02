@@ -1,27 +1,15 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
-import Link from 'next/link'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  MapPin, 
-  Music,
-  ExternalLink,
-  ChevronDown
+import {
+  Search,
+  Filter,
+  Plus,
+  MoreHorizontal,
+  ChevronDown,
 } from 'lucide-react'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,159 +17,95 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { CreateShowModal } from '@/components/dashboard/create-show-modal'
 import { supabase } from '@/lib/supabase'
-
-// Removed static mock array format in favor of Supabase fetching
+import { CreateShowModal } from '@/components/dashboard/create-show-modal'
 
 export default function ShowsPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All Shows')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [shows, setShows] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const fetchShows = useCallback(async () => {
+  async function fetchShows() {
     try {
       setIsLoading(true)
-      const { data, error } = await supabase
+      
+      // Fetch shows and materials separately to avoid PGRST200 Join errors
+      const { data: showsData, error: showsError } = await supabase
         .from('shows')
-        .select(`
-          id,
-          venue,
-          city,
-          show_date,
-          show_time,
-          status,
-          artist_name,
-          artist_email
-        `)
+        .select('id, venue, city, show_date, show_time, status, artist_name, artist_email')
+        .order('show_date', { ascending: false })
         
-      if (error) {
-        toast.error("Database Error", { 
-          description: `Failed to fetch shows: ${error.message} (Code: ${error.code})` 
+      const { data: materialsData } = await supabase.from('materials').select('show_id, status')
+
+      if (showsError) {
+        console.error('Supabase Error:', showsError)
+        toast.error('Database Error', {
+          description: `Failed to fetch shows: ${showsError.message}`
         })
         return
       }
 
-      if (data) {
-         const formattedShows = data.map((show: any) => {
-           const artistName = show.artist_name || 'Unnamed Artist'
-           
-           let delivered = 0
-           let total = 0
-           
-           let dateStr = show.show_date
-           if (show.show_date) {
-             try {
-               dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
-                 year: 'numeric',
-                 month: 'short',
-                 day: 'numeric'
-               })
-             } catch(e) {}
-           }
+      if (showsData) {
+         const formattedShows = showsData.map((show: any) => {
+           const showMaterials = materialsData?.filter(m => m.show_id === show.id) || []
+           const delivered = showMaterials.filter(m => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
+           const total = showMaterials.length
            
            return {
              id: show.id,
-             artist: artistName,
+             artist: show.artist_name || 'Unnamed Artist',
              venue: show.venue || 'Venue TBD',
              city: show.city || '',
-             date: dateStr || 'TBD',
-             time: show.show_time || 'TBD',
-             status: show.status || 'Upcoming',
-             docsDelivered: delivered,
-             docsTotal: total
+             date: show.show_date || '',
+             time: show.show_time || '',
+             deliveredCount: delivered,
+             totalCount: total,
+             status: show.status || 'pending'
            }
          })
-         
+
          setShows(formattedShows)
       }
     } catch (err) {
-      console.error("Failed to fetch shows:", err)
+      console.error('System Error:', err)
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchShows()
-    
-    // Subscribe to real-time changes on the 'shows' table
-    // This ensures newly created shows from n8n appear immediately
-    // and updates show statuses in real-time
-    const channel = supabase
-      .channel('shows-realtime-sync')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'shows'
-        },
-        (payload) => {
-          console.log('Real-time shows update received:', payload)
-          fetchShows() // Re-fetch to get consistent data with joins (artist, materials)
-        }
-      )
-      .subscribe()
+
+    // Real-time listener for shows and materials
+    const showSub = supabase.channel('shows-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, () => fetchShows()).subscribe()
+    const matSub = supabase.channel('materials-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'materials' }, () => fetchShows()).subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(showSub)
+      supabase.removeChannel(matSub)
     }
-  }, [fetchShows])
+  }, [])
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-      case 'Awaiting Documents':
-        return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20">Awaiting Documents</Badge>
-      case 'Upcoming':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">Upcoming</Badge>
-      case 'Ready':
-        return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Ready</Badge>
-      case 'Show Day':
-        return <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgba(var(--color-primary),0.2)]">Show Day</Badge>
-      case 'Complete':
-        return <Badge variant="outline" className="bg-muted text-muted-foreground border-border">Complete</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
-    }
+  const filteredShows = shows.filter(show =>
+    (show.artist && show.artist.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (show.venue && show.venue.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (show.city && show.city.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
+
+  const getStatusUI = (status: string) => {
+    const s = status.toLowerCase()
+    if (s === 'confirmed' || s === 'completed') return { label: 'Confirmed', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' }
+    if (s === 'pending' || s === 'awaiting') return { label: 'Awaiting Documents', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/20' }
+    if (s === 'cancelled') return { label: 'Cancelled', color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/20' }
+    return { label: status, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' }
   }
-
-  const getDocumentsBadge = (delivered: number, total: number) => {
-    const ratio = delivered / total;
-    if (ratio === 1) {
-      return <span className="text-emerald-400 font-bold">{delivered}/{total} delivered</span>
-    } else if (ratio > 0.5) {
-      return <span className="text-emerald-400 font-bold">{delivered}/{total} delivered</span>
-    } else {
-      return <span className="text-red-400 font-bold">{delivered}/{total} delivered</span>
-    }
-  }
-
-  const filteredShows = shows.filter(show => {
-    const venueName = show.venue || ''
-    const matchesSearch = show.artist.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          venueName.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Map statuses consistently for filtering
-    const displayStatus = (show.status && show.status.toLowerCase() === 'pending') 
-      ? 'Awaiting Documents' 
-      : show.status;
-      
-    const matchesFilter = statusFilter === 'All Shows' || displayStatus === statusFilter;
-    return matchesSearch && matchesFilter;
-  });
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-20">
-      {/* Page Header */}
+    <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black uppercase tracking-tighter italic text-white">Manage Shows</h1>
@@ -189,150 +113,128 @@ export default function ShowsPage() {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-white gap-3 h-12 px-8 shadow-xl shadow-primary/20 transition-all active:scale-95 font-pro-data uppercase tracking-widest text-xs rounded-xl"
+          className="h-12 px-8 bg-primary text-white hover:bg-primary/90 shadow-xl shadow-primary/20 gap-3 font-pro-data uppercase tracking-widest text-xs rounded-xl"
         >
           <Plus size={18} />
-          <span>Add Show</span>
+          Add Show
         </Button>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/60" />
-          <Input 
-            placeholder="Search by artist or venue..." 
-            className="pl-12 h-14 bg-muted/20 border-white/5 focus-visible:ring-primary/50 text-base font-bold tracking-tight rounded-2xl"
+          <Input
+            placeholder="Search by artist or venue..."
+            className="pl-12 h-14 bg-muted/20 border-white/5 focus-visible:ring-primary/50 text-base rounded-2xl font-bold tracking-tight"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-14 px-6 gap-3 border-white/10 bg-muted/20 hover:bg-muted/40 font-pro-data uppercase tracking-widest text-xs rounded-2xl min-w-[200px] justify-between">
-              <div className="flex items-center gap-3">
-                <Filter size={18} />
-                <span>{statusFilter}</span>
-              </div>
-              <ChevronDown size={14} className="opacity-50" />
+            <Button variant="outline" className="h-14 px-8 gap-3 border-white/10 bg-muted/20 hover:bg-muted/40 rounded-2xl font-pro-data uppercase tracking-widest text-xs">
+              <Filter size={18} />
+              <span>All Shows</span>
+              <ChevronDown size={14} className="ml-2 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-ebony-900 border-white/10 rounded-2xl">
-            <DropdownMenuLabel className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground/60 px-4 py-3">Filter Status</DropdownMenuLabel>
-            {['All Shows', 'Awaiting Documents', 'Upcoming', 'Ready', 'Complete', 'Show Day'].map((status) => (
-              <DropdownMenuItem 
-                key={status} 
-                className={`font-semibold text-sm py-3 px-4 rounded-xl cursor-pointer ${statusFilter === status ? 'bg-primary/10 text-primary' : ''}`}
-                onClick={() => setStatusFilter(status)}
-              >
-                {status}
-              </DropdownMenuItem>
-            ))}
+          <DropdownMenuContent className="bg-ebony-900 border-white/10 text-white rounded-xl">
+            <DropdownMenuItem className="hover:bg-white/5">Confirmed Only</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-white/5">Awaiting Docs</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-white/5">Recently Added</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {/* Shows Table Container */}
-      <div className="glass-card rounded-3xl overflow-hidden border-white/5 shadow-2xl bg-muted/5">
-        <Table>
-          <TableHeader className="bg-muted/20">
-            <TableRow className="hover:bg-transparent border-white/5 font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-bold">
-              <TableHead className="w-[280px] py-6 px-8">Artist</TableHead>
-              <TableHead className="py-6">Venue</TableHead>
-              <TableHead className="py-6">City</TableHead>
-              <TableHead className="py-6">Show Date</TableHead>
-              <TableHead className="py-6">Show Time</TableHead>
-              <TableHead className="py-6">Documents</TableHead>
-              <TableHead className="py-6">Status</TableHead>
-              <TableHead className="text-right py-6 px-8">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="divide-y divide-white/5">
-            {filteredShows.length > 0 ? (
-              filteredShows.map((show) => (
-                <TableRow key={show.id} className="group border-0 hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => router.push(`/shows/${show.id}`)}>
-                  <TableCell className="py-5 px-8">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
-                        <Music size={20} />
-                      </div>
-                      <div className="font-bold text-white text-lg tracking-tight group-hover:text-primary transition-colors">
-                          {show.artist}
-                      </div>
+      <div className="glass-card rounded-[2.5rem] overflow-hidden border-white/5 bg-muted/5 shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-muted/20">
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Artist</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Venue</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">City</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Show Date</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Show Time</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Documents</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Status</th>
+                <th className="px-8 py-6 font-pro-data uppercase tracking-widest text-[10px] font-black text-muted-foreground/60">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {isLoading ? (
+                <tr>
+                   <td colSpan={8} className="px-8 py-20 text-center animate-pulse font-pro-data uppercase tracking-widest text-[10px] font-bold text-muted-foreground/40">Fetching active roster...</td>
+                </tr>
+              ) : filteredShows.length > 0 ? (
+                filteredShows.map((show) => {
+                  const statusUI = getStatusUI(show.status)
+                  return (
+                    <tr 
+                      key={show.id} 
+                      className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                      onClick={() => router.push(`/shows/${show.id}`)}
+                    >
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <strong className="text-white text-lg font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors">{show.artist}</strong>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-sm font-bold text-white/80">{show.venue}</td>
+                      <td className="px-8 py-6 text-sm font-medium text-muted-foreground">{show.city}</td>
+                      <td className="px-8 py-6 text-sm font-bold text-white font-pro-data">{show.date}</td>
+                      <td className="px-8 py-6 text-sm font-bold text-white font-pro-data">{show.time}</td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary transition-all duration-1000" 
+                              style={{ width: `${show.totalCount > 0 ? (show.deliveredCount / show.totalCount) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-pro-data font-black text-muted-foreground uppercase tracking-widest">
+                            {show.deliveredCount}/{show.totalCount}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <Badge variant="outline" className={`${statusUI.bg} ${statusUI.color} uppercase tracking-widest text-[9px] font-bold px-3 py-1.5 border`}>
+                          {statusUI.label}
+                        </Badge>
+                      </td>
+                      <td className="px-8 py-6" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground/30 hover:text-white rounded-xl">
+                              <MoreHorizontal size={18} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-ebony-900 border-white/10 text-white rounded-xl">
+                             <DropdownMenuItem className="hover:bg-white/5" onClick={() => router.push(`/shows/${show.id}`)}>View Details</DropdownMenuItem>
+                             <DropdownMenuItem className="hover:bg-white/5">Edit Show</DropdownMenuItem>
+                             <DropdownMenuItem className="hover:bg-red-500/20 text-red-500">Cancel Show</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td colSpan={8} className="px-8 py-32 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <Music size={40} className="text-muted-foreground/20" />
+                      <p className="text-muted-foreground font-medium">No shows found matching your criteria.</p>
+                      <Button variant="link" onClick={() => setSearchQuery('')} className="text-primary uppercase tracking-widest text-[10px] font-bold">Clear Filters</Button>
                     </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-foreground">
-                    <div className="flex items-center gap-2">
-                        <MapPin size={16} className="text-muted-foreground/40" />
-                        {show.venue}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-muted-foreground">
-                    {show.city}
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-bold text-foreground">
-                      {show.date}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-pro-data font-bold tracking-widest text-muted-foreground">
-                      {show.time}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-[12px] font-pro-data uppercase tracking-widest">
-                      {getDocumentsBadge(show.docsDelivered, show.docsTotal)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(show.status)}
-                  </TableCell>
-                  <TableCell className="text-right px-8">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10 group">
-                          <MoreHorizontal className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 bg-ebony-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2 shadow-2xl">
-                        <DropdownMenuLabel className="font-pro-data uppercase text-[10px] tracking-widest text-muted-foreground/50 py-2 px-3">Show Options</DropdownMenuLabel>
-                        <DropdownMenuItem 
-                          className="gap-3 cursor-pointer h-12 px-3 rounded-xl font-bold bg-primary/10 text-primary mb-1 hover:bg-primary/20"
-                          onClick={(e) => { e.stopPropagation(); router.push(`/shows/${show.id}`) }}
-                        >
-                          <ExternalLink size={16} /> 
-                          <span>View Details</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-white/5 mx-2 my-1" />
-                        <DropdownMenuItem 
-                          className="gap-3 cursor-pointer h-10 px-3 rounded-xl font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                          onClick={(e) => { e.stopPropagation(); toast.error('Account Settings required to delete shows.') }}
-                        >
-                          <span>Delete Show</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-                <TableRow>
-                    <TableCell colSpan={8} className="h-48 text-center">
-                        <p className="text-muted-foreground font-medium">No shows found matching your criteria.</p>
-                        <Button variant="link" onClick={() => { setSearchQuery(''); setStatusFilter('All Shows'); }} className="text-primary mt-2">Clear Filters</Button>
-                    </TableCell>
-                </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <CreateShowModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchShows}
-      />
+      <CreateShowModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); fetchShows(); }} />
     </div>
   )
 }
