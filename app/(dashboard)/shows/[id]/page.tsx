@@ -15,6 +15,8 @@ import {
   ExternalLink,
   ChevronRight,
   Plus,
+  AlertCircle,
+  FileText,
   MoreHorizontal
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -71,6 +73,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         })
         
         const mats = matsData || []
+        const totalToExpect = mats.length > 0 ? mats.length : 6
+        
         const formattedDocs = mats.map((mat: any) => {
           const deadline = mat.deadline ? new Date(mat.deadline) : null
           const now = new Date()
@@ -92,7 +96,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       }
     } catch (err: any) {
       console.error('Failed to load show detail:', err)
-      toast.error('Could not load show details.')
+      toast.error('Detailed Load Failure', {
+        description: err.message || 'Check database connection'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -130,7 +136,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   )
 
   const deliveredCount = materials.filter(m => m.status.toLowerCase() === 'delivered' || m.status.toLowerCase() === 'submitted').length
-  const totalCount = materials.length
+  const totalCount = materials.length > 0 ? materials.length : 6
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20 max-w-7xl mx-auto">

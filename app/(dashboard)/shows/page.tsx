@@ -8,6 +8,9 @@ import {
   Plus,
   MoreHorizontal,
   ChevronDown,
+  Music,
+  AlertCircle,
+  FileText,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -51,9 +54,10 @@ export default function ShowsPage() {
 
       if (showsData) {
          const formattedShows = showsData.map((show: any) => {
-           const showMaterials = materialsData?.filter(m => m.show_id === show.id) || []
-           const delivered = showMaterials.filter(m => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
-           const total = showMaterials.length
+           const showMaterials = materialsData?.filter((m: any) => m.show_id === show.id) || []
+           const delivered = showMaterials.filter((m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
+           // Default to 6 if no materials are found to match the professional blueprint
+           const total = showMaterials.length > 0 ? showMaterials.length : 6
            
            return {
              id: show.id,
@@ -70,8 +74,11 @@ export default function ShowsPage() {
 
          setShows(formattedShows)
       }
-    } catch (err) {
-      console.error('System Error:', err)
+    } catch (err: any) {
+      console.error('Failed to load show detail:', err)
+      toast.error('Detailed Load Failure', {
+        description: err.message || 'Check database connection'
+      })
     } finally {
       setIsLoading(false)
     }
