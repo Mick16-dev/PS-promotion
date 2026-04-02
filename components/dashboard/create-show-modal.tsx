@@ -58,12 +58,6 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     if (isOpen) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
-<<<<<<< HEAD
-        const { data, error } = await supabase.from('artists').select('id, name')
-        if (data && !error) {
-          setArtists(data)
-          if (data.length > 0) setSelectedArtistId(data[0].id)
-=======
         try {
           const { data, error } = await supabase.from('artists').select('id, name')
 
@@ -89,7 +83,6 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
           }
         } finally {
           setIsLoadingArtists(false)
->>>>>>> 9aac17ef09acd592c9377945794d838b5e056308
         }
       }
       fetchArtists()
