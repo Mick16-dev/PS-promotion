@@ -145,18 +145,18 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
              <div>
                 <h1 className="text-6xl font-bold tracking-tight text-white mb-2">{show.artist_name}</h1>
                 <div className="flex items-center gap-4 text-white/60">
-                   <div className="flex items-center gap-2 text-white/50">
+                   <div className="flex items-center gap-2 text-zinc-300">
                       <MapPin size={12} />
                       <span className="text-xs font-bold uppercase tracking-widest">{show.venue}</span>
                    </div>
                 </div>
-                <p className="text-sm font-medium text-white/40">{show.date} • {show.city}</p>
+                <p className="text-sm font-medium text-zinc-400">{show.date} • {show.city}</p>
               </div>
 
               <div className="flex items-center gap-10 w-full md:w-auto px-4">
                 <div className="flex flex-col items-end gap-2 pr-6 border-r border-white/5">
                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-white/30">Materials</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Materials</span>
                    </div>
                 </div>
              </div>
@@ -186,9 +186,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                { label: 'Status', val: show.status || 'Active', icon: Clock4 }
              ].map((s, i) => (
                <div key={i} className="glass-card p-8 rounded-[2.5rem] border-white/5 bg-white/[0.01]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">{s.label}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3">{s.label}</p>
                   <div className="flex items-center gap-3">
-                     <div className="h-10 w-10 rounded-xl bg-white/[0.03] flex items-center justify-center text-white/50">
+                     <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-zinc-400">
                         <s.icon size={18} />
                      </div>
                      <span className="text-xl font-bold text-white tracking-tight">{s.val}</span>
@@ -202,7 +202,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
              <div className="flex items-center justify-between mb-10">
                 <div>
                    <h2 className="text-2xl font-bold text-white tracking-tight">Show Requirements</h2>
-                   <p className="text-sm text-white/30 mt-1 font-medium italic">Track essential documents for this performance.</p>
+                   <p className="text-sm text-zinc-400 mt-1 font-medium">Track essential documents for this performance.</p>
                 </div>
                 <Button variant="ghost" size="icon" className="h-12 w-12 bg-white/[0.03] border border-white/5 rounded-2xl hover:bg-white/5">
                    <Plus size={20} />
@@ -224,15 +224,15 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                            {isDone ? <CheckCircle2 size={24} /> : (isOverdue ? <AlertCircle size={24} /> : <div className="h-2 w-2 rounded-full bg-white/20" />)}
                         </div>
                         <div>
-                           <p className={`text-lg font-bold tracking-tight ${isDone ? 'text-emerald-500/80' : (isOverdue ? 'text-rose-500/90 font-black' : 'text-white')}`}>{doc.name}</p>
-                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mt-1">{isDone ? 'Delivered' : (isOverdue ? 'Action Required' : 'Select Deadline')}</p>
+                           <p className={`text-lg font-bold tracking-tight ${isDone ? 'text-emerald-400 font-bold' : (isOverdue ? 'text-rose-400 font-black' : 'text-white')}`}>{doc.name}</p>
+                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mt-1">{isDone ? 'Delivered' : (isOverdue ? 'Action Required' : 'Awaiting Document')}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-8">
-                         <div className="text-right flex flex-col items-end opacity-80">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Due Date</span>
-                            <span className={`text-xs font-bold ${isOverdue ? 'text-rose-500 underline decoration-2 underline-offset-4' : 'text-white'}`}>{doc.deadline}</span>
+                         <div className="text-right flex flex-col items-end">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1">Due Date</span>
+                            <span className={`text-xs font-bold px-3 py-1 rounded-lg ${isOverdue ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-white/5 text-zinc-300'}`}>{doc.deadline}</span>
                          </div>
                          <Button variant="ghost" size="icon" className="h-10 w-10 text-white/20 hover:text-white rounded-xl">
                             <MoreHorizontal size={18} />

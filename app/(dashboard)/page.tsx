@@ -155,13 +155,13 @@ export default function DashboardHome() {
           { label: 'Overdue Clearances', value: stats.overdueDocs, icon: AlertCircle, color: 'text-rose-500' }
         ].map((stat, i) => (
           <div key={i} className="group glass-card p-10 rounded-[3rem] border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-700 relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.1] transition-all group-hover:scale-110">
-                <stat.icon size={120} strokeWidth={1} />
+             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-all group-hover:scale-110">
+                <stat.icon size={120} strokeWidth={1} className="text-zinc-500" />
              </div>
-             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 mb-6">{stat.label}</p>
+             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-6">{stat.label}</p>
              <div className="flex items-end gap-3">
                 <span className={`text-6xl font-bold tracking-tight leading-none ${stat.color}`}>{stat.value}</span>
-                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 group-hover:text-white/80 transition-colors mb-1">
+                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors mb-1">
                    <ArrowUpRight size={20} />
                 </div>
              </div>
@@ -176,9 +176,9 @@ export default function DashboardHome() {
              <div className="flex items-center justify-between mb-12">
                 <div>
                    <h3 className="text-2xl font-bold text-white tracking-tight">Requires Attention</h3>
-                   <p className="text-sm text-white/40 mt-1 font-medium">Items that missed their scheduled deadline.</p>
+                   <p className="text-sm text-zinc-400 mt-1 font-medium">Items that missed their scheduled deadline.</p>
                 </div>
-                <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest text-primary/80 hover:text-primary">
+                <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest text-primary hover:text-white">
                   View Full Report
                 </Button>
              </div>
@@ -196,10 +196,10 @@ export default function DashboardHome() {
                         </div>
                         <div>
                           <p className="text-lg font-bold text-white tracking-tight">{item.artist}</p>
-                          <div className="flex items-center gap-3 mt-1 opacity-70">
-                             <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">{item.venue}</span>
-                             <span className="h-1 w-1 rounded-full bg-white/60" />
-                             <span className="text-[11px] text-rose-500 font-bold uppercase tracking-widest underline decoration-2 underline-offset-4">Due: {item.deadline}</span>
+                          <div className="flex items-center gap-3 mt-1 underline decoration-zinc-800 underline-offset-4">
+                             <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-300">{item.venue}</span>
+                             <span className="h-1 w-1 rounded-full bg-zinc-600" />
+                             <span className="text-[11px] text-rose-400 font-black uppercase tracking-widest bg-rose-500/10 px-2 py-0.5 rounded">Due: {item.deadline}</span>
                           </div>
                         </div>
                       </div>

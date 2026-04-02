@@ -143,18 +143,18 @@ export default function ShowsPage() {
                 <div className="flex items-center gap-4 mb-1">
                    <h3 className="text-xl font-bold text-white tracking-tight truncate">{show.artist}</h3>
                    <div className="h-1 w-1 rounded-full bg-white/20" />
-                   <div className="flex items-center gap-2 text-white/70">
+                   <div className="flex items-center gap-2 text-zinc-300">
                       <MapPin size={12} />
                       <span className="text-xs font-bold uppercase tracking-widest">{show.venue}</span>
                    </div>
                 </div>
-                <p className="text-sm font-medium text-white/50">{show.date} • {show.city}</p>
+                <p className="text-sm font-medium text-zinc-400">{show.date} • {show.city}</p>
               </div>
 
               <div className="flex items-center gap-10 w-full md:w-auto px-4">
                 <div className="flex flex-col items-end gap-2 pr-6 border-r border-white/5">
                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-white/50">Materials</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Materials</span>
                       <span className="text-lg font-bold text-white leading-none">{show.progress}/{show.totalItems}</span>
                    </div>
                    <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
