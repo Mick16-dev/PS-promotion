@@ -58,14 +58,24 @@ export default function ShowsPage() {
           date,
           time,
           status,
-          artist:artist_id ( name ),
-          materials ( status )
+          artist_id,
+          artists:artist_id ( name )
         `)
         
-      if (data && !error) {
-         const formattedShows = data.map(show => {
-           const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
-          const artistName = artistInfo?.name || 'Unnamed Artist'
+      if (error) {
+        console.error("Supabase Error:", error)
+        toast.error("Database Error", { 
+          description: `Failed to fetch shows: ${error.message} (Code: ${error.code})` 
+        })
+        return
+      }
+
+      if (data) {
+         console.log('Fetched data:', data)
+         const formattedShows = data.map((show: any) => {
+           // Standard Supabase join handling for one-to-one
+           const artistInfo = show.artists;
+           const artistName = artistInfo?.name || 'Unnamed Artist'
            
            let delivered = 0
            let total = show.materials?.length || 0
@@ -113,6 +123,29 @@ export default function ShowsPage() {
 
   React.useEffect(() => {
     fetchShows()
+    
+    // Subscribe to real-time changes on the 'shows' table
+    // This ensures newly created shows from n8n appear immediately
+    // and updates show statuses in real-time
+    const channel = supabase
+      .channel('shows-realtime-sync')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'shows'
+        },
+        (payload) => {
+          console.log('Real-time shows update received:', payload)
+          fetchShows() // Re-fetch to get consistent data with joins (artist, materials)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [fetchShows])
 
   const getStatusBadge = (status: string) => {
@@ -149,9 +182,12 @@ export default function ShowsPage() {
     const matchesSearch = show.artist.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           venueName.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Map 'Awaiting Documents' filter to also match raw 'pending' status from Supabase
-    const normalizedStatus = (show.status === 'pending') ? 'Awaiting Documents' : show.status
-    const matchesFilter = statusFilter === 'All Shows' || normalizedStatus === statusFilter;
+    // Map statuses consistently for filtering
+    const displayStatus = (show.status && show.status.toLowerCase() === 'pending') 
+      ? 'Awaiting Documents' 
+      : show.status;
+      
+    const matchesFilter = statusFilter === 'All Shows' || displayStatus === statusFilter;
     return matchesSearch && matchesFilter;
   });
 
@@ -195,7 +231,7 @@ export default function ShowsPage() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-ebony-900 border-white/10 rounded-2xl">
             <DropdownMenuLabel className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground/60 px-4 py-3">Filter Status</DropdownMenuLabel>
-            {['All Shows', 'Awaiting Documents', 'Ready', 'Complete', 'Show Day'].map((status) => (
+            {['All Shows', 'Awaiting Documents', 'Upcoming', 'Ready', 'Complete', 'Show Day'].map((status) => (
               <DropdownMenuItem 
                 key={status} 
                 className={`font-semibold text-sm py-3 px-4 rounded-xl cursor-pointer ${statusFilter === status ? 'bg-primary/10 text-primary' : ''}`}
@@ -309,6 +345,21 @@ export default function ShowsPage() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchShows}
       />
+
+      {/* Development Debug View */}
+      <div className="mt-20 p-8 glass-card border-red-500/20 bg-red-500/5 rounded-3xl">
+        <h3 className="text-red-500 font-bold uppercase font-pro-data tracking-widest text-xs mb-4">DEBUG: Supabase Connection Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/60">
+          <div className="space-y-2">
+            <p>Project URL: <span className="text-white">{process.env.NEXT_PUBLIC_SUPABASE_URL}</span></p>
+            <p>Data Status: <span className="text-white">{isLoading ? 'Loading...' : 'Ready'}</span></p>
+          </div>
+          <div className="space-y-2">
+            <p>Shows Count (State): <span className="text-white">{shows.length}</span></p>
+            <p>Raw Payload Slice: <span className="text-white lowercase font-normal">{JSON.stringify(shows).slice(0, 100)}...</span></p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -7,8 +7,10 @@ import {
   Filter,
   Music,
   ArrowRight,
+  MoreHorizontal,
   UserRound
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,8 +31,16 @@ export default function ArtistsPage() {
         // Fetch reliability directly as it's calculated in the backend/n8n
         const { data, error } = await supabase.from('artists').select('id, name, genre, reliability')
 
-        if (data && !error) {
-          const formattedArtists = data.map(artist => ({
+        if (error) {
+          console.error('Supabase Error:', error)
+          toast.error('Database Error', {
+            description: `Failed to load artists: ${error.message} (Code: ${error.code})`
+          })
+          return
+        }
+
+        if (data) {
+          const formattedArtists = data.map((artist: any) => ({
             id: artist.id,
             name: artist.name || 'Unknown Artist',
             genre: artist.genre || 'Various',
@@ -44,7 +54,7 @@ export default function ArtistsPage() {
           setArtists(formattedArtists)
         }
       } catch (err) {
-        console.error('Failed to load artists:', err)
+        console.error('System Error:', err)
       } finally {
         setIsLoading(false)
       }
