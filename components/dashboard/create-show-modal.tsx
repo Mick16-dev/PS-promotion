@@ -47,6 +47,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [venue, setVenue] = useState('')
   const [city, setCity] = useState('')
   const [showDate, setShowDate] = useState('')
+  const [showTime, setShowTime] = useState('')
   
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -118,8 +119,14 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       // Find full artist details
       const selectedArtist = artists.find(a => a.id === selectedArtistId)
 
+      // Generate a stable show ID client-side so n8n can use it when inserting
+      const show_id = crypto.randomUUID()
+
       // Prepare data for n8n
       const payload = {
+        show_id,
+        show_name: `${selectedArtist?.name || 'Show'} @ ${venue}`,
+        show_time: showTime || null,
         artist_id: selectedArtistId,
         artist_name: selectedArtist?.name || 'Unknown Artist',
         artist_email: selectedArtist?.email || '',
@@ -162,6 +169,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       setVenue('')
       setCity('')
       setShowDate('')
+      setShowTime('')
       setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
       setDocDates({})
     } catch (error) {
@@ -259,6 +267,19 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
                     onChange={(e) => setShowDate(e.target.value)}
                     required
                     className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20"
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="time" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Show Time</Label>
+                <div className="relative group">
+                  <Input 
+                    id="time" 
+                    name="time"
+                    type="time" 
+                    value={showTime}
+                    onChange={(e) => setShowTime(e.target.value)}
+                    className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20 pl-5"
                   />
                 </div>
               </div>
