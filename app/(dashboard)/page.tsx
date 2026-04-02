@@ -18,8 +18,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
-
 // Removed mock arrays to rely on state
 
 export default function DashboardHome() {
@@ -174,10 +172,6 @@ export default function DashboardHome() {
     setIsSendingReminder(item.id)
     
     try {
-      if (!REMINDER_WEBHOOK_URL) {
-        throw new Error('Reminder webhook is not configured.')
-      }
-
       const payload = {
         material_id: item.id,
         artist_email: item.artistEmail,
@@ -188,7 +182,7 @@ export default function DashboardHome() {
         portal_token: item.portalToken
       }
 
-      const response = await fetch(REMINDER_WEBHOOK_URL, {
+      const response = await fetch('/api/n8n/send-reminder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
