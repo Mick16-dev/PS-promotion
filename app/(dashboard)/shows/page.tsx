@@ -59,15 +59,7 @@ export default function ShowsPage() {
           show_time,
           status,
           artist_name,
-          artist_email,
-          materials (
-            id,
-            item_name,
-            status,
-            deadline,
-            submitted_at,
-            file_url
-          )
+          artist_email
         `)
         
       if (error) {
@@ -82,15 +74,7 @@ export default function ShowsPage() {
            const artistName = show.artist_name || 'Unnamed Artist'
            
            let delivered = 0
-           let total = show.materials?.length || 0
-           
-           if (show.materials) {
-             show.materials.forEach((mat: any) => {
-               if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
-                 delivered++
-               }
-             })
-           }
+           let total = 0
            
            let dateStr = show.show_date
            if (show.show_date) {
