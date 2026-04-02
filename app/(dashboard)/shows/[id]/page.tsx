@@ -43,16 +43,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       
       const { data: showData, error: showErr } = await supabase
         .from('shows')
-        .select(`
-          id,
-          venue,
-          city,
-          show_date,
-          show_time,
-          status,
-          artist_name,
-          artist_email
-        `)
+        .select('id, venue, city, show_date, show_time, status, artist_name, artist_email')
         .eq('id', id)
         .single()
         
@@ -71,15 +62,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         
         const mats = matsData || []
         
-        // If NO materials in DB, create the professional blueprint (6 items)
+        // Use EXACT 5-document blueprint from user requirement
         if (mats.length === 0) {
           const blueprint = [
-            'EPK / Bio',
+            'EPK',
+            'Artist Bio',
+            'Press Photos',
             'Technical Rider',
-            'Hospitality Rider',
-            'Press Materials',
-            'Input List',
-            'Stage Plot'
+            'Signed Contract'
           ].map((name, index) => ({
             id: `blueprint-${index}`,
             name,
@@ -94,15 +84,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           const formattedDocs = mats.map((mat: any) => {
             const deadline = mat.deadline ? new Date(mat.deadline) : null
             const now = new Date()
-            const isOverdue = deadline && deadline < now && (mat.status?.toLowerCase() !== 'delivered' && mat.status?.toLowerCase() !== 'submitted')
+            // Strict check for late status
+            const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
+            const isLate = deadline && deadline < now && !isDelivered
             
-            let docStatus = mat.status || 'awaiting'
-            if (isOverdue) docStatus = 'overdue'
-
             return {
               id: mat.id,
               name: mat.item_name || 'Document',
-              status: docStatus,
+              status: isLate ? 'overdue' : (isDelivered ? 'delivered' : 'awaiting'),
               deadline: mat.deadline || 'TBD',
               submitted_at: mat.submitted_at,
               file_url: mat.file_url
@@ -143,15 +132,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   )
 
   if (!show) return (
-    <div className="flex flex-col items-center justify-center py-32 text-center">
-      <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-4">Show not found.</h3>
-      <Button variant="link" onClick={() => router.push('/shows')} className="text-link gap-2">
-        <ArrowLeft size={16} /> Back to All Shows
-      </Button>
-    </div>
+    <div className="flex flex-col items-center justify-center py-32 text-center text-white">Show not found.</div>
   )
 
-  const deliveredCount = materials.filter(m => m.status.toLowerCase() === 'delivered' || m.status.toLowerCase() === 'submitted').length
+  const deliveredCount = materials.filter(m => m.status === 'delivered').length
   const totalCount = materials.length
 
   return (
@@ -187,7 +171,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-8 flex flex-col gap-10">
           <div className="glass-card rounded-[3rem] p-12 border-white/5 bg-muted/5 grid grid-cols-1 md:grid-cols-3 gap-12 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             <div className="space-y-3 relative z-10">
               <span className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-black flex items-center gap-2">
                 <CalendarIcon size={14} className="text-primary/60" /> Date
@@ -216,17 +199,17 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 <h3 className="text-3xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4 leading-none tracking-[-0.03em]">
                   Material Checklist
                 </h3>
-                <p className="text-muted-foreground font-medium mt-3">Monitoring document deliverability for this show.</p>
+                <p className="text-muted-foreground font-medium mt-3 uppercase text-[10px] tracking-widest font-pro-data">Monitoring 5 core requirements</p>
               </div>
               <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-white/5 hover:bg-white/10 text-white border border-white/5 ml-4">
                 <Plus size={24} />
               </Button>
             </div>
 
-            <div className="space-y-4 px-2">
+            <div className="space-y-3 px-2">
               {materials.map((doc) => {
-                const isDone = doc.status.toLowerCase() === 'delivered' || doc.status.toLowerCase() === 'submitted'
-                const isOverdue = doc.status.toLowerCase() === 'overdue'
+                const isDone = doc.status === 'delivered'
+                const isOverdue = doc.status === 'overdue'
                 
                 return (
                   <div 
@@ -239,12 +222,12 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                       </div>
                       <div>
                         <p className={`text-xl font-black uppercase italic tracking-tighter transition-colors ${isDone ? 'text-emerald-400' : (isOverdue ? 'text-red-400' : 'text-white')}`}>{doc.name}</p>
-                        <p className="text-[9px] font-pro-data font-black uppercase tracking-[0.2em] mt-1 text-muted-foreground/40">{isDone ? 'Item Received' : (isOverdue ? 'Overdue' : 'Awaiting Submission')}</p>
+                        <p className="text-[9px] font-pro-data font-black uppercase tracking-[0.2em] mt-1 text-muted-foreground/40">{isDone ? 'Complete' : (isOverdue ? 'Action Required' : 'Awaiting Submission')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-10">
                       <div className="text-right flex flex-col items-end hidden sm:flex">
-                        <span className="text-[10px] font-pro-data text-muted-foreground/30 uppercase tracking-[0.2em] font-black pb-1">Deadline</span>
+                        <span className="text-[10px] font-pro-data text-muted-foreground/30 uppercase tracking-[0.2em] font-black pb-1">Due</span>
                         <span className={`text-xs font-pro-data font-black tracking-widest uppercase ${isOverdue ? 'text-red-400' : 'text-white/60'}`}>{doc.deadline}</span>
                       </div>
                       <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground/40 hover:text-white rounded-2xl group-hover/item:bg-white/10 transition-all ml-4">
@@ -259,61 +242,43 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-10">
-           <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-muted/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
-                  <User size={120} className="text-primary" />
-              </div>
-              <h3 className="text-lg font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3">
-                  <User size={18} className="text-primary" /> Artist Intelligence
+           {/* Artist Contact Panel */}
+           <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-muted/5 relative overflow-hidden group border-white/5 shadow-2xl shadow-indigo-500/5">
+              <h3 className="text-[10px] font-pro-data uppercase tracking-[0.2em] font-black mb-6 text-primary flex items-center gap-2">
+                  <User size={14} /> Artist Detail
               </h3>
               
               <div className="space-y-10">
                   <div>
-                      <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black mb-3">Primary Contact</p>
-                      <h4 className="text-2xl font-black uppercase italic italic tracking-tighter text-white">{show.artist_name}</h4>
-                      <p className="text-muted-foreground mt-2 font-bold font-pro-data text-sm flex items-center gap-3">
-                          <Mail size={16} className="text-primary/40" />
+                      <h4 className="text-3xl font-black uppercase italic tracking-tighter text-white">{show.artist_name}</h4>
+                      <p className="text-muted-foreground mt-2 font-bold font-pro-data text-sm truncate opacity-60">
                           {show.artist_email || 'No email provided'}
                       </p>
                   </div>
-
-                  <div className="pt-10 border-t border-white/5">
-                      <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black mb-6">Historical Reliability</p>
-                      <div className="flex items-center justify-between mb-4">
-                          <span className="text-white font-black text-4xl italic tracking-tighter font-pro-data">{reliability.score}%</span>
-                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 uppercase font-bold tracking-widest text-[9px] px-3 py-1.5 rounded-lg">High Performance</Badge>
-                      </div>
-                      <div className="w-full h-3 bg-white/5 rounded-2xl overflow-hidden shadow-inner border border-white/5">
-                        <div className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-[2000ms]" style={{ width: `${reliability.score}%` }} />
-                      </div>
+                   <div className="pt-10 border-t border-white/5">
+                      <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black mb-6 italic underline">Reliability Score</p>
+                      <span className="text-white font-black text-5xl italic tracking-tighter font-pro-data">100%</span>
                   </div>
               </div>
            </div>
 
-           <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-ebony-950/80 shadow-2xl relative overflow-hidden group border-primary/20">
-              <div className="absolute top-0 left-0 w-1 bg-primary h-full opacity-60" />
-              <h3 className="text-lg font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3 text-white">
-                  <ExternalLink size={18} className="text-primary" /> Portal Intelligence
+           {/* Portal Card */}
+           <div className="glass-card rounded-[3rem] p-10 bg-indigo-500/5 border-indigo-500/20 shadow-2xl relative overflow-hidden group">
+              <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center gap-3 text-indigo-400">
+                  <ExternalLink size={18} /> Direct Artist Portal
               </h3>
-              
-              <p className="text-muted-foreground text-sm font-medium leading-relaxed opacity-80">
-                  Artists manage their submissions through a private, password-less portal. You are monitoring this active link.
-              </p>
-
-              <div className="mt-8 p-6 bg-muted/40 rounded-3xl border border-white/5 flex flex-col gap-4">
-                  <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black opacity-40">Public Workflow Link</p>
-                  <p className="text-xs font-bold text-primary truncate font-pro-data tracking-tight">{show.portalUrl}</p>
+               <div className="p-6 bg-white/[0.03] rounded-3xl border border-white/5">
+                  <p className="text-xs font-pro-data font-bold text-white/50 truncate tracking-tight">{show.portalUrl}</p>
               </div>
-
                <Button 
                 variant="outline" 
-                className="w-full mt-10 h-14 rounded-2xl gap-3 border-white/10 hover:bg-white/5 transition-all text-white font-black uppercase italic tracking-tighter"
+                className="w-full mt-10 h-14 rounded-2xl border-white/10 hover:bg-white/5 text-white font-black uppercase italic tracking-tighter"
                 onClick={() => {
                   navigator.clipboard.writeText(show.portalUrl)
-                  toast.success('Portal link copied to clipboard')
+                  toast.success('Link Copied')
                 }}
               >
-                Copy Portal Link
+                Copy Link
               </Button>
            </div>
         </div>

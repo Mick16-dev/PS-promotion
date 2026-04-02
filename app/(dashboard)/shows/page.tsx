@@ -56,8 +56,8 @@ export default function ShowsPage() {
          const formattedShows = showsData.map((show: any) => {
            const showMaterials = materialsData?.filter((m: any) => m.show_id === show.id) || []
            const delivered = showMaterials.filter((m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted').length
-           // Default to 6 if no materials are found to match the professional blueprint
-           const total = showMaterials.length > 0 ? showMaterials.length : 6
+           // Default to 5 based on exact user requirement
+           const total = showMaterials.length > 0 ? showMaterials.length : 5
            
            return {
              id: show.id,

@@ -37,9 +37,9 @@ export default function DashboardHome() {
     const savedLockouts = localStorage.getItem('reminder_lockouts')
     if (savedLockouts) {
       try {
-        const parsed = JSON.parse(savedLockouts)
+        const parsed = JSON.parse(savedLockouts) as Record<string, number>
         const now = Date.now()
-        setLockouts(Object.fromEntries(Object.entries(parsed).filter(([_, expiry]) => now < (expiry as number))))
+        setLockouts(Object.fromEntries(Object.entries(parsed).filter(([_, expiry]) => now < expiry)) as Record<string, boolean>)
       } catch (e) {}
     }
 
@@ -58,15 +58,15 @@ export default function DashboardHome() {
         
         const now = new Date()
 
-        // Iterate through each show to ensure consistent 6-doc default counting
-        shows?.forEach(show => {
-          const showMats = materials?.filter(m => m.show_id === show.id) || []
+        // Iterate through each show to ensure consistent 5-doc default counting
+        shows?.forEach((show: any) => {
+          const showMats = materials?.filter((m: any) => m.show_id === show.id) || []
           
-          // If no materials in DB yet, assume 6 are "Awaiting"
+          // If no materials in DB yet, assume 5 core documents are "Awaiting"
           if (showMats.length === 0) {
-            awaitingCount += 6
+            awaitingCount += 5
           } else {
-            showMats.forEach(mat => {
+            showMats.forEach((mat: any) => {
               const docName = mat.item_name || 'Document'
               const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
               
@@ -234,6 +234,7 @@ export default function DashboardHome() {
                       <p className="font-black text-white text-xl uppercase italic tracking-tighter">{item.artist}</p>
                       <p className="text-sm text-muted-foreground font-medium flex items-center gap-2 mt-1">
                         {item.venue} <span className="text-white/10">•</span> <span className="text-white/80">{item.document}</span>
+                        <span className="text-red-500/60 ml-2 font-bold">[DUE: {item.deadline}]</span>
                       </p>
                     </div>
                   </div>
