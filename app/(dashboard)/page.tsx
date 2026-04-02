@@ -1,300 +1,250 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 import { 
-  Music, 
-  CheckCircle2, 
+  BarChart3, 
+  Calendar as CalendarIcon, 
   Clock, 
+  ChevronRight, 
+  Bell, 
+  ArrowUpRight,
+  TrendingUp,
+  Music,
+  CheckCircle2,
   AlertCircle,
-  ArrowRight,
-  Send,
-  AlertTriangle,
-  FileText,
-  Loader2
+  MoreVertical,
+  Search,
+  User,
+  ExternalLink,
+  MapPin,
+  Clock4
 } from 'lucide-react'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
 export default function DashboardHome() {
-  const router = useRouter()
-  const [stats, setStats] = useState([
-    { name: 'Total Shows', value: '--', icon: Music, color: 'text-primary' },
-    { name: 'Documents Awaiting', value: '--', icon: Clock, color: 'text-amber-500' },
-    { name: 'Documents Delivered', value: '--', icon: CheckCircle2, color: 'text-emerald-500' },
-    { name: 'Documents Late', value: '--', icon: AlertCircle, color: 'text-red-500' },
-  ])
+  const [stats, setStats] = useState({
+    totalShows: 0,
+    awaitingDocs: 0,
+    overdueDocs: 0,
+    upcomingDeals: 0
+  })
+  
+  const [overdueItems, setOverdueItems] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
-  const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
 
-  const [overdueDocs, setOverdueDocs] = useState<any[]>([])
-  const [recentActivity, setRecentActivity] = useState<any[]>([])
+  async function fetchDashboardData() {
+    try {
+      setIsLoading(true)
+      const { data: shows, error: showsErr } = await supabase
+        .from('shows')
+        .select('*')
+        .order('show_date')
+      
+      const { data: materials, error: matsErr } = await supabase
+        .from('materials')
+        .select('*')
+        .not('status', 'eq', 'delivered')
+        .not('status', 'eq', 'submitted')
 
-  useEffect(() => {
-    const savedLockouts = localStorage.getItem('reminder_lockouts')
-    if (savedLockouts) {
-      try {
-        const parsed = JSON.parse(savedLockouts) as Record<string, number>
-        const now = Date.now()
-        setLockouts(Object.fromEntries(Object.entries(parsed).filter(([_, expiry]) => now < expiry)) as Record<string, boolean>)
-      } catch (e) {}
-    }
+      if (showsErr || matsErr) throw showsErr || matsErr
 
-    async function fetchDashboardData() {
-      try {
-        setIsLoading(true)
-        
-        const { data: shows, count: showsCount } = await supabase.from('shows').select('id, venue, artist_name, artist_email', { count: 'exact' })
-        const { data: materials } = await supabase.from('materials').select('id, show_id, status, deadline, submitted_at, item_name')
-        
+      if (shows) {
         let awaitingCount = 0
-        let deliveredCount = 0
-        let lateCount = 0
-        let overdueList: any[] = []
-        let activityList: any[] = []
-        
+        const overdueList: any[] = []
         const now = new Date()
 
-        // Iterate through each show to ensure consistent 5-doc default counting
         shows?.forEach((show: any) => {
           const showMats = materials?.filter((m: any) => m.show_id === show.id) || []
           
-          // If no materials in DB yet, assume 5 core documents are "Awaiting"
           if (showMats.length === 0) {
+            // Respect the user's 5-document standard with human terminology
             awaitingCount += 5
           } else {
             showMats.forEach((mat: any) => {
-              const docName = mat.item_name || 'Document'
-              const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
+              const deadline = mat.deadline ? new Date(mat.deadline) : null
+              const isLate = deadline && deadline < now
               
-              if (isDelivered) {
-                deliveredCount++
-                if (mat.submitted_at) {
-                  activityList.push({
-                    id: mat.id,
-                    artist: show.artist_name || 'Unnamed Artist',
-                    document: docName,
-                    venue: show.venue || 'Venue TBD',
-                    time: new Date(mat.submitted_at)
-                  })
-                }
+              if (isLate) {
+                overdueList.push({
+                  id: mat.id,
+                  artist: show.artist_name,
+                  venue: show.venue,
+                  document: mat.item_name || 'Requirement',
+                  deadline: mat.deadline,
+                  showId: show.id
+                })
               } else {
-                const isLate = mat.deadline && new Date(mat.deadline) < now
-                if (isLate) {
-                  lateCount++
-                  overdueList.push({
-                    id: mat.id,
-                    artist: show.artist_name || 'Unnamed Artist',
-                    artistEmail: show.artist_email || '',
-                    venue: show.venue || 'Venue TBD',
-                    document: docName,
-                    deadline: mat.deadline,
-                    portalToken: show.id || '',
-                    daysLate: Math.max(1, Math.floor((now.getTime() - new Date(mat.deadline).getTime()) / (1000 * 3600 * 24)))
-                  })
-                } else {
-                  awaitingCount++
-                }
+                awaitingCount++
               }
             })
           }
         })
-        
-        activityList.sort((a, b) => b.time.getTime() - a.time.getTime())
-        
-        setStats([
-          { name: 'Total Shows', value: (showsCount || 0).toString(), icon: Music, color: 'text-primary' },
-          { name: 'Documents Awaiting', value: awaitingCount.toString(), icon: Clock, color: 'text-amber-500' },
-          { name: 'Documents Delivered', value: deliveredCount.toString(), icon: CheckCircle2, color: 'text-emerald-500' },
-          { name: 'Documents Late', value: lateCount.toString(), icon: AlertCircle, color: 'text-red-500' },
-        ])
-        
-        setOverdueDocs(overdueList)
-        setRecentActivity(activityList.slice(0, 5).map(item => {
-           const hours = Math.floor((now.getTime() - item.time.getTime()) / (1000 * 3600))
-           let timeStr = hours < 1 ? 'Just now' : (hours >= 24 ? `${Math.floor(hours / 24)} days ago` : `${hours} hours ago`)
-           return { ...item, time: timeStr }
-        }))
-        
-      } catch (error) {
-        console.error("Dashboard error:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    
-    fetchDashboardData()
 
-    const showSub = supabase.channel('show-stats').on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, () => fetchDashboardData()).subscribe()
-    const matSub = supabase.channel('mat-stats').on('postgres_changes', { event: '*', schema: 'public', table: 'materials' }, () => fetchDashboardData()).subscribe()
-
-    return () => {
-      supabase.removeChannel(showSub)
-      supabase.removeChannel(matSub)
-    }
-  }, [])
-
-  const handleSendReminder = async (item: any) => {
-    if (lockouts[item.id]) return
-    setIsSendingReminder(item.id)
-    
-    try {
-      const response = await fetch('/api/n8n/send-reminder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          material_id: item.id,
-          artist_email: item.artistEmail,
-          artist_name: item.artist,
-          item_name: item.document,
-          deadline: item.deadline,
-          show_name: item.venue,
-          portal_token: item.portalToken
+        setStats({
+          totalShows: shows.length,
+          awaitingDocs: awaitingCount,
+          overdueDocs: overdueList.length,
+          upcomingDeals: 0
         })
-      })
-
-      if (!response.ok) throw new Error('Reminder failed')
-
-      toast.success('Reminder Sent', { description: `Manual reminder for ${item.document} sent.` })
-      const expiry = Date.now() + 24 * 60 * 60 * 1000
-      const newLockouts = { ...lockouts, [item.id]: true }
-      setLockouts(newLockouts)
-      
-      const saved = localStorage.getItem('reminder_lockouts')
-      const parsed = saved ? JSON.parse(saved) : {}
-      parsed[item.id] = expiry
-      localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
-    } catch (error) {
-      toast.error('Failed to send reminder.')
+        setOverdueItems(overdueList.slice(0, 5))
+      }
+    } catch (err: any) {
+      console.error('Data Fetch Failure:', err)
+      toast.error('Sync Error', { description: 'Check your connection' })
     } finally {
-      setIsSendingReminder(null)
+      setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchDashboardData()
+
+    const showsSub = supabase.channel('shows-dash').on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, () => fetchDashboardData()).subscribe()
+    const matsSub = supabase.channel('mats-dash').on('postgres_changes', { event: '*', schema: 'public', table: 'materials' }, () => fetchDashboardData()).subscribe()
+
+    return () => {
+      supabase.removeChannel(showsSub)
+      supabase.removeChannel(matsSub)
+    }
+  }, [])
 
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
-          <Music className="h-8 w-8 animate-bounce text-primary/50" />
-          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Refreshing Roster Data...</p>
+        <div className="flex flex-col items-center gap-6">
+          <div className="h-12 w-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60">Preparing your space</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-7xl mx-auto pb-20 pt-8">
+      {/* Header Section - Human Style */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white">ShowReady Dashboard</h1>
-          <p className="text-muted-foreground mt-2 font-medium">Welcome back. Monitoring your active shows and document deadlines.</p>
+           <div className="flex items-center gap-3 mb-4">
+              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Live Updates Active</span>
+           </div>
+           <h1 className="text-6xl font-bold tracking-[-0.05em] text-white leading-tight">
+            Hi, Promoter. <br/>
+            <span className="text-white/40">Here is your week.</span>
+          </h1>
         </div>
-        <Button onClick={() => router.push('/shows')} className="h-12 px-8 bg-primary text-white hover:bg-primary/90 shadow-xl shadow-primary/20 font-pro-data tracking-widest uppercase text-xs rounded-xl">
-          Manage Shows
-        </Button>
+        <div className="flex items-center gap-4">
+           <Button variant="outline" className="h-14 w-14 rounded-2xl bg-white/[0.03] border-white/5 text-white/40 hover:text-white transition-all">
+             <Bell size={20} />
+           </Button>
+           <Button className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-white/90 gap-3 font-bold text-sm tracking-tight transition-transform active:scale-95 shadow-2xl shadow-white/10">
+             <Plus size={20} /> Add New Show
+           </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.name} className="glass-card p-8 rounded-[2rem] flex flex-col justify-between group hover:border-primary/40 transition-all duration-500 bg-muted/5 relative overflow-hidden">
-            <div className={`absolute -right-4 -top-4 p-8 opacity-5 group-hover:opacity-10 transition-opacity rotate-12 ${stat.color}`}>
-                <stat.icon size={80} />
-            </div>
-            <div className={`p-3 w-fit rounded-2xl bg-muted/30 border border-white/5 ${stat.color} group-hover:bg-primary group-hover:text-white transition-all`}>
-                <stat.icon className="h-6 w-6" />
-            </div>
-            <div className="mt-8 relative z-10">
-              <p className="text-[11px] font-pro-data uppercase tracking-widest text-muted-foreground font-bold">{stat.name}</p>
-              <p className="text-4xl font-black mt-2 tracking-tight italic font-pro-data text-white">{stat.value}</p>
-            </div>
+      {/* Main Stats - Minimal & Premium */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[
+          { label: 'Upcoming Shows', value: stats.totalShows, icon: CalendarIcon, color: 'text-white' },
+          { label: 'Awaiting Documents', value: stats.awaitingDocs, icon: Clock4, color: 'text-amber-400' },
+          { label: 'Overdue Clearances', value: stats.overdueDocs, icon: AlertCircle, color: 'text-rose-500' }
+        ].map((stat, i) => (
+          <div key={i} className="group glass-card p-10 rounded-[3rem] border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-700 relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-all group-hover:scale-110">
+                <stat.icon size={120} strokeWidth={1} />
+             </div>
+             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 mb-6">{stat.label}</p>
+             <div className="flex items-end gap-3">
+                <span className={`text-6xl font-bold tracking-tight leading-none ${stat.color}`}>{stat.value}</span>
+                <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white/20 group-hover:text-white/40 transition-colors mb-1">
+                   <ArrowUpRight size={20} />
+                </div>
+             </div>
           </div>
         ))}
       </div>
 
-      <div className="space-y-10">
-        {overdueDocs.length > 0 && (
-          <div className="glass-card rounded-[2.5rem] overflow-hidden border-red-500/20 shadow-2xl shadow-red-500/5">
-            <div className="bg-red-500/10 border-b border-red-500/20 px-8 py-5 flex items-center gap-3">
-              <AlertTriangle className="text-red-500 h-5 w-5" />
-              <h3 className="text-red-500 font-black uppercase font-pro-data tracking-widest text-xs">
-                {overdueDocs.length} overdue documents requiring action
-              </h3>
-            </div>
-            <div className="divide-y divide-white/5 bg-muted/5">
-              {overdueDocs.map((item) => (
-                <div key={item.id} className="p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-6">
-                    <div className="h-14 w-14 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 shadow-lg">
-                      <FileText size={22} />
-                    </div>
-                    <div>
-                      <p className="font-black text-white text-xl uppercase italic tracking-tighter">{item.artist}</p>
-                      <p className="text-sm text-muted-foreground font-medium flex items-center gap-2 mt-1">
-                        {item.venue} <span className="text-white/10">•</span> <span className="text-white/80">{item.document}</span>
-                        <span className="text-red-500/60 ml-2 font-bold">[DUE: {item.deadline}]</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6 justify-between sm:justify-end w-full sm:w-auto">
-                    <span className="text-red-400 font-bold text-xs uppercase bg-red-500/10 px-4 py-2 rounded-xl border border-red-500/20 font-pro-data tracking-widest">
-                      {item.daysLate}d Overdue
-                    </span>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleSendReminder(item)}
-                      disabled={isSendingReminder === item.id || lockouts[item.id]}
-                      className="border-white/10 hover:bg-white/10 font-pro-data uppercase tracking-widest text-[10px] h-12 px-6 rounded-xl gap-3 min-w-[170px]"
-                    >
-                      {isSendingReminder === item.id ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                      {isSendingReminder === item.id ? 'Sending...' : (lockouts[item.id] ? 'Sent' : 'Resend Reminder')}
-                    </Button>
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+        {/* Overdue Section - Human Centric */}
+        <div className="md:col-span-8 flex flex-col">
+          <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-white/[0.02] relative min-h-[500px]">
+             <div className="flex items-center justify-between mb-12">
+                <div>
+                   <h3 className="text-2xl font-bold text-white tracking-tight">Requires Attention</h3>
+                   <p className="text-sm text-muted-foreground/50 mt-1">Items that missed their scheduled deadline.</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest text-primary/60 hover:text-primary">
+                  View Full Report
+                </Button>
+             </div>
 
-        <div className="glass-card rounded-[2.5rem] overflow-hidden border-white/5 bg-muted/5">
-          <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between bg-muted/20">
-            <div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Recent Activity</h3>
-                <p className="text-xs text-muted-foreground mt-1 font-medium">Monitoring the latest roster submissions</p>
-            </div>
-            <Link href="/shows" className="text-[10px] font-pro-data uppercase tracking-widest text-primary hover:underline flex items-center gap-2 font-bold bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
-              View All <ArrowRight size={12} />
-            </Link>
-          </div>
-          <div className="divide-y divide-white/5">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-8 hover:bg-white/[0.02] transition-colors group">
-                  <div className="flex items-center gap-6">
-                    <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 shadow-lg">
-                      <CheckCircle2 size={20} />
+             <div className="space-y-4">
+                {overdueItems.length > 0 ? (
+                  overdueItems.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="group flex items-center justify-between p-6 bg-white/[0.02] border border-white/[0.03] rounded-3xl hover:bg-white/[0.05] hover:border-white/10 transition-all duration-500 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-6">
+                        <div className="h-14 w-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-2xl shadow-rose-500/10 group-hover:scale-110 transition-transform">
+                          <AlertCircle size={22} />
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-white tracking-tight">{item.artist}</p>
+                          <div className="flex items-center gap-3 mt-1 opacity-40">
+                             <span className="text-[11px] font-bold uppercase tracking-widest">{item.venue}</span>
+                             <span className="h-1 w-1 rounded-full bg-white/40" />
+                             <span className="text-[11px] text-rose-500/80 font-bold uppercase tracking-widest">Late: {item.deadline}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                         <Badge className="bg-white/5 text-muted-foreground/60 border-white/5 font-bold uppercase text-[9px] tracking-[0.2em] px-4 h-8 rounded-full">
+                           {item.document}
+                         </Badge>
+                         <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                           <ChevronRight size={18} className="text-white" />
+                         </div>
+                      </div>
                     </div>
-                    <p className="text-base text-muted-foreground font-medium">
-                      <strong className="text-white uppercase italic tracking-tighter">{activity.artist}</strong> submitted <span className="text-white/80">[{activity.document}]</span> for <span className="text-white/80">{activity.venue}</span>
-                    </p>
+                  ))
+                ) : (
+                  <div className="py-24 flex flex-col items-center justify-center text-center opacity-30">
+                    <CheckCircle2 size={40} className="mb-4" />
+                    <p className="font-bold uppercase tracking-widest text-xs">All requirements on schedule.</p>
                   </div>
-                  <span className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/30 font-bold whitespace-nowrap ml-4">
-                    {activity.time}
-                  </span>
-                </div>
-              ))
-            ) : (
-                <div className="p-20 flex flex-col items-center justify-center text-center">
-                    <div className="h-20 w-20 rounded-3xl bg-muted/20 border border-white/5 flex items-center justify-center mb-6">
-                        <FileText size={32} className="text-muted-foreground/20" />
-                    </div>
-                    <p className="text-xl font-black uppercase tracking-tighter italic text-white/40">No recent submissions</p>
-                    <p className="text-sm text-muted-foreground mt-2 max-w-sm font-medium">Your feed will update automatically as soon as artists provide their materials.</p>
-                </div>
-            )}
+                )}
+             </div>
           </div>
+        </div>
+
+        {/* Quick Links - Premium Style */}
+        <div className="md:col-span-4 flex flex-col gap-8">
+           <div className="glass-card rounded-[3.5rem] p-10 bg-white border-white shadow-[0_30px_60px_-15px_rgba(255,255,255,0.1)] group">
+              <Music className="text-black mb-8 group-hover:rotate-12 transition-transform" size={40} strokeWidth={1.5} />
+              <h4 className="text-2xl font-bold text-black tracking-tight leading-tight mb-4">Launch New Artist Roster</h4>
+              <p className="text-sm text-black/50 font-medium leading-relaxed mb-10">Start a new collection workflow and share the portal with your artist.</p>
+              <Button className="w-full h-16 bg-black text-white hover:bg-zinc-800 rounded-3xl font-bold text-sm tracking-tight transition-transform active:scale-95">
+                Get Started
+              </Button>
+           </div>
+
+           <div className="glass-card rounded-[3.5rem] p-10 border-white/5 bg-white/[0.02] flex flex-col gap-6">
+              <h5 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/30 mb-2">Live Support</h5>
+              <div className="flex items-center gap-4 group">
+                 <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-primary transition-colors">
+                   <Clock size={20} />
+                 </div>
+                 <div>
+                    <p className="font-bold text-white tracking-tight text-sm">Scheduled Maintenance</p>
+                    <p className="text-xs text-muted-foreground/40 mt-1">Today at 2:00 AM UTC</p>
+                 </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>
