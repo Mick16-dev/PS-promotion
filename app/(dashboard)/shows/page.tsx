@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -46,80 +46,82 @@ export default function ShowsPage() {
   const [shows, setShows] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  React.useEffect(() => {
-    async function fetchShows() {
-      try {
-        setIsLoading(true)
-        const { data, error } = await supabase
-          .from('shows')
-          .select(`
-            id,
-            venue_name,
-            city,
-            date,
-            time,
-            status,
-            artist:artist_id ( name ),
-            materials ( status )
-          `)
-          
-        if (data && !error) {
-           const formattedShows = data.map(show => {
-             const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
-            const artistName = artistInfo?.name || 'Unnamed Artist'
-             
-             let delivered = 0
-             let total = show.materials?.length || 0
-             
-             if (show.materials) {
-                show.materials.forEach((mat: any) => {
-                   if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
-                      delivered++
-                   }
-                })
-             }
-             
-             let dateStr = show.date
-             if (show.date) {
-               try {
-                 dateStr = new Date(show.date).toLocaleDateString(undefined, {
-                   year: 'numeric',
-                   month: 'short',
-                   day: 'numeric'
-                 })
-               } catch(e) {}
-             }
-             
-             return {
-               id: show.id,
-               artist: artistName,
-              venue: show.venue_name || 'Venue TBD',
-               city: show.city || '',
-               date: dateStr || 'TBD',
-               time: show.time || 'TBD',
-               status: show.status || 'Upcoming',
-               docsDelivered: delivered,
-               docsTotal: total
-             }
-           })
+  const fetchShows = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const { data, error } = await supabase
+        .from('shows')
+        .select(`
+          id,
+          venue_name,
+          city,
+          date,
+          time,
+          status,
+          artist:artist_id ( name ),
+          materials ( status )
+        `)
+        
+      if (data && !error) {
+         const formattedShows = data.map(show => {
+           const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
+          const artistName = artistInfo?.name || 'Unnamed Artist'
            
-           setShows(formattedShows)
-        }
-      } catch (err) {
-        console.error("Failed to fetch shows:", err)
-      } finally {
-        setIsLoading(false)
+           let delivered = 0
+           let total = show.materials?.length || 0
+           
+           if (show.materials) {
+              show.materials.forEach((mat: any) => {
+                 if (mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted') {
+                    delivered++
+                 }
+              })
+           }
+           
+           let dateStr = show.date
+           if (show.date) {
+             try {
+               dateStr = new Date(show.date).toLocaleDateString(undefined, {
+                 year: 'numeric',
+                 month: 'short',
+                 day: 'numeric'
+               })
+             } catch(e) {}
+           }
+           
+           return {
+             id: show.id,
+             artist: artistName,
+            venue: show.venue_name || 'Venue TBD',
+             city: show.city || '',
+             date: dateStr || 'TBD',
+             time: show.time || 'TBD',
+             status: show.status || 'Upcoming',
+             docsDelivered: delivered,
+             docsTotal: total
+           }
+         })
+         
+         setShows(formattedShows)
       }
+    } catch (err) {
+      console.error("Failed to fetch shows:", err)
+    } finally {
+      setIsLoading(false)
     }
-    fetchShows()
   }, [])
+
+  React.useEffect(() => {
+    fetchShows()
+  }, [fetchShows])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Upcoming':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">Upcoming</Badge>
+      case 'pending':
       case 'Awaiting Documents':
         return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20">Awaiting Documents</Badge>
+      case 'Upcoming':
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">Upcoming</Badge>
       case 'Ready':
         return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Ready</Badge>
       case 'Show Day':
@@ -299,7 +301,11 @@ export default function ShowsPage() {
         </Table>
       </div>
 
-      <CreateShowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateShowModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchShows}
+      />
     </div>
   )
 }

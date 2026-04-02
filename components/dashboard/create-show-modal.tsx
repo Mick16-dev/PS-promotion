@@ -27,6 +27,7 @@ import { supabase } from '@/lib/supabase'
 interface CreateShowModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
 const defaultDocs = [
@@ -37,7 +38,7 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
-export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
+export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [artists, setArtists] = useState<any[]>([])
   const [isLoadingArtists, setIsLoadingArtists] = useState(false)
@@ -165,6 +166,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       })
       
       onClose()
+      onSuccess?.()
       
       // Reset form
       setVenue('')
