@@ -15,9 +15,21 @@ function isAuthPath(pathname: string) {
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
 
+  const supabaseUrl =
+    process.env.SUPABASE_URL ??
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    ''
+  const supabaseAnonKey =
+    process.env.SUPABASE_ANON_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    ''
+
+  // If env isn't set (common on first deploy), don't hard-block the whole site with middleware errors.
+  if (!supabaseUrl || !supabaseAnonKey) return response
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {

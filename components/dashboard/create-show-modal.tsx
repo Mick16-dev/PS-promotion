@@ -37,8 +37,6 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK || ''
-
 export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [artists, setArtists] = useState<any[]>([])
@@ -60,12 +58,39 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     if (isOpen) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
+<<<<<<< HEAD
         const { data, error } = await supabase.from('artists').select('id, name')
         if (data && !error) {
           setArtists(data)
           if (data.length > 0) setSelectedArtistId(data[0].id)
+=======
+        try {
+          const { data, error } = await supabase.from('artists').select('id, name')
+
+          if (error) {
+            console.error('Failed to fetch artists:', error)
+            const urlHint =
+              typeof window !== 'undefined'
+                ? (process.env.NEXT_PUBLIC_SUPABASE_URL || '').split('.supabase.co')[0].slice(-12)
+                : ''
+            toast.error('Could not load artists.', {
+              description: `Supabase query failed (table: artists${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
+            })
+          } else if (data) {
+            setArtists(data)
+            if (data.length > 0) {
+              setSelectedArtistId((prev) => prev || data[0].id)
+            } else {
+              toast.error('No artists available.', {
+                description:
+                  'Your artist table returned 0 rows. This is usually caused by Row Level Security (RLS) blocking reads, or the row being in a different table (artist vs artists).',
+              })
+            }
+          }
+        } finally {
+          setIsLoadingArtists(false)
+>>>>>>> 9aac17ef09acd592c9377945794d838b5e056308
         }
-        setIsLoadingArtists(false)
       }
       fetchArtists()
     }
@@ -97,10 +122,6 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     setIsSubmitting(true)
     
     try {
-      if (!N8N_WEBHOOK_URL) {
-        throw new Error('Create-show webhook is not configured.')
-      }
-
       // Prepare data for n8n
       const payload = {
         artist_id: selectedArtistId,
@@ -116,15 +137,20 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         timestamp: new Date().toISOString()
       }
 
-      // POST to n8n
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
+      const response = await fetch('/api/n8n/create-show', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
 
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`)
+        let details = ''
+        try {
+          const json = await response.json()
+          details = json?.error || json?.details || json?.body || ''
+        } catch {}
+        throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
       }
       
       toast.success('Show created.', {
@@ -148,7 +174,12 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
       <DialogContent className="sm:max-w-[600px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-y-auto max-h-[90vh] rounded-[2rem]">
         {/* Luminous Header Gradient */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
@@ -165,7 +196,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         <form onSubmit={handleSubmit} className="px-8 py-6 space-y-8 relative z-10 bg-black/20">
           <div className="space-y-6">
             {/* Context Fields */}
-            <div className="space-y-3">
+            <div className="space-y-3 pb-2">
               <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist</Label>
               <Select 
                 value={selectedArtistId} 

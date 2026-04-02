@@ -1,17 +1,27 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-let supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
-let supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim()
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim()
 
-console.log('Supabase FINAL FIX Check:', {
-  urlExists: !!supabaseUrl,
-  urlStart: supabaseUrl.substring(0, 10),
-  keyExists: !!supabaseAnonKey,
-  keyLength: supabaseAnonKey.length
-})
-
-if (supabaseUrl.includes('placeholder') || supabaseAnonKey.includes('placeholder')) {
-  console.warn('Supabase credentials are missing or using placeholders. Dashboard login will fail.')
+if (!supabaseUrl || !supabaseAnonKey) {
+  // Keep this intentionally terse to avoid accidentally leaking anything into client logs.
+  console.warn('Supabase env vars missing. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.')
 }
 
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
+export const supabase = (() => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Avoid throwing during Next.js build/prerender; fail only if code actually tries to use Supabase.
+    return new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(
+            'Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.',
+          )
+        },
+      },
+    ) as any
+  }
+
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+})()

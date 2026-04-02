@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { LanguageProvider } from './context/language-context'
+import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const inter = Inter({ 
@@ -43,11 +45,14 @@ export default function RootLayout({
         {/* Ambient Lumina Effect Layer */}
         <div className="fixed inset-0 pointer-events-none lumina-glow opacity-50 z-0" />
         
-        <LanguageProvider>
-          <main className="relative z-10 flex min-h-screen flex-col">
-            {children}
-          </main>
-        </LanguageProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <LanguageProvider>
+            <main className="relative z-10 flex min-h-screen flex-col">
+              {children}
+            </main>
+          </LanguageProvider>
+          <Toaster richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   )
