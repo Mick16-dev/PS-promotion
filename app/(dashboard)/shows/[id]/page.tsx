@@ -1,28 +1,25 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { toast } from 'sonner'
+import { useParams, useRouter } from 'next/navigation'
 import { 
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Clock3,
+  ArrowLeft, 
+  MapPin, 
+  Calendar as CalendarIcon, 
+  Clock, 
+  User, 
+  Mail, 
+  CheckCircle2, 
+  Circle, 
+  Clock4,
   ExternalLink,
-  Copy,
-  Mail,
-  Download,
-  Eye,
-  Send,
-  AlertTriangle,
-  Music,
-  Loader2
+  ChevronRight,
+  Plus,
+  MoreHorizontal
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
 interface ShowDetailPageProps {
@@ -30,503 +27,287 @@ interface ShowDetailPageProps {
 }
 
 export default function ShowDetailPage({ params }: ShowDetailPageProps) {
-  const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [showInfo, setShowInfo] = useState<any>(null)
-  const [documents, setDocuments] = useState<any[]>([])
-  const [reliability, setReliability] = useState<any>(null)
-  const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
-  const [id, setId] = useState<string | null>(null)
+  const router = useRouter()
+  const { id } = React.use(params)
   
-  useEffect(() => {
-    async function getParams() {
-      const resolvedParams = await params
-      setId(resolvedParams.id)
-    }
-    getParams()
-  }, [params])
+  const [show, setShow] = useState<any>(null)
+  const [materials, setMaterials] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [reliability, setReliability] = useState({ score: 100 })
 
-  useEffect(() => {
-    if (!id) return
-    // Load lockouts from local storage
-    const savedLockouts = localStorage.getItem('reminder_lockouts')
-    if (savedLockouts) {
-      try {
-        const parsed = JSON.parse(savedLockouts)
-        const now = Date.now()
-        const activeLockouts: Record<string, boolean> = {}
-        Object.keys(parsed).forEach(lid => {
-          if (now < parsed[lid]) activeLockouts[lid] = true
+  async function fetchShowData() {
+    try {
+      setIsLoading(true)
+      
+      // Fetch show info separately
+      const { data: showData, error: showErr } = await supabase
+        .from('shows')
+        .select(`
+          id,
+          venue,
+          city,
+          show_date,
+          show_time,
+          status,
+          portal_url,
+          artist_name,
+          artist_email
+        `)
+        .eq('id', id)
+        .single()
+        
+      if (showErr) throw showErr
+
+      // Fetch materials info separately to avoid PGRST200 Join errors
+      const { data: matsData } = await supabase
+        .from('materials')
+        .select('*')
+        .eq('show_id', id)
+
+      if (showData) {
+        setShow({
+          ...showData,
+          portalUrl: showData.portal_url || (typeof window !== 'undefined' ? `${window.location.origin}/portal/${id}` : `/portal/${id}`)
         })
-        setLockouts(activeLockouts)
-      } catch (e) {}
-    }
-
-    async function fetchShowDetail() {
-      try {
-        setIsLoading(true)
-
-        // Fetch the show with related artist and documents
-        const { data: show, error } = await supabase
-          .from('shows')
-          .select(`
-            id,
-            venue,
-            city,
-            show_date,
-            show_time,
-            status,
-            artist_name,
-            artist_email,
-            materials (
-              id,
-              item_name,
-              status,
-              deadline,
-              submitted_at,
-              file_url
-            )
-          `)
-          .eq('id', id)
-          .single()
-
-        if (error) {
-          console.error('Supabase Detail Error:', error)
-          toast.error("Database Error", { description: error.message })
-          setIsLoading(false)
-          return
-        }
-
-        if (!show) {
-          setIsLoading(false)
-          return
-        }
-
-        const now = new Date()
-        const now2 = new Date()
-
-        // Calculate show status
-        let computedStatus = show.status || 'Upcoming'
-        if (show.show_date) {
-          const showDate = new Date(show.show_date)
-          const isToday = showDate.toDateString() === now.toDateString()
-          const isPast = showDate < now && !isToday
-          const allMats = show.materials || []
-          const allDelivered = allMats.length > 0 && allMats.every(
-            (m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted'
-          )
-
-          if (isPast) computedStatus = 'Complete'
-          else if (isToday) computedStatus = 'Show Day'
-          else if (allDelivered) computedStatus = 'Ready'
-          else computedStatus = 'Awaiting Documents'
-        }
-
-        // Format date
-        let dateStr = 'TBD'
-        if (show.show_date) {
-          try {
-            dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
-              year: 'numeric', month: 'short', day: 'numeric'
-            })
-          } catch (e) {}
-        }
-
-        setShowInfo({
-          artist: show.artist_name || 'Unnamed Artist',
-          artistEmail: show.artist_email || '',
-          artistId: show.artist_id || '',
-          venue: show.venue || 'Venue TBD',
-          city: show.city || '',
-          date: dateStr,
-          rawDate: show.show_date,
-          time: show.show_time || 'TBD',
-          status: computedStatus,
-          portalUrl: show.portal_url || (typeof window !== 'undefined' ? `${window.location.origin}/portal/${id}` : `/portal/${id}`)
-        })
-
-        // Process show documents
-        const mats = show.materials || []
+        
+        const mats = matsData || []
         const formattedDocs = mats.map((mat: any) => {
-          const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
-          let docStatus: 'delivered' | 'awaiting' | 'late' = 'awaiting'
-
-          if (isDelivered) {
-            docStatus = 'delivered'
-          } else if (mat.deadline && new Date(mat.deadline) < now2) {
-            docStatus = 'late'
-          }
-
-          let deadlineStr = ''
-          let daysInfo = ''
-          if (mat.deadline) {
-            const dl = new Date(mat.deadline)
-            deadlineStr = dl.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-            const diffMs = dl.getTime() - now2.getTime()
-            const diffDays = Math.ceil(diffMs / (1000 * 3600 * 24))
-            if (!isDelivered) {
-              if (diffDays < 0) daysInfo = `${Math.abs(diffDays)} days overdue`
-              else if (diffDays === 0) daysInfo = 'Due today'
-              else daysInfo = `${diffDays} days remaining`
-            }
-          }
-
-          let submittedStr = ''
-          if (mat.submitted_at) {
-            submittedStr = new Date(mat.submitted_at).toLocaleDateString(undefined, {
-              year: 'numeric', month: 'long', day: 'numeric'
-            })
-          }
+          const deadline = mat.deadline ? new Date(mat.deadline) : null
+          const now = new Date()
+          const isOverdue = deadline && deadline < now && (mat.status?.toLowerCase() !== 'delivered' && mat.status?.toLowerCase() !== 'submitted')
+          
+          let docStatus = mat.status || 'awaiting'
+          if (isOverdue) docStatus = 'overdue'
 
           return {
             id: mat.id,
             name: mat.item_name || 'Document',
             status: docStatus,
-            deadline: deadlineStr,
-            rawDeadline: mat.deadline,
-            submittedAt: submittedStr,
-            daysInfo,
-            fileUrl: mat.file_url || ''
+            deadline: mat.deadline || 'TBD',
+            submitted_at: mat.submitted_at,
+            file_url: mat.file_url
           }
         })
-
-        setDocuments(formattedDocs)
-
-        // Fetch reliability directly from the artist table based on name
-        if (show.artist_name) {
-          const { data: artistRel } = await supabase
-            .from('artists')
-            .select('reliability_score')
-            .eq('name', show.artist_name)
-            .single()
-            
-          if (artistRel) {
-            setReliability({
-              score: artistRel.reliability_score ?? 100
-            })
-          }
-        }
-
-      } catch (err) {
-        console.error('Error loading show detail:', err)
-      } finally {
-        setIsLoading(false)
+        setMaterials(formattedDocs)
       }
+    } catch (err: any) {
+      console.error('Failed to load show detail:', err)
+      toast.error('Could not load show details.')
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    fetchShowDetail()
+  useEffect(() => {
+    fetchShowData()
 
-    // Real-time listener for materials updates
-    const subscription = supabase
-      .channel(`material-updates-${id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'materials',
-          filter: `show_id=eq.${id}`
-        },
-        () => {
-          fetchShowDetail() // Re-fetch all data when a document changes
-        }
-      )
-      .subscribe()
+    // Real-time listeners for current show and materials
+    const showSub = supabase.channel(`show-${id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'shows', filter: `id=eq.${id}` }, () => fetchShowData()).subscribe()
+    const matSub = supabase.channel(`mats-${id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'materials', filter: `show_id=eq.${id}` }, () => fetchShowData()).subscribe()
 
     return () => {
-      supabase.removeChannel(subscription)
+      supabase.removeChannel(showSub)
+      supabase.removeChannel(matSub)
     }
   }, [id])
 
-  const handleReminder = async (doc: any) => {
-    if (lockouts[doc.id]) return
-
-    setIsSendingReminder(doc.id)
-    
-    try {
-      const payload = {
-        material_id: doc.id,
-        artist_email: showInfo?.artistEmail,
-        artist_name: showInfo?.artist,
-        item_name: doc.name,
-        deadline: doc.rawDeadline,
-        show_name: showInfo?.venue,
-        portal_token: showInfo?.artistId // fallback to artist id if portal token not explicit
-      }
-
-      const response = await fetch('/api/n8n/send-reminder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) throw new Error('Reminder failed')
-
-      toast.success('Reminder Sent', {
-        description: `Requested ${doc.name} update.`
-      })
-
-      // Set 24h lockout
-      const expiry = Date.now() + 24 * 60 * 60 * 1000
-      const newLockouts = { ...lockouts, [doc.id]: true }
-      setLockouts(newLockouts)
-
-      const savedLockouts = localStorage.getItem('reminder_lockouts')
-      const parsed = savedLockouts ? JSON.parse(savedLockouts) : {}
-      parsed[doc.id] = expiry
-      localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
-
-    } catch (error) {
-      toast.error('Failed to send reminder. Try again later.')
-    } finally {
-      setIsSendingReminder(null)
-    }
-  }
-
-  const handleCopyLink = () => {
-    if (!showInfo?.portalUrl) return
-    navigator.clipboard.writeText(showInfo.portalUrl)
-    toast.success('Portal Link Copied', { description: 'Link copied to clipboard.' })
-  }
-
-  const getReliabilityStatus = (score: number) => {
-    if (score >= 80) return { label: 'Reliable', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', barColor: 'bg-emerald-500' }
-    if (score >= 50) return { label: 'Inconsistent', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/20', barColor: 'bg-amber-500' }
-    return { label: 'Unreliable', color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/20', barColor: 'bg-red-500' }
-  }
-
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'Ready': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-      case 'Awaiting Documents': return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-      case 'Show Day': return 'bg-primary/20 text-primary border-primary/30'
-      case 'Complete': return 'bg-muted text-muted-foreground border-border'
-      default: return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-    }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
-          <Music className="h-8 w-8 animate-bounce text-primary/50" />
-          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading Show...</p>
-        </div>
+  if (isLoading) return (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
+        <Clock className="h-8 w-8 animate-bounce text-primary/50" />
+        <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Synchronizing Show Intelligence...</p>
       </div>
-    )
-  }
+    </div>
+  )
 
-  if (!showInfo) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center text-center">
-        <div>
-          <p className="text-xl font-bold text-white">Show not found.</p>
-          <Link href="/shows" className="text-primary mt-4 inline-block hover:underline">← Back to All Shows</Link>
-        </div>
-      </div>
-    )
-  }
+  if (!show) return (
+    <div className="flex flex-col items-center justify-center py-32 text-center">
+      <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white mb-4">Show not found.</h3>
+      <Button variant="link" onClick={() => router.push('/shows')} className="text-primary gap-2">
+        <ArrowLeft size={16} /> Back to All Shows
+      </Button>
+    </div>
+  )
 
-  const relStatus = reliability ? getReliabilityStatus(reliability.score) : getReliabilityStatus(100)
-  const deliveredCount = documents.filter(d => d.status === 'delivered').length
+  const deliveredCount = materials.filter(m => m.status.toLowerCase() === 'delivered' || m.status.toLowerCase() === 'submitted').length
+  const totalCount = materials.length
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-7xl mx-auto">
-      {/* HEADER SECTION */}
-      <div className="space-y-6">
-        <Link href="/shows" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-white transition-colors font-bold group">
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
-          All Shows
-        </Link>
-        
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <div className="space-y-4">
-            <h1 className="text-5xl font-black uppercase tracking-tighter italic text-white leading-none">
-              {showInfo.artist}
-            </h1>
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-medium text-lg">
-              <span className="flex items-center gap-2 text-white"><MapPin size={18} className="text-primary" /> {showInfo.venue}</span>
-              {showInfo.city && <><span className="text-white/20">•</span><span className="text-foreground">{showInfo.city}</span></>}
-              <span className="text-white/20">•</span>
-              <span className="flex items-center gap-2 font-pro-data uppercase tracking-widest text-sm font-bold"><Calendar size={18} className="text-primary" /> {showInfo.date}</span>
-              <span className="text-white/20">•</span>
-              <span className="flex items-center gap-2 font-pro-data uppercase tracking-widest text-sm font-bold"><Clock size={18} className="text-primary" /> {showInfo.time}</span>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20 max-w-7xl mx-auto">
+      {/* Header & Navigation */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div>
+          <button onClick={() => router.push('/shows')} className="group flex items-center gap-3 text-muted-foreground hover:text-white transition-all mb-4 text-xs font-bold uppercase tracking-widest font-pro-data">
+            <div className="h-8 w-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+              <ArrowLeft size={14} />
             </div>
-          </div>
-          <Badge variant="outline" className={`${getStatusBadgeClass(showInfo.status)} text-sm py-2 px-6 rounded-full font-bold uppercase tracking-widest self-start lg:self-auto`}>
-            {showInfo.status}
-          </Badge>
+            Back to Shows
+          </button>
+          <h1 className="text-6xl font-black tracking-tighter uppercase italic text-white leading-none">{show.artist_name}</h1>
+          <p className="text-xl font-medium text-muted-foreground mt-4 flex items-center gap-3 uppercase tracking-tight">
+            <MapPin size={22} className="text-primary/60" />
+            {show.venue}, {show.city}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-4">
+          <Button 
+            className="bg-white/10 text-white hover:bg-white/20 h-14 px-8 rounded-2xl gap-3 font-pro-data uppercase tracking-widest text-[11px] border border-white/5"
+            onClick={() => window.open(show.portalUrl, '_blank')}
+          >
+            <ExternalLink size={18} /> Portal Preview
+          </Button>
+          <Button className="bg-primary text-white hover:bg-primary/90 h-14 px-10 rounded-2xl gap-3 font-pro-data uppercase tracking-widest text-[11px] shadow-2xl shadow-primary/20">
+            Resend All Links
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* DOCUMENTS SECTION */}
-        <div className="lg:col-span-8 space-y-6">
-          <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-            Show Documents
-            <span className="h-6 px-3 rounded-full bg-white/5 border border-white/10 text-[10px] flex items-center justify-center text-muted-foreground font-pro-data tracking-[0.2em]">
-              {deliveredCount} OF {documents.length} DELIVERED
-            </span>
-          </h2>
-          
-          {documents.length === 0 ? (
-            <div className="glass-card rounded-3xl p-12 flex flex-col items-center justify-center text-center border-white/5 bg-muted/5">
-              <p className="text-muted-foreground font-medium">No documents have been set up for this show yet.</p>
+        {/* Main Details Panel */}
+        <div className="lg:col-span-8 flex flex-col gap-10">
+          {/* Logistics Summary */}
+          <div className="glass-card rounded-[3rem] p-12 border-white/5 bg-muted/5 grid grid-cols-1 md:grid-cols-3 gap-12 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="space-y-3 relative z-10">
+              <span className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-black flex items-center gap-2">
+                <CalendarIcon size={14} className="text-primary/60" /> Date
+              </span>
+              <p className="text-4xl font-black italic uppercase tracking-tighter text-white font-pro-data leading-none mt-2">{show.show_date}</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {documents.map((doc) => {
-                const isDelivered = doc.status === 'delivered'
-                const isLate = doc.status === 'late'
-                const isAwaiting = doc.status === 'awaiting'
-
-                return (
-                  <div
-                    key={doc.id}
-                    className={`glass-card rounded-3xl p-6 transition-all bg-muted/5 ${
-                      isDelivered ? 'border-emerald-500/20 hover:border-emerald-500/40 shadow-[0_4px_30px_rgba(16,185,129,0.05)]' :
-                      isLate ? 'border-red-500/30 hover:border-red-500/50 bg-red-500/[0.02] shadow-[0_4px_30px_rgba(239,68,68,0.08)]' :
-                      'border-amber-500/20 hover:border-amber-500/40 shadow-[0_4px_30px_rgba(245,158,11,0.05)]'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          {isDelivered && <CheckCircle2 className="text-emerald-400 h-6 w-6" />}
-                          {isAwaiting && <Clock3 className="text-amber-500 h-6 w-6" />}
-                          {isLate && <AlertTriangle className="text-red-500 h-6 w-6" />}
-                          <h3 className="text-xl font-bold tracking-tight text-white">{doc.name}</h3>
-                          <Badge variant="outline" className={`font-bold uppercase tracking-widest text-[10px] ${
-                            isDelivered ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                            isLate ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                            'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                          }`}>
-                            {isDelivered ? 'Delivered' : isLate ? 'Late' : 'Awaiting'}
-                          </Badge>
-                        </div>
-                        <div className="mt-2 ml-9 space-y-1">
-                          {isDelivered && doc.submittedAt && (
-                            <p className="text-sm text-muted-foreground font-medium">Submitted {doc.submittedAt}</p>
-                          )}
-                          {!isDelivered && doc.deadline && (
-                            <p className="text-sm text-muted-foreground font-medium">
-                              {isLate ? `Was due ${doc.deadline}` : `Due by ${doc.deadline}`}
-                            </p>
-                          )}
-                          {!isDelivered && doc.daysInfo && (
-                            <p className={`text-xs font-bold font-pro-data uppercase tracking-widest ${
-                              isLate ? 'text-red-500' : 'text-amber-500/80'
-                            }`}>{doc.daysInfo}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="ml-9 sm:ml-0 flex items-center gap-3">
-                        {isDelivered ? (
-                          <>
-                            {doc.fileUrl && (
-                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => window.open(doc.fileUrl, '_blank')}>
-                                <Eye size={14} /> Preview File
-                              </Button>
-                            )}
-                            {doc.fileUrl && (
-                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => toast.success(`Downloading ${doc.name}...`)}>
-                                <Download size={14} /> Download
-                              </Button>
-                            )}
-                          </>
-                        ) : isLate ? (
-                          <Button
-                            variant="default"
-                            onClick={() => handleReminder(doc)}
-                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                            className="bg-red-500 text-white hover:bg-red-600 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-11 px-6 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95 min-w-[170px]"
-                          >
-                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />)}
-                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Urgent Reminder')}
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            onClick={() => handleReminder(doc)}
-                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                            className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-400 border-amber-500/20 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-5 rounded-xl transition-colors min-w-[150px]"
-                          >
-                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <Send size={14} />)}
-                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Reminder')}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+            <div className="space-y-3 relative z-10 border-l border-white/5 pl-12">
+              <span className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-black flex items-center gap-2">
+                <Clock size={14} className="text-primary/60" /> Schedule
+              </span>
+              <p className="text-4xl font-black italic uppercase tracking-tighter text-white font-pro-data leading-none mt-2">{show.show_time}</p>
             </div>
-          )}
-        </div>
-
-        {/* SIDEBAR */}
-        <div className="lg:col-span-4 space-y-8">
-            
-          {/* ARTIST PORTAL SECTION */}
-          <div className="glass-card rounded-3xl p-8 border-white/5 bg-muted/10 space-y-6">
-            <div>
-              <h3 className="text-lg font-black uppercase tracking-tighter italic text-white flex items-center gap-3">
-                <ExternalLink size={20} className="text-primary" /> Artist Portal Link
-              </h3>
-              <p className="text-sm text-muted-foreground mt-2 font-medium">This is the secure link the artist uses to upload documents.</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-black/40 border border-white/10 overflow-hidden group">
-                <p className="text-xs font-mono text-muted-foreground/80 truncate group-hover:text-white transition-colors select-all">
-                  {showInfo.portalUrl}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 gap-2 h-12 rounded-xl text-xs font-bold bg-white/5" onClick={handleCopyLink}>
-                  <Copy size={16} /> Copy Link
-                </Button>
-                <Button className="flex-1 bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 gap-2 h-12 rounded-xl text-xs font-bold" onClick={() => toast.success('Portal email re-sent to artist.')}>
-                  <Mail size={16} /> Resend Email
-                </Button>
+            <div className="space-y-3 relative z-10 border-l border-white/5 pl-12">
+               <span className="font-pro-data uppercase tracking-widest text-[10px] text-muted-foreground font-black flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-primary/60" /> Progress
+              </span>
+              <div className="flex items-center gap-4 mt-2">
+                 <p className="text-4xl font-black italic uppercase tracking-tighter text-white font-pro-data leading-none">{deliveredCount}/{totalCount}</p>
               </div>
             </div>
           </div>
 
-          {/* ARTIST RELIABILITY SECTION */}
-          {reliability && (
-            <div className="glass-card rounded-3xl p-8 border-white/5 bg-muted/10 space-y-6 relative overflow-hidden">
-              <div className="absolute -right-4 -top-4 opacity-5 rotate-12">
-                <CheckCircle2 size={120} className={relStatus.color} />
-              </div>
-              
-              <div className="relative z-10">
-                <h3 className="text-lg font-black uppercase tracking-tighter italic text-white flex items-center justify-between">
-                  Artist Reliability
-                  <Badge variant="outline" className={`${relStatus.bg} ${relStatus.color} uppercase tracking-widest text-[10px] font-bold`}>{relStatus.label}</Badge>
+          {/* Checklist Panel */}
+          <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-muted/5 relative overflow-hidden group min-h-[600px] flex flex-col">
+            <div className="flex items-center justify-between mb-10 px-4 pt-4">
+              <div>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
+                  Material Checklist
                 </h3>
-                
-                <div className="mt-8 flex items-end gap-3">
-                  <span className="text-7xl font-black tracking-tighter italic font-pro-data leading-none text-white">{reliability.score}</span>
-                  <span className="text-sm font-pro-data text-muted-foreground uppercase tracking-widest font-bold mb-2">Out of 100</span>
-                </div>
-
-                <div className="mt-6 flex-1 h-3 bg-black/40 rounded-full overflow-hidden border border-white/5 shadow-inner">
-                  <div 
-                    className={`h-full rounded-full opacity-80 ${relStatus.barColor}`}
-                    style={{ width: `${reliability.score}%`, transition: 'width 1s ease-in-out' }}
-                  />
-                </div>
-
-                <div className="mt-8">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Reliability is pulled directly from the backend as verified by automated submission monitoring.
-                  </p>
-                </div>
+                <p className="text-muted-foreground font-medium mt-2">Monitoring document deliverability for this show.</p>
               </div>
+              <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-white/5 hover:bg-white/10 text-white border border-white/5">
+                <Plus size={24} />
+              </Button>
             </div>
-          )}
+
+            <div className="space-y-4 px-2">
+              {materials.length > 0 ? (
+                materials.map((doc) => {
+                  const isDone = doc.status.toLowerCase() === 'delivered' || doc.status.toLowerCase() === 'submitted'
+                  const isOverdue = doc.status.toLowerCase() === 'overdue'
+                  
+                  return (
+                    <div 
+                      key={doc.id} 
+                      className={`flex items-center justify-between font-bold text-sm bg-muted/20 border border-white/5 p-8 rounded-3xl group/item hover:bg-white/[0.05] transition-all hover:border-white/10 cursor-pointer`}
+                    >
+                      <div className="flex items-center gap-8">
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all duration-500 border ${isDone ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : (isOverdue ? 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'bg-white/5 text-muted-foreground/30 border-white/5')}`}>
+                          {isDone ? <CheckCircle2 size={24} /> : (isOverdue ? <AlertCircle size={24} /> : <Circle size={20} />)}
+                        </div>
+                        <div>
+                          <p className={`text-xl font-black uppercase italic tracking-tighter transition-colors ${isDone ? 'text-emerald-400' : 'text-white'}`}>{doc.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1 font-bold font-pro-data uppercase tracking-widest opacity-60">Status: {doc.status}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-10">
+                        <div className="text-right flex flex-col items-end">
+                          <span className="text-[10px] font-pro-data text-muted-foreground/30 uppercase tracking-[0.2em] font-black pb-1">Deadline</span>
+                          <span className={`text-xs font-pro-data font-black tracking-widest uppercase ${isOverdue ? 'text-red-400' : 'text-white/60'}`}>{doc.deadline}</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-12 w-12 text-muted-foreground/40 hover:text-white rounded-2xl group-hover/item:bg-white/10 transition-all">
+                          <MoreHorizontal size={20} />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="py-20 flex flex-col items-center justify-center text-center opacity-40">
+                  <FileText size={48} className="mb-4" />
+                  <p className="uppercase tracking-widest text-xs font-black font-pro-data">No specific documents required yet.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Info Panels */}
+        <div className="lg:col-span-4 flex flex-col gap-10">
+           {/* Artist Contact Panel */}
+           <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-muted/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
+                  <User size={120} className="text-primary" />
+              </div>
+              <h3 className="text-lg font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3">
+                  <User size={18} className="text-primary" /> Artist Intelligence
+              </h3>
+              
+              <div className="space-y-10">
+                  <div>
+                      <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black mb-3">Primary Contact</p>
+                      <h4 className="text-2xl font-black uppercase italic italic tracking-tighter text-white">{show.artist_name}</h4>
+                      <p className="text-muted-foreground mt-2 font-bold font-pro-data text-sm flex items-center gap-3">
+                          <Mail size={16} className="text-primary/40" />
+                          {show.artist_email || 'No email provided'}
+                      </p>
+                  </div>
+
+                  <div className="pt-10 border-t border-white/5">
+                      <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black mb-6">Historical Reliability</p>
+                      <div className="flex items-center justify-between mb-4">
+                          <span className="text-white font-black text-4xl italic tracking-tighter font-pro-data">{reliability.score}%</span>
+                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 uppercase font-bold tracking-widest text-[9px] px-3 py-1.5 rounded-lg">High Performance</Badge>
+                      </div>
+                      <div className="w-full h-3 bg-white/5 rounded-2xl overflow-hidden shadow-inner border border-white/5">
+                        <div className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-[2000ms]" style={{ width: `${reliability.score}%` }} />
+                      </div>
+                  </div>
+              </div>
+           </div>
+
+           {/* Portal Management Panel */}
+           <div className="glass-card rounded-[3rem] p-10 border-white/5 bg-ebony-950/80 shadow-2xl relative overflow-hidden group border-primary/20">
+              <div className="absolute top-0 left-0 w-1 bg-primary h-full opacity-60" />
+              <h3 className="text-lg font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3 text-white">
+                  <ExternalLink size={18} className="text-primary" /> Portal Intelligence
+              </h3>
+              
+              <p className="text-muted-foreground text-sm font-medium leading-relaxed">
+                  Artists manage their submissions through a private, password-less portal. You are monitoring this active link.
+              </p>
+
+              <div className="mt-8 p-6 bg-muted/40 rounded-3xl border border-white/5 flex flex-col gap-4">
+                  <p className="text-[10px] font-pro-data text-muted-foreground/40 uppercase tracking-[0.2em] font-black">Public Workflow Link</p>
+                  <p className="text-xs font-bold text-primary truncate font-pro-data tracking-tight">{show.portalUrl}</p>
+              </div>
+
+               <Button 
+                variant="outline" 
+                className="w-full mt-10 h-14 rounded-2xl gap-3 border-white/10 hover:bg-white/5 transition-all text-white font-black uppercase italic tracking-tighter"
+                onClick={() => {
+                  navigator.clipboard.writeText(show.portalUrl)
+                  toast.success('Portal link copied to clipboard')
+                }}
+              >
+                Copy Portal Link
+              </Button>
+           </div>
         </div>
       </div>
     </div>
