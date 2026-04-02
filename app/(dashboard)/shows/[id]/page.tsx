@@ -137,12 +137,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
-          portalUrl: show.portal_url || `${window.location.origin}/portal/${id}`
+          portalUrl: show.portal_url || (typeof window !== 'undefined' ? `${window.location.origin}/portal/${id}` : `/portal/${id}`)
         })
 
         // Process show documents
         const mats = show.materials || []
-        const now2 = new Date()
         const formattedDocs = mats.map((mat: any) => {
           const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
           let docStatus: 'delivered' | 'awaiting' | 'late' = 'awaiting'
