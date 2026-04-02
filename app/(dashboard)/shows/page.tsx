@@ -62,7 +62,6 @@ export default function ShowsPage() {
         `)
         
       if (error) {
-        console.error("Supabase Error:", error)
         toast.error("Database Error", { 
           description: `Failed to fetch shows: ${error.message} (Code: ${error.code})` 
         })
@@ -70,7 +69,6 @@ export default function ShowsPage() {
       }
 
       if (data) {
-         console.log('Fetched raw data:', data)
          const formattedShows = data.map((show: any) => {
            const artistName = show.artist_name || 'Unnamed Artist'
            
@@ -334,21 +332,6 @@ export default function ShowsPage() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchShows}
       />
-
-      {/* Development Debug View */}
-      <div className="mt-20 p-8 glass-card border-red-500/20 bg-red-500/5 rounded-3xl">
-        <h3 className="text-red-500 font-bold uppercase font-pro-data tracking-widest text-xs mb-4">DEBUG: Supabase Connection Details</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground/60">
-          <div className="space-y-2">
-            <p>Project URL: <span className="text-white">{process.env.NEXT_PUBLIC_SUPABASE_URL}</span></p>
-            <p>Data Status: <span className="text-white">{isLoading ? 'Loading...' : 'Ready'}</span></p>
-          </div>
-          <div className="space-y-2">
-            <p>Shows Count (State): <span className="text-white">{shows.length}</span></p>
-            <p>Raw Payload Slice: <span className="text-white lowercase font-normal">{JSON.stringify(shows).slice(0, 100)}...</span></p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
