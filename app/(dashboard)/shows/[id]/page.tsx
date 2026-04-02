@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 
 interface ShowDetailPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default function ShowDetailPage({ params }: ShowDetailPageProps) {
@@ -36,9 +36,18 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   const [documents, setDocuments] = useState<any[]>([])
   const [reliability, setReliability] = useState<any>(null)
   const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
-  const id = params.id
+  const [id, setId] = useState<string | null>(null)
+  
+  useEffect(() => {
+    async function getParams() {
+      const resolvedParams = await params
+      setId(resolvedParams.id)
+    }
+    getParams()
+  }, [params])
 
   useEffect(() => {
+    if (!id) return
     // Load lockouts from local storage
     const savedLockouts = localStorage.getItem('reminder_lockouts')
     if (savedLockouts) {
