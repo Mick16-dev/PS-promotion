@@ -14,7 +14,9 @@ import {
   ChevronRight,
   Clock4,
   Paperclip,
-  ArrowRight
+  ArrowRight,
+  User,
+  FileWarning
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -112,14 +114,13 @@ export default function ShowDetailPage() {
           {/* Quick Stats Banner - Precision Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              {[
-               { label: 'Schedule', val: show.show_time, icon: Clock },
-               { label: 'Deliverables', val: `${deliveredCount} of ${totalCount}`, icon: CheckCircle2 },
-               { label: 'Status', val: show.status || 'Active', icon: Clock4 }
+               { label: 'Stage Schedule', val: show.show_time, icon: Clock },
+               { label: 'Advancement Integrity', val: `${deliveredCount} of ${totalCount}`, icon: CheckCircle2 },
+               { label: 'Tour Status', val: show.status || 'Active', icon: Clock4 }
              ].map((s, i) => (
                <div key={i} className="bg-[#151618] border border-white/[0.04] p-6 rounded-xl">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3">{s.label}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-3">{s.label}</p>
                   <div className="flex items-center gap-3">
-                     <s.icon size={16} className="text-zinc-600" />
                      <span className="text-lg font-bold text-white tracking-tight">{s.val}</span>
                   </div>
                </div>
@@ -130,7 +131,7 @@ export default function ShowDetailPage() {
           <div className="bg-[#151618] border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl">
              <div className="px-8 py-5 border-b border-white/[0.04] flex items-center justify-between bg-white/[0.01]">
                 <div>
-                   <h2 className="text-sm font-bold text-zinc-100 italic">Production Checklist</h2>
+                   <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Technical Rider & Deliverables</h2>
                 </div>
                 <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg bg-zinc-900 text-zinc-500 hover:text-white border border-white/[0.05]">
                    <Plus size={14} />

@@ -115,15 +115,15 @@ export default function DashboardHome() {
               <span className="text-zinc-500 text-xs font-medium tracking-tight">Active Roster Monitoring</span>
            </div>
            <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
-             Dashboard <span className="text-zinc-600 font-medium">/ Overview</span>
+             Production <span className="text-zinc-600 font-medium">/ Control</span>
            </h1>
         </div>
         <div className="flex items-center gap-3">
-           <Button variant="outline" className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-100 font-semibold text-sm px-4 rounded-lg">
-             Customize
+           <Button variant="outline" className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 font-semibold text-xs px-4 rounded-lg">
+             Customize View
            </Button>
            <Button className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2">
-             <Plus size={16} strokeWidth={3} /> New Show
+             <Plus size={16} strokeWidth={3} /> Add Engagement
            </Button>
         </div>
       </div>
@@ -131,18 +131,18 @@ export default function DashboardHome() {
       {/* Senior Stats Grid - High Precision */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
         {[
-          { label: 'Active Shows', value: stats.totalShows, icon: Calendar, accent: 'text-white' },
-          { label: 'Awaiting Fulfillment', value: stats.awaitingDocs, icon: Clock4, accent: 'text-amber-500' },
-          { label: 'Overdue Clearances', value: stats.overdueDocs, icon: AlertCircle, accent: 'text-rose-500' }
+          { label: 'Active Advancements', value: stats.totalShows, icon: Calendar, accent: 'text-white' },
+          { label: 'Materials Pipeline', value: stats.awaitingDocs, icon: Clock4, accent: 'text-amber-500' },
+          { label: 'Priority Overdue', value: stats.overdueDocs, icon: AlertCircle, accent: 'text-rose-500' }
         ].map((stat, i) => (
           <div key={i} className="bg-[#151618] border border-white/[0.04] rounded-xl p-8 hover:border-white/[0.08] transition-colors group relative overflow-hidden">
              <div className="flex items-center justify-between mb-8">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">{stat.label}</span>
-                <stat.icon size={16} className="text-zinc-600 group-hover:text-zinc-300 transition-colors" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">{stat.label}</span>
+                <stat.icon size={14} className="text-zinc-600 group-hover:text-zinc-300 transition-colors" />
              </div>
              <div className="flex items-baseline gap-2">
                 <span className={`text-4xl font-bold tracking-tight ${stat.accent}`}>{stat.value}</span>
-                <span className="text-xs font-bold text-zinc-600">Items</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-700">Records</span>
              </div>
           </div>
         ))}
@@ -170,7 +170,7 @@ export default function DashboardHome() {
                   <div key={item.id} className="group flex items-center justify-between px-8 py-4 hover:bg-white/[0.02] cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-rose-500">
                     <div className="flex items-center gap-6 min-w-0">
                        <div className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
-                          <AlertCircle size={14} strokeWidth={2.5} />
+                          <FileWarning size={14} strokeWidth={2.5} />
                        </div>
                        <div className="min-w-0">
                           <div className="flex items-center gap-3">

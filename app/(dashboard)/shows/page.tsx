@@ -12,7 +12,8 @@ import {
   ArrowUpRight,
   MoreVertical,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  User
 } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
@@ -38,9 +39,9 @@ export default function ShowsPage() {
 
       if (showsErr) throw showsErr
 
-      const processedShows = showsData.map(show => {
-        const showMats = materialsData?.filter(m => m.show_id === show.id) || []
-        const delivered = showMats.filter(m => m.status === 'delivered' || m.status === 'submitted').length
+      const processedShows = showsData.map((show: any) => {
+        const showMats = materialsData?.filter((m: any) => m.show_id === show.id) || []
+        const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
         const total = showMats.length > 0 ? showMats.length : 5
         
         return {
@@ -84,19 +85,19 @@ export default function ShowsPage() {
               <span className="text-zinc-300 text-xs font-bold">Manage Shows</span>
            </div>
            <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
-             Production <span className="text-zinc-600 font-medium">Pipeline</span>
+             Advancement <span className="text-zinc-600 font-medium">Pipeline</span>
            </h1>
         </div>
         <div className="flex items-center gap-3">
            <div className="relative group mr-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-zinc-300 transition-colors" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-700" size={14} />
               <input 
-                placeholder="Find show or artist..." 
-                className="bg-zinc-900 border border-white/[0.05] rounded-lg h-10 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20 transition-all w-[240px]"
+                placeholder="Search engagements..." 
+                className="bg-zinc-900 border border-white/[0.05] rounded-xl h-10 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-white/20 transition-all w-[240px]"
               />
            </div>
            <Button className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2">
-             <Plus size={16} strokeWidth={3} /> Import Show
+             <Plus size={16} strokeWidth={3} /> Sync Engagements
            </Button>
         </div>
       </div>
@@ -125,10 +126,10 @@ export default function ShowsPage() {
                          <span className="text-lg font-bold text-white tracking-tight group-hover:text-primary transition-colors">{show.artist}</span>
                          <Badge className="bg-emerald-500/10 text-emerald-500 border-none text-[9px] font-black uppercase px-2 py-0">ACTIVE</Badge>
                       </div>
-                      <div className="flex items-center gap-3 mt-1 underline decoration-zinc-800 underline-offset-4">
-                         <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">{show.venue}</span>
-                         <span className="h-1 w-1 rounded-full bg-zinc-700" />
-                         <span className="text-[11px] font-medium text-zinc-500">{show.date} • {show.city}</span>
+                      <div className="flex items-center gap-3 mt-1 underline decoration-zinc-900 underline-offset-8">
+                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{show.venue}</span>
+                         <span className="h-1 w-1 rounded-full bg-zinc-800" />
+                         <span className="text-[11px] font-medium text-zinc-600 italic">{show.date} • {show.city}</span>
                       </div>
                    </div>
                 </div>
@@ -136,7 +137,7 @@ export default function ShowsPage() {
                 <div className="flex items-center gap-12 mt-4 md:mt-0">
                    <div className="flex flex-col items-end gap-2 pr-10 border-r border-white/5">
                       <div className="flex items-center gap-3">
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Materials</span>
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Deliverables</span>
                          <span className="text-sm font-bold text-white">{show.progress}/{show.totalItems}</span>
                       </div>
                       <div className="w-32 h-1 bg-zinc-900 rounded-full overflow-hidden">
