@@ -45,54 +45,35 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     // Load lockouts from local storage
     const savedLockouts = localStorage.getItem('reminder_lockouts')
     if (savedLockouts) {
-      try {
-        const parsed = JSON.parse(savedLockouts)
-        const now = Date.now()
-        const activeLockouts: Record<string, boolean> = {}
-        Object.keys(parsed).forEach(lid => {
-          if (now < parsed[lid]) activeLockouts[lid] = true
-        })
-        setLockouts(activeLockouts)
-      } catch (e) {}
-    }
-
-    async function fetchShowDetail() {
+      
       try {
         setIsLoading(true)
 
-        // Fetch the show with related artist and documents
-        const { data: show, error } = await supabase
+        // 1. Fetch Show details
+        const { data: showData, error: showErr } = await supabase
           .from('shows')
-          .select(`
-            id,
-            venue,
-            city,
-            show_date,
-            show_time,
-            status,
-            artist_name,
-            artist_email,
-            materials (
-              id,
-              item_name,
-              status,
-              deadline,
-              submitted_at,
-              file_url,
-              portal_token
-            )
-          `)
+          .select('*')
           .eq('id', id)
           .single()
 
-        if (error || !show) {
-          console.error('FAILED TO LOAD SHOW. ID:', id, 'ERROR:', error)
+        if (showErr || !showData) {
+          console.error('FAILED TO LOAD SHOW. ID:', id, 'ERROR:', showErr)
           setIsLoading(false)
           return
         }
 
+        // 2. Fetch associated materials
+        const { data: materialsData, error: matsErr } = await supabase
+          .from('materials')
+          .select('*')
+          .eq('show_id', id)
+          .order('deadline', { ascending: true })
+
+        // Merge into the local show object
+        const show = { ...showData, materials: materialsData || [] }
         const artistInfo = { name: show.artist_name, email: show.artist_email, id: show.artist_id }
         const now = new Date()
+
 
         // Calculate show status
         let computedStatus = show.status || 'Upcoming'
@@ -128,7 +109,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           venue: show.venue || 'Venue TBD',
           city: show.city || '',
           date: dateStr,
-          rawDate: show.date,
+          rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
           portalUrl: (() => {
@@ -186,7 +167,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             submittedAt: submittedStr,
             daysInfo,
             fileUrl: mat.file_url || '',
-            portal_token: mat.portal_token || '',
             portal_token: mat.portal_token || ''
           }
         })
