@@ -232,6 +232,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         item_name: doc.name,
         deadline: doc.rawDeadline,
         show_name: showInfo?.venue,
+        portal_url: 'https://sr-artist-portal-live.vercel.app',
         portal_token: showInfo?.artistId // fallback to artist id if portal token not explicit
       }
 

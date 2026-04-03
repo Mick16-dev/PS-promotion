@@ -142,7 +142,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
             name: doc.label,
             deadline: docDates[doc.id] || showDate // Default to show date if not set
           })),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        portal_url: 'https://sr-artist-portal-live.vercel.app'
       }
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
