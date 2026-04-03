@@ -139,7 +139,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           portalUrl: (() => {
             const firstMatWithToken = show.materials?.find((m) => m.portal_token);
             const portalToken = firstMatWithToken ? firstMatWithToken.portal_token : '';
-            const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://ps-artist-portal-tmp.vercel.app';
+            const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
             let finalPortalUrl = show.portal_url || '';
             if (!finalPortalUrl || finalPortalUrl.includes('supabase.co')) {
               finalPortalUrl = portalToken ? `${basePortalUrl}/?token=${portalToken}` : 'Token generation pending...';
