@@ -74,6 +74,7 @@ export default function ShowDetailPage() {
               show_id: show.id,
               artist_id: show.artist_id,
               artist_name: show.artist_name,
+              artist_email: show.artist_email,
               item_name: itemName || 'Production Deliverables',
               portal_token: portalToken || show.id
            })
