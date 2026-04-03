@@ -15,10 +15,10 @@ type ScanState =
   | { kind: 'complete' }
 
 const SCAN_LINES_DE: Record<Extract<ScanState, { kind: 'scanning' }>['step'], string> = {
-  0: 'Meister-Validierung…',
-  1: 'Material-ID: SML DN100…',
-  2: 'Abgleich mit Zentrale Walle…',
-  3: 'Technisches Protokoll wird erstellt…',
+  0: 'Meister-Validierung...',
+  1: 'Material-ID: SML DN100...',
+  2: 'Abgleich mit Zentrale Walle...',
+  3: 'Technisches Protokoll wird erstellt...',
 }
 
 export function RotekMasterVisualService({ onCtaClick }: { onCtaClick?: () => void }) {

@@ -74,7 +74,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
                 ? (process.env.NEXT_PUBLIC_SUPABASE_URL || '').split('.supabase.co')[0].slice(-12)
                 : ''
             toast.error('Could not load artists.', {
-              description: `Supabase query failed (table: artists${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
+              description: `Supabase query failed (table: artists${urlHint ? `, project: ...${urlHint}` : ''}). ${error.message || ''}`.trim(),
             })
           } else if (data) {
             setArtists(data)
