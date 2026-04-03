@@ -83,7 +83,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
               status,
               deadline,
               submitted_at,
-              file_url
+              file_url,
+              portal_token
             )
           `)
           .eq('id', id)
@@ -135,7 +136,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.date,
           time: show.time || 'TBD',
           status: computedStatus,
-          portalUrl: show.portal_url || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/portal/${id}`
+          portalUrl: (() => {
+            const firstMatWithToken = show.materials?.find((m) => m.portal_token);
+            const portalToken = firstMatWithToken ? firstMatWithToken.portal_token : '';
+            const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://ps-artist-portal-tmp.vercel.app';
+            let finalPortalUrl = show.portal_url || '';
+            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co')) {
+              finalPortalUrl = portalToken ? `${basePortalUrl}/?token=${portalToken}` : 'Token generation pending...';
+            }
+            return finalPortalUrl;
+          })()
         })
 
         // Process show documents
@@ -180,7 +190,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             rawDeadline: mat.deadline,
             submittedAt: submittedStr,
             daysInfo,
-            fileUrl: mat.file_url || ''
+            fileUrl: mat.file_url || '',
+            portal_token: mat.portal_token || ''
           }
         })
 
