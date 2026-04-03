@@ -28,17 +28,17 @@ import { supabase } from '@/lib/supabase'
 const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
 
 interface ShowDetailPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default function ShowDetailPage({ params }: ShowDetailPageProps) {
+  const { id } = React.use(params)
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [reliability, setReliability] = useState<any>(null)
   const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
-  const id = params.id
 
   useEffect(() => {
     // Load lockouts from local storage
