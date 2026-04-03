@@ -1,0 +1,87 @@
+
+> showready-music-dashboard@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 3 errors:
+./components/dashboard/create-show-modal.tsx:61:1
+Parsing ecmascript source code failed
+  59 |       async function fetchArtists() {
+  60 |         setIsLoadingArtists(true)
+> 61 | <<<<<<< HEAD
+     | ^^^^^^^
+  62 |         const { data, error } = await supabase.from('artists').select('id, name')
+  63 |         if (data && !error) {
+  64 |           setArtists(data)
+
+Merge conflict marker encountered.
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/create-show-modal.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/create-show-modal.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+
+./components/dashboard/create-show-modal.tsx:66:1
+Parsing ecmascript source code failed
+  64 |           setArtists(data)
+  65 |           if (data.length > 0) setSelectedArtistId(data[0].id)
+> 66 | =======
+     | ^^^^^^^
+  67 |         try {
+  68 |           const { data, error } = await supabase.from('artists').select('id, name')
+  69 |
+
+Merge conflict marker encountered.
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/create-show-modal.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/create-show-modal.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+
+./components/dashboard/create-show-modal.tsx:92:1
+Parsing ecmascript source code failed
+  90 |         } finally {
+  91 |           setIsLoadingArtists(false)
+> 92 | >>>>>>> 9aac17ef09acd592c9377945794d838b5e056308
+     | ^^^^^^^
+  93 |         }
+  94 |       }
+  95 |       fetchArtists()
+
+Merge conflict marker encountered.
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/create-show-modal.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Client Component Browser]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/create-show-modal.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Client Component SSR]
+    ./app/(dashboard)/shows/page.tsx [Server Component]
+
+
+    at <unknown> (./components/dashboard/create-show-modal.tsx:61:1)
+    at <unknown> (./components/dashboard/create-show-modal.tsx:66:1)
+    at <unknown> (./components/dashboard/create-show-modal.tsx:92:1)

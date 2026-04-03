@@ -14,6 +14,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isCheckingSession, setIsCheckingSession] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  const [cooldownUntil, setCooldownUntil] = React.useState<number | null>(null)
+  const [redirectedFrom, setRedirectedFrom] = React.useState<string>('/')
+  const failedAttemptsRef = React.useRef(0)
+  const cooldownTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   React.useEffect(() => {
     let isMounted = true
@@ -34,11 +38,26 @@ export default function LoginPage() {
 
     return () => {
       isMounted = false
+      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current)
     }
   }, [router])
 
+  React.useEffect(() => {
+    // Avoid useSearchParams() prerender constraints by reading from window on client.
+    const params = new URLSearchParams(window.location.search)
+    setRedirectedFrom(params.get('redirectedFrom') || '/')
+  }, [])
+
+  const safeRedirect =
+    redirectedFrom.startsWith('/') && !redirectedFrom.startsWith('//')
+      ? redirectedFrom
+      : '/'
+
+  const isInCooldown = cooldownUntil !== null && Date.now() < cooldownUntil
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isInCooldown) return
     setIsLoading(true)
     setError(null)
 
@@ -49,12 +68,24 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        failedAttemptsRef.current += 1
+
+        // Avoid leaking detailed auth reasons (e.g., user exists vs not).
+        setError('Invalid email or password.')
+
+        // Basic client-side cooldown after repeated failures.
+        if (failedAttemptsRef.current >= 5) {
+          const until = Date.now() + 30_000
+          setCooldownUntil(until)
+          failedAttemptsRef.current = 0
+          cooldownTimerRef.current = setTimeout(() => setCooldownUntil(null), 30_000)
+        }
         return
       }
 
       if (data.session) {
-        router.replace('/')
+        failedAttemptsRef.current = 0
+        router.replace(safeRedirect)
         router.refresh()
       }
     } catch (err) {
@@ -98,6 +129,11 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+          {isInCooldown && (
+            <div className="p-3 text-xs font-semibold text-amber-500 bg-amber-400/10 border border-amber-500/20 rounded-lg text-center animate-in fade-in slide-in-from-top-2 duration-300">
+              Too many attempts. Please wait a moment and try again.
+            </div>
+          )}
           <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">Email address</label>
             <input
@@ -107,6 +143,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
               className="w-full bg-muted/30 border border-border/80 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/50 text-foreground transition-all outline-none placeholder:text-muted-foreground/40"
+              autoComplete="email"
             />
           </div>
 
@@ -122,12 +159,13 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="w-full bg-muted/30 border border-border/80 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/50 text-foreground transition-all outline-none placeholder:text-muted-foreground/40"
+              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isInCooldown}
             className="group relative flex w-full justify-center overflow-hidden rounded-xl bg-primary px-4 py-4 text-sm font-bold text-white transition-all hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 active:scale-[0.98]"
           >
             {isLoading ? (

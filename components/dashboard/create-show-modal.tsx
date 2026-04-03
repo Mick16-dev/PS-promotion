@@ -20,13 +20,14 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, MapPin, Music, User, Send, Loader2 } from 'lucide-react'
+import { CalendarIcon, MapPin, Music, User, Send, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 
 interface CreateShowModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
 const defaultDocs = [
@@ -37,9 +38,7 @@ const defaultDocs = [
   { id: 'contract', label: 'Signed Contract' }
 ]
 
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK || ''
-
-export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
+export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [artists, setArtists] = useState<any[]>([])
   const [isLoadingArtists, setIsLoadingArtists] = useState(false)
@@ -49,6 +48,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   const [venue, setVenue] = useState('')
   const [city, setCity] = useState('')
   const [showDate, setShowDate] = useState('')
+  const [showTime, setShowTime] = useState('')
   
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -60,12 +60,32 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     if (isOpen) {
       async function fetchArtists() {
         setIsLoadingArtists(true)
-        const { data, error } = await supabase.from('artist').select('id, name')
-        if (data && !error) {
-          setArtists(data)
-          if (data.length > 0) setSelectedArtistId(data[0].id)
+        try {
+          const { data, error } = await supabase.from('artists').select('id, name, email')
+
+          if (error) {
+            console.error('Failed to fetch artists:', error)
+            const urlHint =
+              typeof window !== 'undefined'
+                ? (process.env.NEXT_PUBLIC_SUPABASE_URL || '').split('.supabase.co')[0].slice(-12)
+                : ''
+            toast.error('Could not load artists.', {
+              description: `Supabase query failed (table: artists${urlHint ? `, project: …${urlHint}` : ''}). ${error.message || ''}`.trim(),
+            })
+          } else if (data) {
+            setArtists(data)
+            if (data.length > 0) {
+              setSelectedArtistId((prev) => prev || data[0].id)
+            } else {
+              toast.error('No artists available.', {
+                description:
+                  'Your artist table returned 0 rows. This is usually caused by Row Level Security (RLS) blocking reads, or the row being in a different table (artist vs artists).',
+              })
+            }
+          }
+        } finally {
+          setIsLoadingArtists(false)
         }
-        setIsLoadingArtists(false)
       }
       fetchArtists()
     }
@@ -97,13 +117,22 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
     setIsSubmitting(true)
     
     try {
-      if (!N8N_WEBHOOK_URL) {
-        throw new Error('Create-show webhook is not configured.')
-      }
+      // Find full artist details
+      const selectedArtist = artists.find(a => a.id === selectedArtistId)
+
+      // Generate a stable show ID client-side so n8n can use it when inserting
+      const show_id = crypto.randomUUID()
 
       // Prepare data for n8n
       const payload = {
+        show_id,
+        show_name: `${selectedArtist?.name || 'Show'} @ ${venue}`,
+        show_time: showTime || null,
+        status: 'pending',
         artist_id: selectedArtistId,
+        artist_name: selectedArtist?.name || 'Unknown Artist',
+        artist_email: selectedArtist?.email || '',
+        venue: venue,
         venue_name: venue,
         city: city,
         date: showDate,
@@ -116,15 +145,20 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         timestamp: new Date().toISOString()
       }
 
-      // POST to n8n
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
+      const response = await fetch('/api/n8n/create-show', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
 
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`)
+        let details = ''
+        try {
+          const json = await response.json()
+          details = json?.error || json?.details || json?.body || ''
+        } catch {}
+        throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
       }
       
       toast.success('Show created.', {
@@ -132,11 +166,13 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
       })
       
       onClose()
+      onSuccess?.()
       
       // Reset form
       setVenue('')
       setCity('')
       setShowDate('')
+      setShowTime('')
       setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
       setDocDates({})
     } catch (error) {
@@ -148,10 +184,23 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-y-auto max-h-[90vh] rounded-[2rem]">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent className="sm:max-w-[600px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-y-auto max-h-[90vh] rounded-[2rem] [&>button]:hidden">
         {/* Luminous Header Gradient */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+        
+        {/* Manual Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-6 top-6 z-50 h-8 w-8 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/60 transition-all"
+        >
+          <X size={16} />
+        </button>
         
         <div className="p-8 pb-6 relative z-10 border-b border-white/5">
           <DialogHeader>
@@ -165,7 +214,7 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
         <form onSubmit={handleSubmit} className="px-8 py-6 space-y-8 relative z-10 bg-black/20">
           <div className="space-y-6">
             {/* Context Fields */}
-            <div className="space-y-3">
+            <div className="space-y-3 pb-2">
               <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist</Label>
               <Select 
                 value={selectedArtistId} 
@@ -229,6 +278,19 @@ export function CreateShowModal({ isOpen, onClose }: CreateShowModalProps) {
                     onChange={(e) => setShowDate(e.target.value)}
                     required
                     className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20"
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="time" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Show Time</Label>
+                <div className="relative group">
+                  <Input 
+                    id="time" 
+                    name="time"
+                    type="time" 
+                    value={showTime}
+                    onChange={(e) => setShowTime(e.target.value)}
+                    className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20 pl-5"
                   />
                 </div>
               </div>

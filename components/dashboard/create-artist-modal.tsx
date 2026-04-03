@@ -36,7 +36,7 @@ export function CreateArtistModal({ isOpen, onClose }: CreateArtistModalProps) {
     setIsSubmitting(true)
     
     try {
-      const { error } = await (supabase as any).from('artist').insert([
+      const { error } = await (supabase as any).from('artists').insert([
         {
           name: formData.name,
           genre: formData.genre,
