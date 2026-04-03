@@ -65,22 +65,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           .from('shows')
           .select(`
             id,
-            venue_name,
+            venue,
             city,
-            date,
-            time,
+            show_date,
+            show_time,
             status,
-            portal_url,
-            artist_id,
-            artist:artist_id (
-              id,
-              name,
-              email,
-              reliability
-            ),
+            artist_name,
+            artist_email,
             materials (
               id,
-              document_name,
+              item_name,
               status,
               deadline,
               submitted_at,
@@ -97,13 +91,13 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           return
         }
 
-        const artistInfo = Array.isArray(show.artist) ? show.artist[0] : show.artist
+        const artistInfo = { name: show.artist_name, email: show.artist_email, id: show.artist_id }
         const now = new Date()
 
         // Calculate show status
         let computedStatus = show.status || 'Upcoming'
-        if (show.date) {
-          const showDate = new Date(show.date)
+        if (show.show_date) {
+          const showDate = new Date(show.show_date)
           const isToday = showDate.toDateString() === now.toDateString()
           const isPast = showDate < now && !isToday
           const allMats = show.materials || []
@@ -119,9 +113,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         // Format date
         let dateStr = 'TBD'
-        if (show.date) {
+        if (show.show_date) {
           try {
-            dateStr = new Date(show.date).toLocaleDateString(undefined, {
+            dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
               year: 'numeric', month: 'short', day: 'numeric'
             })
           } catch (e) {}
@@ -131,11 +125,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           artist: artistInfo?.name || 'Unnamed Artist',
           artistEmail: artistInfo?.email || '',
           artistId: artistInfo?.id || show.artist_id,
-          venue: show.venue_name || 'Venue TBD',
+          venue: show.venue || 'Venue TBD',
           city: show.city || '',
           date: dateStr,
           rawDate: show.date,
-          time: show.time || 'TBD',
+          time: show.show_time || 'TBD',
           status: computedStatus,
           portalUrl: (() => {
             const firstMatWithToken = show.materials?.find((m) => m.portal_token);
@@ -185,7 +179,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
           return {
             id: mat.id,
-            name: mat.document_name || 'Document',
+            name: mat.item_name || 'Document',
             status: docStatus,
             deadline: deadlineStr,
             rawDeadline: mat.deadline,
