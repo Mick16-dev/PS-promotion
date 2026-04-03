@@ -42,6 +42,10 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [artists, setArtists] = useState<any[]>([])
   const [isLoadingArtists, setIsLoadingArtists] = useState(false)
+  const [showAddArtist, setShowAddArtist] = useState(false)
+  const [newArtistName, setNewArtistName] = useState('')
+  const [newArtistEmail, setNewArtistEmail] = useState('')
+  const [isAddingArtist, setIsAddingArtist] = useState(false)
   
   // Form state
   const [selectedArtistId, setSelectedArtistId] = useState<string>('')
@@ -90,6 +94,32 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       fetchArtists()
     }
   }, [isOpen])
+
+  const handleAddArtist = async () => {
+    if (!newArtistName || !newArtistEmail) {
+      toast.error('Please enter both name and email.')
+      return
+    }
+    setIsAddingArtist(true)
+    try {
+      const { data, error } = await supabase
+        .from('artists')
+        .insert({ name: newArtistName, email: newArtistEmail })
+        .select()
+        .single()
+      if (error) throw error
+      setArtists(prev => [...prev, data])
+      setSelectedArtistId(data.id)
+      setNewArtistName('')
+      setNewArtistEmail('')
+      setShowAddArtist(false)
+      toast.success(`Artist "${data.name}" added.`)
+    } catch (err: any) {
+      toast.error('Failed to add artist: ' + (err.message || ''))
+    } finally {
+      setIsAddingArtist(false)
+    }
+  }
 
   const handleDocToggle = (id: string, checked: boolean) => {
     setSelectedDocs(prev => ({ ...prev, [id]: checked }))
