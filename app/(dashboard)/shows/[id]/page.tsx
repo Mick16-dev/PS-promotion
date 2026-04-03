@@ -32,7 +32,8 @@ interface ShowDetailPageProps {
 }
 
 export default function ShowDetailPage({ params }: ShowDetailPageProps) {
-  const { id } = React.use(params)
+  const paramValue = (params && typeof params.then === 'function') ? React.use(params) : params;
+  const id = paramValue?.id;
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
@@ -91,7 +92,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           .single()
 
         if (error || !show) {
-          console.error('Failed to load show:', error)
+          console.error('FAILED TO LOAD SHOW. ID:', id, 'ERROR:', error)
           setIsLoading(false)
           return
         }
@@ -206,7 +207,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         }
 
       } catch (err) {
-        console.error('Error loading show detail:', err)
+        console.error('FETCH_DETAIL_CRASH. ID:', id, 'ERROR:', err)
       } finally {
         setIsLoading(false)
       }
