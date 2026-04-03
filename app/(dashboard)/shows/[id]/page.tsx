@@ -62,7 +62,7 @@ export default function ShowDetailPage() {
     }
   }
 
-  async function handleSendReminder(itemName?: string) {
+  async function handleSendReminder(itemName?: string, portalToken?: string) {
      if (!show) return
      
      try {
@@ -74,12 +74,8 @@ export default function ShowDetailPage() {
               show_id: show.id,
               artist_id: show.artist_id,
               artist_name: show.artist_name,
-              artist_email: show.artist_email,
-              venue: show.venue,
-              city: show.city,
-              date: show.show_date,
               item_name: itemName || 'Production Deliverables',
-              portal_token: show.id // Standardizing as show ID for now
+              portal_token: portalToken || show.id
            })
         })
 
@@ -213,7 +209,7 @@ export default function ShowDetailPage() {
                       <div className="flex items-center gap-10">
                          {!isDone && (
                            <Button 
-                             onClick={() => handleSendReminder(name)}
+                             onClick={() => handleSendReminder(name, doc.portal_token)}
                              disabled={isSending}
                              variant="ghost" 
                              className="h-8 bg-zinc-900 text-zinc-500 hover:text-white border border-white/[0.05] text-[10px] font-bold uppercase tracking-widest px-3 gap-2 opacity-0 group-hover:opacity-100 transition-all"
