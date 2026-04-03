@@ -191,6 +191,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             submittedAt: submittedStr,
             daysInfo,
             fileUrl: mat.file_url || '',
+            portal_token: mat.portal_token || '',
             portal_token: mat.portal_token || ''
           }
         })
