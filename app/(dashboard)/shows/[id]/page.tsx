@@ -233,7 +233,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         deadline: doc.rawDeadline,
         show_name: showInfo?.venue,
         portal_url: 'https://sr-artist-portal-live.vercel.app',
-        portal_token: showInfo?.artistId // fallback to artist id if portal token not explicit
+        portal_token: doc.portal_token,
+        show_id: id
       }
 
       const response = await fetch(REMINDER_WEBHOOK_URL, {
