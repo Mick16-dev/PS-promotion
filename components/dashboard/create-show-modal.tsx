@@ -152,35 +152,62 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
       // Generate a stable show ID client-side so n8n can use it when inserting
       const show_id = crypto.randomUUID()
-
       // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
 
+      // Build per-document entries with unique tokens
+      const docs = defaultDocs
+        .filter(doc => selectedDocs[doc.id])
+        .map(doc => {
+          const token = Math.random().toString(36).substring(2, 17)
+          return {
+            name: doc.label,
+            deadline: docDates[doc.id] || showDate,
+            portal_token: token,
+            portal_url: `${basePortalUrl}/?token=${token}`
+          }
+        })
+
+      // Use the first document's portal URL as the primary link for the email
+      const primaryPortalUrl = docs.length > 0 ? docs[0].portal_url : basePortalUrl
+      const artistName = selectedArtist?.name || 'Unknown Artist'
+      const showName = `${artistName} @ ${venue}`
+
+      // Pre-build the full HTML email so n8n just forwards it — no n8n templating needed
+      const email_html = `<!DOCTYPE html>
+<html>
+<body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0;">
+  <div style="max-width:600px;margin:auto;background:white;border-radius:10px;padding:40px;">
+    <h2 style="margin-top:0;color:#111;">Hi ${artistName},</h2>
+    <p style="color:#333;">Your show at <strong>${venue}</strong>${city ? `, ${city}` : ''} on <strong>${showDate}</strong> has been confirmed.</p>
+    <p style="color:#333;">Please submit your production materials via your Artist Portal:</p>
+    <a href="${primaryPortalUrl}"
+       style="display:inline-block;background:#000;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:16px 0;">
+      OPEN ARTIST PORTAL
+    </a>
+    <p style="color:#555;font-size:14px;">Please ensure all items are submitted before your earliest deadline.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+    <p style="color:#888;font-size:12px;">Best regards,<br><strong>ShowReady Production Team</strong></p>
+  </div>
+</body>
+</html>`
+
       const payload = {
         show_id,
-        show_name: `${selectedArtist?.name || 'Show'} @ ${venue}`,
+        show_name: showName,
         show_time: showTime || null,
         status: 'pending',
         artist_id: selectedArtistId,
-        artist_name: selectedArtist?.name || 'Unknown Artist',
+        artist_name: artistName,
         artist_email: selectedArtist?.email || '',
-        venue: venue,
+        venue,
         venue_name: venue,
-        city: city,
+        city,
         date: showDate,
-        required_documents: defaultDocs
-          .filter(doc => selectedDocs[doc.id])
-          .map(doc => {
-            const token = Math.random().toString(36).substring(2, 17)
-            return {
-              name: doc.label,
-              deadline: docDates[doc.id] || showDate,
-              portal_token: token,
-              portal_url: `${basePortalUrl}/?token=${token}`
-            }
-          }),
+        required_documents: docs,
         timestamp: new Date().toISOString(),
-        portal_url: basePortalUrl
+        portal_url: primaryPortalUrl,
+        email_html
       };
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)

@@ -225,17 +225,39 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
       const docToken = String(doc.portal_token || '').trim()
       const fullPortalUrl = docToken ? `${basePortalUrl}/?token=${docToken}` : basePortalUrl
+      const artistName = showInfo?.artist || 'Artist'
+      const venueName = showInfo?.venue || 'Venue'
+
+      // Pre-build the full reminder HTML so n8n just forwards it — no n8n templating needed
+      const email_html = `<!DOCTYPE html>
+<html>
+<body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0;">
+  <div style="max-width:600px;margin:auto;background:white;border-radius:10px;padding:40px;">
+    <h2 style="margin-top:0;color:#111;">Hi ${artistName},</h2>
+    <p style="color:#333;">This is a friendly reminder that your <strong>${doc.name}</strong> for the show at <strong>${venueName}</strong> is due soon.</p>
+    ${doc.rawDeadline ? `<p style="color:#e55;">Deadline: <strong>${new Date(doc.rawDeadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>` : ''}
+    <p style="color:#333;">Please submit it via your Artist Portal:</p>
+    <a href="${fullPortalUrl}"
+       style="display:inline-block;background:#000;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:16px 0;">
+      OPEN ARTIST PORTAL
+    </a>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+    <p style="color:#888;font-size:12px;">Best regards,<br><strong>ShowReady Production Team</strong></p>
+  </div>
+</body>
+</html>`
 
       const payload = {
         material_id: doc.id,
         artist_email: showInfo?.artistEmail,
-        artist_name: showInfo?.artist,
+        artist_name: artistName,
         item_name: doc.name,
         deadline: doc.rawDeadline,
-        show_name: showInfo?.venue,
+        show_name: venueName,
         portal_url: fullPortalUrl,
         portal_token: docToken,
-        show_id: id
+        show_id: id,
+        email_html
       }
 
       const response = await fetch(REMINDER_WEBHOOK_URL, {
