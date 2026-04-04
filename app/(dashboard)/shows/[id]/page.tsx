@@ -222,6 +222,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         throw new Error('Reminder webhook is not configured.')
       }
 
+      const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
+      const docToken = String(doc.portal_token || '').trim()
+      const fullPortalUrl = docToken ? `${basePortalUrl}/?token=${docToken}` : basePortalUrl
+
       const payload = {
         material_id: doc.id,
         artist_email: showInfo?.artistEmail,
@@ -229,8 +233,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         item_name: doc.name,
         deadline: doc.rawDeadline,
         show_name: showInfo?.venue,
-        portal_url: 'https://sr-artist-portal-live.vercel.app',
-        portal_token: String(doc.portal_token).trim(),
+        portal_url: fullPortalUrl,
+        portal_token: docToken,
         show_id: id
       }
 

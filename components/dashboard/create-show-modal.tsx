@@ -153,7 +153,9 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       // Generate a stable show ID client-side so n8n can use it when inserting
       const show_id = crypto.randomUUID()
 
-      // Prepare data for n8n
+      // Generate portal base URL (from env var with fallback)
+      const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
+
       const payload = {
         show_id,
         show_name: `${selectedArtist?.name || 'Show'} @ ${venue}`,
@@ -168,13 +170,17 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: defaultDocs
           .filter(doc => selectedDocs[doc.id])
-          .map(doc => ({
-            name: doc.label,
-            deadline: docDates[doc.id] || showDate,
-            portal_token: Math.random().toString(36).substring(2, 17)
-          })),
+          .map(doc => {
+            const token = Math.random().toString(36).substring(2, 17)
+            return {
+              name: doc.label,
+              deadline: docDates[doc.id] || showDate,
+              portal_token: token,
+              portal_url: `${basePortalUrl}/?token=${token}`
+            }
+          }),
         timestamp: new Date().toISOString(),
-        portal_url: 'https://sr-artist-portal-live.vercel.app'
+        portal_url: basePortalUrl
       };
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
