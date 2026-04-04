@@ -1,0 +1,186 @@
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(auth)\login\page.tsx
+  6:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(dashboard)\artists\page.tsx
+  4:73  warning  'Loader2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(dashboard)\calendar\page.tsx
+  13:3   warning  'FileText' is defined but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+  33:10  warning  'isLoading' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(dashboard)\page.tsx
+   6:3  warning  'ArrowUpRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   7:3  warning  'Music' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  10:3  warning  'Search' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+  11:3  warning  'User' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  14:3  warning  'ChevronRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  15:3  warning  'Filter' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+  16:3  warning  'Layers' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(dashboard)\shows\[id]\page.tsx
+   12:3   warning  'AlertCircle' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   57:16  warning  'e' is defined but never used                                                       @typescript-eslint/no-unused-vars
+   57:19  error    Empty block statement                                                               no-empty
+   87:45  warning  'matsErr' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  122:20  warning  'e' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  122:23  error    Empty block statement                                                               no-empty
+  255:14  warning  'error' is defined but never used                                                   @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\(dashboard)\shows\page.tsx
+   7:3   warning  'ArrowUpRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   8:3   warning  'MoreVertical' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   9:3   warning  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  10:3   warning  'AlertCircle' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  11:3   warning  'User' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  12:3   warning  'ChevronRight' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  13:3   warning  'Clock4' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+  14:3   warning  'Paperclip' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  80:14  warning  'err' is defined but never used                                                 @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\contact\page.tsx
+   7:38  warning  'MessageSquare' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  14:21  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\kontakt\page.tsx
+   9:10  warning  'Input' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  10:10  warning  'Label' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  11:10  warning  'Textarea' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\pricing\page.tsx
+  7:17  warning  'Mail' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  9:8   warning  'Link' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\app\team\page.tsx
+   8:3  warning  'Users' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  10:3  warning  'History' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  15:3  warning  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\before-after-gallery.tsx
+  8:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\dashboard\create-show-modal.tsx
+   23:32  warning  'Music' is defined but never used. Allowed unused vars must match /^_/u                     @typescript-eslint/no-unused-vars
+   45:10  warning  'showAddArtist' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+   48:10  warning  'isAddingArtist' is assigned a value but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+   98:9   warning  'handleAddArtist' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  192:19  error    Empty block statement                                                                       no-empty
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\differentiator.tsx
+  5:33  warning  'Scale' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+  5:49  warning  'ClipboardCheck' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  6:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\einsatzgebiete.tsx
+  35:29  warning  'i' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\faq-section.tsx
+  11:10  warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  49:21  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\features-section.tsx
+   7:10  warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+   9:3   warning  'PiggyBank' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+  58:14  warning  'language' is assigned a value but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  61:9   warning  'container' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  69:9   warning  'item' is assigned a value but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\footer.tsx
+  5:10  warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  6:17  warning  'Mail' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  6:56  warning  'Twitter' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  6:65  warning  'Linkedin' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  6:75  warning  'Instagram' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  8:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\header.tsx
+  7:10  warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\hero-section.tsx
+    4:10   warning  'Upload' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    4:18   warning  'Droplet' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+    4:27   warning  'CircleOff' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+    4:46   warning  'Plus' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+    4:52   warning  'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+    4:101  warning  'Cpu' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    4:124  warning  'MoveHorizontal' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+    4:148  warning  'Search' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    4:156  warning  'FileText' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+    4:166  warning  'Timer' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+    8:10   warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+    9:8    warning  'Link' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   15:10   warning  'cn' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   69:31   warning  'onCtaClick' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   87:36   warning  'img' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  152:9    warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  293:32   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\join-modal.tsx
+   4:13  warning  'Users' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   4:20  warning  'Briefcase' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   4:65  warning  'UserCheck' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  10:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\layout\navbar.tsx
+   5:24  warning  'User' is defined but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+   7:10  warning  'toast' is defined but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+  14:3   warning  'DropdownMenuSeparator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\lumnar-services-preview.tsx
+  13:41  warning  'onCtaClick' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\master-expert-section.tsx
+  28:21  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\pricing-section.tsx
+  6:10  warning  'Magnetic' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\problem-solution.tsx
+  7:8  warning  'Link' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\services-section.tsx
+   6:10  warning  'ArrowRight' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+   6:56  warning  'Timer' is defined but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+   7:8   warning  'Link' is defined but never used. Allowed unused vars must match /^_/u                     @typescript-eslint/no-unused-vars
+   8:10  warning  'services' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  10:7   warning  'diagnosisSteps' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  24:21  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\sticky-conversion.tsx
+  7:22  warning  'Zap' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\testimonials-section.tsx
+    5:16  warning  'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+    6:10  warning  'cn' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  117:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\trust-badges.tsx
+   7:3  warning  'Camera' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   8:3  warning  'Upload' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   9:3  warning  'Activity' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  10:3  warning  'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  11:3  warning  'ArrowRight' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  12:3  warning  'MapPin' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  13:3  warning  'ShieldCheck' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  14:3  warning  'Wrench' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  15:3  warning  'Box' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  16:3  warning  'Cpu' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\ui\spotlight-card.tsx
+   3:35  warning  'useEffect' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+  20:10  warning  'isHovered' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\ui\stacking-section.tsx
+  11:45  warning  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\components\ui\use-toast.ts
+  18:7  warning  'actionTypes' is assigned a value but only used as a type. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\hooks\use-toast.ts
+  18:7  warning  'actionTypes' is assigned a value but only used as a type. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\micha\.gemini\antigravity\scratch\PS-promotion-scratch\middleware.ts
+  39:48  warning  'options' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+Γ£û 115 problems (3 errors, 112 warnings)
+

@@ -21,6 +21,7 @@ export default function ServicePage() {
 
   if (!service) {
     notFound()
+    return null
   }
 
   const title = language === 'de' ? service.titleDe : service.titleEn

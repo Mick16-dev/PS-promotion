@@ -24,8 +24,19 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
 
+interface Show {
+  id: string;
+  artist: string;
+  venue: string;
+  city: string;
+  date: string;
+  progress: number;
+  totalItems: number;
+  status: string;
+}
+
 export default function ShowsPage() {
-  const [shows, setShows] = useState<any[]>([])
+  const [shows, setShows] = useState<Show[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)

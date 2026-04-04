@@ -1,0 +1,41 @@
+app/(auth)/login/page.tsx(4,27): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+app/(dashboard)/artists/page.tsx(5,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/(dashboard)/calendar/page.tsx(5,27): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+app/(dashboard)/page.tsx(21,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/(dashboard)/shows/[id]/page.tsx(4,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/(dashboard)/shows/page.tsx(20,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/api/n8n/create-show/route.ts(1,30): error TS7016: Could not find a declaration file for module 'next/server'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/server.js' implicitly has an 'any' type.
+app/api/n8n/send-reminder/route.ts(1,30): error TS7016: Could not find a declaration file for module 'next/server'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/server.js' implicitly has an 'any' type.
+app/datenschutz/page.tsx(8,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/impressum/page.tsx(8,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/layout.tsx(1,41): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+app/layout.tsx(2,39): error TS7016: Could not find a declaration file for module 'next/font/google'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/font/google/index.js' implicitly has an 'any' type.
+app/pricing/page.tsx(9,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/services/[slug]/page.tsx(3,27): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+app/services/[slug]/page.tsx(4,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+app/services/[slug]/page.tsx(13,26): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+app/services/[slug]/page.tsx(26,37): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(26,55): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(27,37): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(27,55): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(28,40): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(28,61): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(29,42): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(29,65): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(30,39): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(30,59): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(50,8): error TS18048: 'service' is possibly 'undefined'.
+app/services/[slug]/page.tsx(55,48): error TS18048: 'service' is possibly 'undefined'.
+app/team/page.tsx(19,19): error TS7016: Could not find a declaration file for module 'next/image'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/image.js' implicitly has an 'any' type.
+components/header.tsx(8,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/hero-section.tsx(9,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/layout/navbar.tsx(4,27): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+components/layout/navbar.tsx(51,39): error TS7006: Parameter 'mat' implicitly has an 'any' type.
+components/layout/sidebar.tsx(4,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/layout/sidebar.tsx(5,29): error TS7016: Could not find a declaration file for module 'next/navigation'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/navigation.js' implicitly has an 'any' type.
+components/lumnar-services-preview.tsx(6,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/lumnar/SpotlightCard.tsx(3,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/master-expert-section.tsx(6,19): error TS7016: Could not find a declaration file for module 'next/image'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/image.js' implicitly has an 'any' type.
+components/problem-solution.tsx(7,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+components/services-section.tsx(7,18): error TS7016: Could not find a declaration file for module 'next/link'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/link.js' implicitly has an 'any' type.
+middleware.ts(1,48): error TS7016: Could not find a declaration file for module 'next/server'. 'C:/Users/micha/.gemini/antigravity/scratch/PS-promotion-scratch/node_modules/next/server.js' implicitly has an 'any' type.

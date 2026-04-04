@@ -189,7 +189,9 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         try {
             const json = await response.json()
           details = json?.error || json?.details || json?.body || ''
-          } catch { }
+          } catch {
+            // ignore JSON parse error for error response
+          }
         throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
     }
       

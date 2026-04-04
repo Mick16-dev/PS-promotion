@@ -1,0 +1,21 @@
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'showready-music-dashboard@0.1.0',
+npm warn EBADENGINE   required: { node: '20.x' },
+npm warn EBADENGINE   current: { node: 'v24.13.0', npm: '11.6.2' }
+npm warn EBADENGINE }
+npm warn deprecated next@15.1.0: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
+
+changed 181 packages, and audited 488 packages in 4m
+
+142 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (1 moderate, 2 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.

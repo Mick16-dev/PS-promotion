@@ -48,7 +48,7 @@ export function Navbar() {
           .limit(3)
         
         if (data && !error) {
-           const formatted = data.map(mat => {
+           const formatted = data.map((mat: any) => {
              const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
              const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
              

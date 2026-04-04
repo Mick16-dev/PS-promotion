@@ -54,7 +54,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           return acc
         }, {})
         setLockouts(active)
-      } catch (e) {}
+      } catch (e) {
+        // ignore parse error
+      }
     }
 
     async function fetchShowDetail() {
@@ -119,7 +121,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
               year: 'numeric', month: 'short', day: 'numeric'
             })
-          } catch (e) {}
+          } catch (e) {
+            // ignore date format error
+          }
         }
 
         setShowInfo({
