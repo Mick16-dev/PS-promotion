@@ -187,6 +187,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: docs,
         timestamp: new Date().toISOString(),
+        portal_token: showPortalToken,
         portal_url: primaryPortalUrl
       };
 
