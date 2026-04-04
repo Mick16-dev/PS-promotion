@@ -52,11 +52,11 @@
     "framer-motion": "^12.35.1",
     "input-otp": "1.4.2",
     "lucide-react": "^0.564.0",
-    "next": "15.1.0",
+    "next": "^16.1.7",
     "next-themes": "^0.4.6",
-    "react": "19.0.0",
+    "react": "^19.2.4",
     "react-day-picker": "9.13.2",
-    "react-dom": "19.0.0",
+    "react-dom": "^19.2.4",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
@@ -67,8 +67,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.0",
-    "eslint-config-next": "15.1.0",
-    "@next/eslint-plugin-next": "15.1.0",
+    "eslint-config-next": "^16.1.7",
+    "@next/eslint-plugin-next": "^16.1.7",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^22",
     "@types/react": "19.2.14",
@@ -83,6 +83,6 @@
     "typescript": "5.7.3"
   },
   "optionalDependencies": {
-    "@next/swc-win32-x64-msvc": "15.1.0"
+    "@next/swc-win32-x64-msvc": "^16.1.7"
   }
 }
