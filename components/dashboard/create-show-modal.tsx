@@ -170,7 +170,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           }
         })
 
-      const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
+      const primaryPortalUrl = `${basePortalUrl}/?token=${show_id}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
       const payload = {
@@ -187,7 +187,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: docs,
         timestamp: new Date().toISOString(),
-        portal_token: showPortalToken,
+        portal_token: show_id,
         portal_url: primaryPortalUrl
       };
 
