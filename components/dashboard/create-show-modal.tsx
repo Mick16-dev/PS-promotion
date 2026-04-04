@@ -155,60 +155,26 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
 
-      // Build per-document entries — each item contains all fields needed for Supabase insert
-      // so n8n can loop over required_documents and insert each row directly
-      const showDeadline = showDate
-        ? new Date(new Date(showDate).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        : null
-
+      // Build required_documents — n8n Code node reads doc.name, doc.deadline, doc.portal_token
       const docs = defaultDocs
         .filter(doc => selectedDocs[doc.id])
         .map(doc => {
           const token = Math.random().toString(36).substring(2, 17)
-          const deadline = docDates[doc.id] || showDate
-          const expiresAt = deadline
-            ? new Date(new Date(deadline).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
-            : showDeadline
           return {
-            id: crypto.randomUUID(),        // Supabase row UUID
-            show_id,                         // FK to shows table
-            artist_id: selectedArtistId,     // FK to artists table
-            item_name: doc.label,            // matches n8n field name
-            deadline,
-            status: 'pending',
+            name: doc.label,
+            deadline: docDates[doc.id] || showDate,
             portal_token: token,
-            portal_url: `${basePortalUrl}/?token=${token}`,
-            expires_at: expiresAt
+            portal_url: `${basePortalUrl}/?token=${token}`
           }
         })
 
-      // Use the first document's portal URL as the primary link for the email
+      // Use the first doc's token-based URL as the top-level portal_url for the email
       const primaryPortalUrl = docs.length > 0 ? docs[0].portal_url : basePortalUrl
       const artistName = selectedArtist?.name || 'Unknown Artist'
-      const showName = `${artistName} @ ${venue}`
-
-      // Pre-build the full HTML email so n8n just forwards it — no n8n templating needed
-      const email_html = `<!DOCTYPE html>
-<html>
-<body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0;">
-  <div style="max-width:600px;margin:auto;background:white;border-radius:10px;padding:40px;">
-    <h2 style="margin-top:0;color:#111;">Hi ${artistName},</h2>
-    <p style="color:#333;">Your show at <strong>${venue}</strong>${city ? `, ${city}` : ''} on <strong>${showDate}</strong> has been confirmed.</p>
-    <p style="color:#333;">Please submit your production materials via your Artist Portal:</p>
-    <a href="${primaryPortalUrl}"
-       style="display:inline-block;background:#000;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:16px 0;">
-      OPEN ARTIST PORTAL
-    </a>
-    <p style="color:#555;font-size:14px;">Please ensure all items are submitted before your earliest deadline.</p>
-    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
-    <p style="color:#888;font-size:12px;">Best regards,<br><strong>ShowReady Production Team</strong></p>
-  </div>
-</body>
-</html>`
 
       const payload = {
         show_id,
-        show_name: showName,
+        show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
         status: 'pending',
         artist_id: selectedArtistId,
@@ -220,8 +186,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: docs,
         timestamp: new Date().toISOString(),
-        portal_url: primaryPortalUrl,
-        email_html
+        portal_url: primaryPortalUrl
       };
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
