@@ -45,6 +45,19 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     // Load lockouts from local storage
     const savedLockouts = localStorage.getItem('reminder_lockouts')
     if (savedLockouts) {
+      try {
+        const parsed = JSON.parse(savedLockouts)
+        const now = Date.now()
+        const active = Object.keys(parsed).reduce((acc: any, key) => {
+          if (parsed[key] > now) acc[key] = true
+          return acc
+        }, {})
+        setLockouts(active)
+      } catch (e) {}
+    }
+
+    async function fetchShowDetail() {
+      if (!id) return
       
       try {
         setIsLoading(true)
@@ -73,7 +86,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         const show = { ...showData, materials: materialsData || [] }
         const artistInfo = { name: show.artist_name, email: show.artist_email, id: show.artist_id }
         const now = new Date()
-
 
         // Calculate show status
         let computedStatus = show.status || 'Upcoming'
@@ -113,8 +125,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           time: show.show_time || 'TBD',
           status: computedStatus,
           portalUrl: (() => {
-            const firstMatWithToken = show.materials?.find((m) => m.portal_token);
-            const portalToken = firstMatWithToken ? firstMatWithToken.portal_token : '';
+            const firstMatWithToken = show.materials?.find((m: any) => m.portal_token);
+            const portalToken = firstMatWithToken ? String(firstMatWithToken.portal_token).trim() : '';
             const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
             let finalPortalUrl = show.portal_url || '';
             if (!finalPortalUrl || finalPortalUrl.includes('supabase.co')) {
@@ -173,12 +185,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         setDocuments(formattedDocs)
 
-        // Fetch reliability directly from the artist table (populated by n8n)
-        if (artistInfo) {
-          setReliability({
-            score: artistInfo.reliability ?? 100
-          })
-        }
+        // Set reliability if artist info exists
+        setReliability({
+          score: show.artist_reliability ?? 100
+        })
 
       } catch (err) {
         console.error('FETCH_DETAIL_CRASH. ID:', id, 'ERROR:', err)
@@ -208,7 +218,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         deadline: doc.rawDeadline,
         show_name: showInfo?.venue,
         portal_url: 'https://sr-artist-portal-live.vercel.app',
-        portal_token: doc.portal_token,
+        portal_token: String(doc.portal_token).trim(),
         show_id: id
       }
 
