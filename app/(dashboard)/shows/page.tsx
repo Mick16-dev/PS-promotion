@@ -51,13 +51,14 @@ export default function ShowsPage() {
         const showMats = materialsData?.filter((m: any) => m.show_id === show.id) || []
         const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
         const total = showMats.length > 0 ? showMats.length : 5
+        const artistName = show.artist_name || 'Unnamed Artist'
         
         return {
           id: show.id,
-          artist: show.artist_name,
-          venue: show.venue,
-          city: show.city,
-          date: show.show_date,
+          artist: artistName,
+          venue: show.venue || show.venue_name || 'Venue TBD',
+          city: show.city || '',
+          date: show.show_date || '',
           progress: delivered,
           totalItems: total,
           status: 'active'
