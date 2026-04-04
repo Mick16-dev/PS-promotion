@@ -155,16 +155,30 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
 
-      // Build per-document entries with unique tokens
+      // Build per-document entries — each item contains all fields needed for Supabase insert
+      // so n8n can loop over required_documents and insert each row directly
+      const showDeadline = showDate
+        ? new Date(new Date(showDate).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : null
+
       const docs = defaultDocs
         .filter(doc => selectedDocs[doc.id])
         .map(doc => {
           const token = Math.random().toString(36).substring(2, 17)
+          const deadline = docDates[doc.id] || showDate
+          const expiresAt = deadline
+            ? new Date(new Date(deadline).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            : showDeadline
           return {
-            name: doc.label,
-            deadline: docDates[doc.id] || showDate,
+            id: crypto.randomUUID(),        // Supabase row UUID
+            show_id,                         // FK to shows table
+            artist_id: selectedArtistId,     // FK to artists table
+            item_name: doc.label,            // matches n8n field name
+            deadline,
+            status: 'pending',
             portal_token: token,
-            portal_url: `${basePortalUrl}/?token=${token}`
+            portal_url: `${basePortalUrl}/?token=${token}`,
+            expires_at: expiresAt
           }
         })
 
