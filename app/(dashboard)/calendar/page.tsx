@@ -280,7 +280,7 @@ export default function CalendarPage() {
                     <span className="text-white">{show.time}</span>
                     <span className="text-white/20">—</span>
                     <span className="text-muted-foreground uppercase tracking-widest text-[10px] font-black">
-                        {show.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        {(show.date as any).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
                 </div>
