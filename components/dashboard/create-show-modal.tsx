@@ -175,7 +175,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           })),
         timestamp: new Date().toISOString(),
         portal_url: 'https://sr-artist-portal-live.vercel.app'
-
+      };
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
       const response = await fetch('/api/n8n/create-show', {

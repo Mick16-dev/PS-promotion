@@ -32,8 +32,9 @@ interface ShowDetailPageProps {
 }
 
 export default function ShowDetailPage({ params }: ShowDetailPageProps) {
-  const paramValue = (params && typeof params.then === 'function') ? React.use(params) : params;
-  const id = paramValue?.id;
+  // Safe extraction of ID from params (handling both Promise and plain object patterns)
+  const resolvedParams = (params && typeof (params as any).then === 'function') ? React.use(params) : params;
+  const id = resolvedParams ? (resolvedParams as any).id : null;
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
@@ -63,14 +64,21 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         setIsLoading(true)
 
         // 1. Fetch Show details
+        console.log('Fetching show with ID:', id);
         const { data: showData, error: showErr } = await supabase
           .from('shows')
           .select('*')
           .eq('id', id)
           .single()
 
-        if (showErr || !showData) {
-          console.error('FAILED TO LOAD SHOW. ID:', id, 'ERROR:', showErr)
+        if (showErr) {
+          console.error('SUPABASE_SHOW_FETCH_ERROR. ID:', id, 'ERROR:', showErr)
+          setIsLoading(false)
+          return
+        }
+
+        if (!showData) {
+          console.error('SHOW_DATA_EMPTY. ID:', id)
           setIsLoading(false)
           return
         }
