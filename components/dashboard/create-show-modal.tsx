@@ -154,22 +154,23 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const show_id = crypto.randomUUID()
       // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
+      
+      // Generate a master portal token for this show
+      const showPortalToken = Math.random().toString(36).substring(2, 17)
 
-      // Build required_documents — n8n Code node reads doc.name, doc.deadline, doc.portal_token
+      // Build required_documents
       const docs = defaultDocs
         .filter(doc => selectedDocs[doc.id])
         .map(doc => {
-          const token = Math.random().toString(36).substring(2, 17)
           return {
             name: doc.label,
             deadline: docDates[doc.id] || showDate,
-            portal_token: token,
-            portal_url: `${basePortalUrl}/?token=${token}`
+            portal_token: showPortalToken,
+            portal_url: `${basePortalUrl}/?token=${showPortalToken}`
           }
         })
 
-      // Use the first doc's token-based URL as the top-level portal_url for the email
-      const primaryPortalUrl = docs.length > 0 ? docs[0].portal_url : `${basePortalUrl}/`
+      const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
       const payload = {
