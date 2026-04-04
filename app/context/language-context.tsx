@@ -144,7 +144,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Hero Section
     'hero.badge': 'Industrielle Praezision seit 1972',
     'hero.title': 'ROTEK MASTER VISUAL SERVICE',
-    'hero.subtitle': 'Technische Diagnose \u0026 Experten-Engineering. Uebermitteln Sie Ihre Stoerung fuer eine sofortige Meister-Validierung in der Zentrale Walle.',
+    'hero.subtitle': 'Technische Diagnose & Experten-Engineering. Uebermitteln Sie Ihre Stoerung fuer eine sofortige Meister-Validierung in der Zentrale Walle.',
     'hero.cta': 'Meister-Video-Diagnose starten',
     'hero.calculate': 'Meister-Video-Diagnose starten',
     'hero.diagnosisInProgress': 'Meister-Protokoll-Verifizierung',
@@ -154,7 +154,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.masterEstimate': 'Technisches Meister-Angebot',
     'hero.masterCertified': 'Meister-Zertifiziert',
     'hero.priority': '24/7 Prioritaet',
-    'hero.nationwide': 'Region Bremen \u0026 Umzu',
+    'hero.nationwide': 'Region Bremen & Umzu',
 
     // Trust
     'trust.title': 'Industrielle Exzellenz',
@@ -190,7 +190,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Pricing
     'pricing.popular': 'Industrie-Standard',
     'pricing.description.basic': 'Grundlegende Unterstuetzung fuer lokale Rohrprobleme.',
-    'pricing.description.standard': 'Der industrielle Standard fuer Privat \u0026 Gewerbe.',
+    'pricing.description.standard': 'Der industrielle Standard fuer Privat & Gewerbe.',
     'pricing.description.premium': 'Maximale Praezision fuer komplexe Infrastruktur.',
     'pricing.guarantee': 'Ihre Sicherheit, unser Auftrag.',
     'pricing.guarantee.desc': 'Alle Preise sind verbindliche Festpreise nach technischer Diagnose. Keine versteckten Gebuehren. Zertifiziert nach Rotek-Standard.',
@@ -201,7 +201,7 @@ const translations: Record<Language, Record<string, string>> = {
     'diff.zeroRisk': 'Null Risiko',
     'diff.zeroRisk.desc': 'Vollstaendiger Versicherungsschutz bei jedem Einsatz.',
     'diff.expertise': 'Echte Expertise',
-    'diff.expertise.desc': 'Keine Subunternehmer. Nur festangestellte Profis.',
+    'diff.expertise.desc': 'No subcontractors. Nur festangestellte Profis.',
     'diff.table.feature': 'Feature / Protokoll',
     'diff.table.rotek': 'Rotek Standard',
     'diff.table.industry': 'Branchendurchschnitt',
@@ -218,7 +218,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Services General
     'services.badge': 'INDUSTRIELLE PRAEZISION SEIT 1972',
     'services.title': 'Rotek Lumnar-Serie',
-    'services.subtitle': 'Der Goldstandard fuer Abwasser- \u0026 Rohrsystemtechnik in Bremen, Verden und Umzu.',
+    'services.subtitle': 'Der Goldstandard fuer Abwasser- & Rohrsystemtechnik in Bremen, Verden und Umzu.',
     'services.meisterCheck': 'Digitaler Meister-Check',
     'services.meisterCheck.desc': 'Starten Sie den "Rotek Master Visual Service" fuer eine technische Ferndiagnose.',
     'services.diagnoseProtocol': 'Diagnose Protokoll',
@@ -242,7 +242,7 @@ const translations: Record<Language, Record<string, string>> = {
     'services.rohrreinigung.title': 'Hochdruckspuelarbeiten (24/7)',
     'services.rohrreinigung.desc': 'Mechanische oder hydrodynamische Reinigung von Entwaesserungsleitungen rund um die Uhr.',
     'services.fettabscheider.title': 'Fettabscheider-Service',
-    'services.fettabscheider.desc': 'Vorgeschriebene Entleerung und Wartung fuer Industrie \u0026 Gastronomie.',
+    'services.fettabscheider.desc': 'Vorgeschriebene Entleerung und Wartung fuer Industrie & Gastronomie.',
     'services.kanalsanierung.title': 'Inliner-Sanierung',
     'services.kanalsanierung.desc': 'Nachhaltige grabenlose Sanierung. Defekte Stellen reparieren ohne Aufgraben.',
     'services.hebeanlagen.title': 'Hebeanlagen / Dichtheitspruefung',
