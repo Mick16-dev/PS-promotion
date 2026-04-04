@@ -142,7 +142,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
             let finalPortalUrl = show.portal_url || '';
             if (!finalPortalUrl || finalPortalUrl.includes('supabase.co')) {
-              finalPortalUrl = portalToken ? `${basePortalUrl}/?token=${portalToken}` : 'Token generation pending...';
+              finalPortalUrl = portalToken ? `${basePortalUrl}/?token=${portalToken}` : `${basePortalUrl}/`;
             }
             return finalPortalUrl;
           })()
@@ -224,7 +224,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
       const docToken = String(doc.portal_token || '').trim()
-      const fullPortalUrl = docToken ? `${basePortalUrl}/?token=${docToken}` : basePortalUrl
+      const fullPortalUrl = docToken ? `${basePortalUrl}/?token=${docToken}` : `${basePortalUrl}/`
       const artistName = showInfo?.artist || 'Artist'
       const venueName = showInfo?.venue || 'Venue'
 

@@ -169,7 +169,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         })
 
       // Use the first doc's token-based URL as the top-level portal_url for the email
-      const primaryPortalUrl = docs.length > 0 ? docs[0].portal_url : basePortalUrl
+      const primaryPortalUrl = docs.length > 0 ? docs[0].portal_url : `${basePortalUrl}/`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
       const payload = {
