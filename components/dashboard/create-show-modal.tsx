@@ -155,7 +155,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
       
-      // Generate a master portal token for this show
+      // Generate a master portal token for this show (shorter, cleaner for URLs)
       const showPortalToken = Math.random().toString(36).substring(2, 17)
 
       // Build required_documents
@@ -165,12 +165,12 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           return {
             name: doc.label,
             deadline: docDates[doc.id] || showDate,
-            portal_token: showPortalToken,
+            portal_token: showPortalToken, // Use the short token
             portal_url: `${basePortalUrl}/?token=${showPortalToken}`
           }
         })
 
-      const primaryPortalUrl = `${basePortalUrl}/?token=${show_id}`
+      const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
       const payload = {
@@ -187,7 +187,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: docs,
         timestamp: new Date().toISOString(),
-        portal_token: show_id,
+        portal_token: showPortalToken, // Consistent use of short token
         portal_url: primaryPortalUrl
       };
 

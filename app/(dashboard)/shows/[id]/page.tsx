@@ -136,13 +136,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
+          portal_token: show.portal_token || show.id, // Explicitly include token in state
           portalUrl: (() => {
             const firstMatWithToken = show.materials?.find((m: any) => m.portal_token);
-            const portalToken = firstMatWithToken ? String(firstMatWithToken.portal_token).trim() : '';
+            const portalToken = show.portal_token || firstMatWithToken?.portal_token || show.id; // Ultimate fallback to show.id
             const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
+            
             let finalPortalUrl = show.portal_url || '';
-            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co')) {
-              finalPortalUrl = portalToken ? `${basePortalUrl}/?token=${portalToken}` : `${basePortalUrl}/`;
+            // If the stored URL is missing a token or belongs to a different domain, rebuild it
+            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) {
+              finalPortalUrl = `${basePortalUrl}/?token=${portalToken}`;
             }
             return finalPortalUrl;
           })()
