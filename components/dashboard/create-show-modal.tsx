@@ -62,7 +62,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
   useEffect(() => {
     if (isOpen) {
-      async function fetchArtists() {
+      const fetchArtists = async () => {
         setIsLoadingArtists(true)
         try {
           const { data, error } = await supabase.from('artists').select('id, name, email')
@@ -223,8 +223,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
     setShowTime('')
     setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
     setDocDates({})
-  } catch (error) {
-    console.error('Submission error:', error)
+  } catch {
+    console.error('Submission error')
     toast.error('Failed to create show. Please try again or check n8n connection.')
   } finally {
     setIsSubmitting(false)

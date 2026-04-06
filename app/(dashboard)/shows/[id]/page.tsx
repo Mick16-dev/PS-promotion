@@ -136,16 +136,20 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
-          portal_token: show.portal_token || show.id, // Explicitly include token in state
+          portal_token: show.portal_token, // NO FALLBACK TO UUID HERE
           portalUrl: (() => {
             const firstMatWithToken = show.materials?.find((m: any) => m.portal_token);
-            const portalToken = show.portal_token || firstMatWithToken?.portal_token || show.id; // Ultimate fallback to show.id
+            const portalToken = show.portal_token || firstMatWithToken?.portal_token; // Prioritize tokens, fallback to null if missing
             const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
             
             let finalPortalUrl = show.portal_url || '';
             // If the stored URL is missing a token or belongs to a different domain, rebuild it
-            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) {
+            // Only rebuild if we actually HAVE a portalToken
+            if ((!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) && portalToken) {
               finalPortalUrl = `${basePortalUrl}/?token=${portalToken}`;
+            } else if (!finalPortalUrl && !portalToken) {
+              // Extreme fallback to UUID only if absolutely no token exists anywhere
+              finalPortalUrl = `${basePortalUrl}/?token=${show.id}`;
             }
             return finalPortalUrl;
           })()
@@ -226,12 +230,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       }
 
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
-      // Use showInfo.portal_token from the database as the primary token source
+      
+      // Resolve the best available token:
+      // 1. Show-level portal_token (15-char standard)
+      // 2. Material-level portal_token (15-char standard fallback)
+      // 3. Show ID (UUID legacy fallback)
       const showToken = String(showInfo?.portal_token || '').trim()
       const docToken = String(doc.portal_token || '').trim()
-      const token = showToken || docToken
+      const token = showToken || docToken || String(id || '').trim()
       
-      const fullPortalUrl = token ? `${basePortalUrl}/?token=${token}` : `${basePortalUrl}/`
+      const fullPortalUrl = `${basePortalUrl}/?token=${token}`
       const artistName = showInfo?.artist || 'Artist'
       const venueName = showInfo?.venue || 'Venue'
 
@@ -262,7 +270,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         deadline: doc.rawDeadline,
         show_name: venueName,
         portal_url: fullPortalUrl,
-        portal_token: docToken,
+        portal_token: token, // Send the identified token (short token if exists, else UUID)
         show_id: id,
         email_html
       }
@@ -289,7 +297,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       parsed[doc.id] = expiry
       localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
 
-    } catch (error) {
+    } catch {
       toast.error('Failed to send reminder. Try again later.')
     } finally {
       setIsSendingReminder(null)
