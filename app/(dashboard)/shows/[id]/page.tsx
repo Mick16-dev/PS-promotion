@@ -36,6 +36,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   const resolvedParams = (params && typeof (params as any).then === 'function') ? React.use(params) : params;
   const id = resolvedParams ? (resolvedParams as any).id : null;
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
+  const [isResendingEmail, setIsResendingEmail] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
@@ -225,16 +226,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     setIsSendingReminder(doc.id)
     
     try {
-      if (!REMINDER_WEBHOOK_URL) {
-        throw new Error('Reminder webhook is not configured.')
-      }
-
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
-      
-      // Resolve the best available token:
-      // 1. Show-level portal_token (15-char standard)
-      // 2. Material-level portal_token (15-char standard fallback)
-      // 3. Show ID (UUID legacy fallback)
       const showToken = String(showInfo?.portal_token || '').trim()
       const docToken = String(doc.portal_token || '').trim()
       const token = showToken || docToken || String(id || '').trim()
@@ -243,42 +235,25 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       const artistName = showInfo?.artist || 'Artist'
       const venueName = showInfo?.venue || 'Venue'
 
-      // Pre-build the full reminder HTML so n8n just forwards it — no n8n templating needed
-      const email_html = `<!DOCTYPE html>
-<html>
-<body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0;">
-  <div style="max-width:600px;margin:auto;background:white;border-radius:10px;padding:40px;">
-    <h2 style="margin-top:0;color:#111;">Hi ${artistName},</h2>
-    <p style="color:#333;">This is a friendly reminder that your <strong>${doc.name}</strong> for the show at <strong>${venueName}</strong> is due soon.</p>
-    ${doc.rawDeadline ? `<p style="color:#e55;">Deadline: <strong>${new Date(doc.rawDeadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>` : ''}
-    <p style="color:#333;">Please submit it via your Artist Portal:</p>
-    <a href="${fullPortalUrl}"
-       style="display:inline-block;background:#000;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:16px 0;">
-      OPEN ARTIST PORTAL
-    </a>
-    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
-    <p style="color:#888;font-size:12px;">Best regards,<br><strong>ShowReady Production Team</strong></p>
-  </div>
-</body>
-</html>`
-
-      const payload = {
-        material_id: doc.id,
-        artist_email: showInfo?.artistEmail,
-        artist_name: artistName,
-        item_name: doc.name,
-        deadline: doc.rawDeadline,
-        show_name: venueName,
-        portal_url: fullPortalUrl,
-        portal_token: token, // Send the identified token (short token if exists, else UUID)
-        show_id: id,
-        email_html
-      }
-
-      const response = await fetch(REMINDER_WEBHOOK_URL, {
+      // Use the internal proxy route instead of hitting n8n directly to avoid CORS/environment issues
+      const response = await fetch('/api/n8n/send-reminder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          material_id: doc.id,
+          artist_email: showInfo?.artistEmail,
+          artist_name: artistName,
+          item_name: doc.name,
+          deadline: doc.rawDeadline,
+          show_name: venueName,
+          portal_url: fullPortalUrl,
+          portal_token: token,
+          show_id: id,
+          venue_name: venueName,
+          city: showInfo?.city || '',
+          show_date: showInfo?.rawDate || '',
+          show_time: showInfo?.time || 'TBD'
+        })
       })
 
       if (!response.ok) throw new Error('Reminder failed')
@@ -297,10 +272,47 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       parsed[doc.id] = expiry
       localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
 
-    } catch {
-      toast.error('Failed to send reminder. Try again later.')
+    } catch (err) {
+      console.error('REMINDER_ERROR:', err)
+      toast.error('Failed to send reminder. Internal error.')
     } finally {
       setIsSendingReminder(null)
+    }
+  }
+
+  const handleResendEmail = async () => {
+    if (!showInfo?.artistEmail) {
+      toast.error('No artist email found.')
+      return
+    }
+
+    setIsResendingEmail(true)
+    try {
+      const response = await fetch('/api/n8n/resend-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          show_id: id,
+          artist_email: showInfo.artistEmail,
+          artist_name: showInfo.artist,
+          venue_name: showInfo.venue,
+          city: showInfo.city,
+          show_date: showInfo.rawDate,
+          portal_url: showInfo.portalUrl,
+          portal_token: showInfo.portal_token
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to resend')
+
+      toast.success('Portal Link Re-sent', {
+        description: `Link sent to ${showInfo.artistEmail}`
+      })
+    } catch (err) {
+      console.error('RESEND_EMAIL_ERROR:', err)
+      toast.error('Failed to resend portal email.')
+    } finally {
+      setIsResendingEmail(false)
     }
   }
 
@@ -508,8 +520,13 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 gap-2 h-12 rounded-xl text-xs font-bold bg-white/5" onClick={handleCopyLink}>
                   <Copy size={16} /> Copy Link
                 </Button>
-                <Button className="flex-1 bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 gap-2 h-12 rounded-xl text-xs font-bold" onClick={() => toast.success('Portal email re-sent to artist.')}>
-                  <Mail size={16} /> Resend Email
+                <Button 
+                  className="flex-1 bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 gap-2 h-12 rounded-xl text-xs font-bold" 
+                  onClick={handleResendEmail}
+                  disabled={isResendingEmail}
+                >
+                  {isResendingEmail ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />} 
+                  {isResendingEmail ? 'Sending...' : 'Resend Email'}
                 </Button>
               </div>
             </div>
