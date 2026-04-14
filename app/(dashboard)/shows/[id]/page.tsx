@@ -205,6 +205,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             submittedAt: submittedStr,
             daysInfo,
             fileUrl: mat.file_url || '',
+            hasFile: !!mat.file_url,
             portal_token: mat.portal_token || ''
           }
         })
@@ -513,30 +514,30 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                     </div>
 
                     <div className="mt-8 relative z-10">
-                      {isReceived ? (
+                      {doc.hasFile ? (
                         <div className="flex gap-2">
                            <Button 
                              onClick={() => handleViewDocument(doc)}
-                             className="flex-1 h-12 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-xs uppercase tracking-widest shadow-xl shadow-white/5"
+                             className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/40 active:scale-95 transition-all"
                            >
-                              <Eye size={16} className="mr-2" /> View
+                              <Eye size={20} className="mr-2" /> View Document
                            </Button>
                            <Button 
                              onClick={() => handleViewDocument(doc)}
                              variant="outline"
-                             className="w-12 h-12 p-0 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10"
+                             className="w-14 h-14 p-0 rounded-2xl border-white/10 bg-white/5 text-white hover:bg-white/10"
                            >
-                              <Download size={16} />
+                              <Download size={20} />
                            </Button>
                         </div>
                       ) : (
                         <Button 
                           onClick={() => handleReminder(doc)}
                           disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                          className={`w-full h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
+                          className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
                             doc.status === 'late' 
-                              ? 'bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20' 
-                              : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 hover:bg-amber-500/30' 
+                              : 'bg-white/5 border border-white/10 text-white/40 hover:bg-white/10'
                           }`}
                         >
                            {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="mr-2" />}
@@ -596,10 +597,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                       </td>
                       <td className="p-6 text-right">
                          <div className="flex justify-end gap-2">
-                           {isReceived ? (
-                             <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest" onClick={() => handleViewDocument(doc)}>View</Button>
+                           {doc.hasFile ? (
+                             <Button size="sm" className="h-9 px-4 bg-destructive text-white hover:bg-destructive/90 text-[10px] font-black uppercase tracking-widest rounded-lg" onClick={() => handleViewDocument(doc)}>View File</Button>
                            ) : (
-                             <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest" onClick={() => handleReminder(doc)}>Remind</Button>
+                             <Button size="sm" variant="outline" className="h-9 px-4 border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest rounded-lg" onClick={() => handleReminder(doc)}>Remind</Button>
                            )}
                          </div>
                       </td>
