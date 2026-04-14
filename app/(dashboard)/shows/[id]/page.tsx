@@ -257,10 +257,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     }
 
     try {
-      // Extract the path from the URL
-      // Expected format: .../storage/v1/object/public/BUCKET_NAME/PATH_TO_FILE
-      // OR if it's already just a path.
       let path = doc.fileUrl
+      
+      // If it's an external link (like Google Drive or another domain) not hosted in our Supabase storage
+      if (!path.includes('/storage/v1/object/') && path.startsWith('http')) {
+         window.open(path, '_blank')
+         return
+      }
+
       let bucket = 'production-materials' // Default assumption
 
       if (path.includes('/storage/v1/object/')) {
@@ -292,7 +296,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       console.error('SIGNED_URL_ERROR:', err)
       // Fallback to direct URL if signed URL fails, maybe it's public
       window.open(doc.fileUrl, '_blank')
-      toast.error('Secure link generation failed. Attempting direct access.')
     }
   }
 
