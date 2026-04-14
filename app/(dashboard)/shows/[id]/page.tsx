@@ -70,10 +70,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       if (!id) return
       
       try {
-        setIsLoading(true)
+        // Only set loading on initial fetch
+        if (!showInfo) setIsLoading(true)
 
         // 1. Fetch Show details
-        console.log('Fetching show with ID:', id);
         const { data: showData, error: showErr } = await supabase
           .from('shows')
           .select('*')
@@ -82,13 +82,12 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
         if (showErr) {
           console.error('SUPABASE_SHOW_FETCH_ERROR. ID:', id, 'ERROR:', showErr)
-          setIsLoading(false)
+          if (!showInfo) setIsLoading(false)
           return
         }
 
         if (!showData) {
-          console.error('SHOW_DATA_EMPTY. ID:', id)
-          setIsLoading(false)
+          if (!showInfo) setIsLoading(false)
           return
         }
 
@@ -143,19 +142,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
-          portal_token: show.portal_token, // NO FALLBACK TO UUID HERE
+          portal_token: show.portal_token,
           portalUrl: (() => {
             const firstMatWithToken = show.materials?.find((m: any) => m.portal_token);
-            const portalToken = show.portal_token || firstMatWithToken?.portal_token; // Prioritize tokens, fallback to null if missing
+            const portalToken = show.portal_token || firstMatWithToken?.portal_token;
             const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
             
             let finalPortalUrl = show.portal_url || '';
-            // If the stored URL is missing a token or belongs to a different domain, rebuild it
-            // Only rebuild if we actually HAVE a portalToken
             if ((!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) && portalToken) {
               finalPortalUrl = `${basePortalUrl}/?token=${portalToken}`;
             } else if (!finalPortalUrl && !portalToken) {
-              // Extreme fallback to UUID only if absolutely no token exists anywhere
               finalPortalUrl = `${basePortalUrl}/?token=${show.id}`;
             }
             return finalPortalUrl;
@@ -225,7 +221,33 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     }
 
     fetchShowDetail()
-  }, [id])
+
+    // Realtime subscription for live updates
+    const channel = supabase
+      .channel(`show-${id}-updates`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'materials',
+          filter: `show_id=eq.${id}`
+        },
+        (payload) => {
+          console.log('Realtime material update detected:', payload)
+          fetchShowDetail()
+          toast('Live Update', {
+            description: 'The artist has updated document status.',
+            icon: <Loader2 size={14} className="animate-spin text-primary" />
+          })
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [id, showInfo?.id])
 
   const handleViewDocument = async (doc: any) => {
     if (!doc.fileUrl) {
