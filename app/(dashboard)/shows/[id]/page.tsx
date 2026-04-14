@@ -195,7 +195,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           return {
             id: mat.id,
             name: mat.item_name || 'Document',
-            status: docStatus,
+            status: isDelivered ? 'delivered' : (mat.deadline && new Date(mat.deadline) < now2 ? 'late' : 'awaiting'),
             deadline: deadlineStr,
             rawDeadline: mat.deadline,
             submittedAt: submittedStr,
@@ -502,30 +502,33 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 const Icon = getNameIcon(doc.name)
 
                 return (
-                  <div 
+                  <motion.div 
                     key={doc.id}
+                    layoutProps={{ duration: 0.5 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
-                      isReceived 
+                      doc.hasFile 
                         ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
                         : 'bg-white/[0.01] border-white/5 hover:border-white/10'
                     }`}
                   >
                     <div className="space-y-6 relative z-10">
                       <div className="flex items-start justify-between">
-                        <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${isReceived ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
+                        <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${doc.hasFile ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
                           <Icon size={24} />
                         </div>
                         <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
-                          isReceived ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
+                          doc.hasFile ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
                         }`}>
-                          {isReceived ? '✅ Received' : '⏳ Pending'}
+                          {doc.hasFile ? '✅ Received' : '⏳ Pending'}
                         </Badge>
                       </div>
 
                       <div>
                         <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
                         <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
-                          {isReceived 
+                          {doc.hasFile 
                             ? `Verification complete. Document is secured and available for production review.` 
                             : doc.daysInfo 
                               ? `Requirement is ${doc.daysInfo}. The artist is currently flagged in the portal.`
@@ -535,45 +538,50 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                       </div>
                     </div>
 
-                    <div className="mt-8 relative z-10">
+                    <div className="mt-8 relative z-10 flex flex-col gap-3">
                       {doc.hasFile ? (
                         <div className="flex gap-2">
-                           <Button 
+                           <motion.button 
+                             whileHover={{ scale: 1.02 }}
+                             whileTap={{ scale: 0.98 }}
                              onClick={() => handleViewDocument(doc)}
-                             className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/40 active:scale-95 transition-all"
+                             className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/20 active:scale-95 transition-all flex items-center justify-center"
                            >
-                              <Eye size={20} className="mr-2" /> View Document
-                           </Button>
-                           <Button 
+                              <Eye size={20} className="mr-2" /> View
+                           </motion.button>
+                           <motion.button 
+                             whileHover={{ scale: 1.02 }}
+                             whileTap={{ scale: 0.98 }}
                              onClick={() => handleViewDocument(doc)}
-                             variant="outline"
-                             className="w-14 h-14 p-0 rounded-2xl border-white/10 bg-white/5 text-white hover:bg-white/10"
+                             className="w-14 h-14 p-0 rounded-2xl border border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center justify-center transition-colors"
                            >
                               <Download size={20} />
-                           </Button>
+                           </motion.button>
                         </div>
                       ) : (
-                        <Button 
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => handleReminder(doc)}
                           disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                          className={`w-full h-14 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
+                          className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 ${
                             doc.status === 'late' 
-                              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30 hover:bg-amber-500/30' 
+                              ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20' 
                               : 'bg-white/5 border border-white/10 text-white/40 hover:bg-white/10'
                           }`}
                         >
-                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="mr-2" />}
+                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                            {isSendingReminder === doc.id ? 'Sending...' : 'Remind Artist'}
-                        </Button>
+                        </motion.button>
                       )}
                     </div>
 
-                    {isReceived && (
+                    {doc.hasFile && (
                       <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.04] transition-opacity">
                         <Icon size={160} />
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 )
               })
             )}
