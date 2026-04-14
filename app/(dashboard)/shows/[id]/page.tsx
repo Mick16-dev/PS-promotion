@@ -19,7 +19,13 @@ import {
   Send,
   AlertTriangle,
   Music,
-  Loader2
+  Loader2,
+  FileSearch,
+  LayoutGrid,
+  ShieldCheck,
+  Utensils,
+  Image as ImageIcon,
+  Map as MapIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -220,6 +226,52 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     fetchShowDetail()
   }, [id])
 
+  const handleViewDocument = async (doc: any) => {
+    if (!doc.fileUrl) {
+      toast.error('No file associated with this document.')
+      return
+    }
+
+    try {
+      // Extract the path from the URL
+      // Expected format: .../storage/v1/object/public/BUCKET_NAME/PATH_TO_FILE
+      // OR if it's already just a path.
+      let path = doc.fileUrl
+      let bucket = 'production-materials' // Default assumption
+
+      if (path.includes('/storage/v1/object/')) {
+        const parts = path.split('/storage/v1/object/')
+        if (parts.length > 1) {
+          const subParts = parts[1].split('/')
+          // Remove 'public/' or 'authenticated/' prefix if present
+          if (subParts[0] === 'public' || subParts[0] === 'authenticated' || subParts[0] === 'sign') {
+            bucket = subParts[1]
+            path = subParts.slice(2).join('/')
+          } else {
+            bucket = subParts[0]
+            path = subParts.slice(1).join('/')
+          }
+        }
+      }
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(path, 3600)
+
+      if (error) throw error
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank')
+      } else {
+        throw new Error('Could not generate signed URL')
+      }
+    } catch (err) {
+      console.error('SIGNED_URL_ERROR:', err)
+      // Fallback to direct URL if signed URL fails, maybe it's public
+      window.open(doc.fileUrl, '_blank')
+      toast.error('Secure link generation failed. Attempting direct access.')
+    }
+  }
+
   const handleReminder = async (doc: any) => {
     if (lockouts[doc.id]) return
 
@@ -394,10 +446,96 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* DOCUMENTS SECTION */}
+        {/* PRODUCTION DOCUMENTS GRID (NEW SECTION) */}
+        <div className="lg:col-span-12 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
+               <LayoutGrid className="text-primary" size={24} />
+               Artist Document Viewer
+            </h2>
+            <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-white/5 border border-white/10">
+               <ShieldCheck className="text-emerald-400" size={14} />
+               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none pt-0.5">Secure Storage Active</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { name: 'Stage Plot', icon: MapIcon, key: 'stage plot' },
+              { name: 'Catering', icon: Utensils, key: 'catering' },
+              { name: 'Press Kit', icon: ImageIcon, key: 'press kit' }
+            ].map((type) => {
+              const doc = documents.find(d => d.name.toLowerCase().includes(type.key))
+              const isReceived = doc && doc.status === 'delivered'
+              
+              return (
+                <div 
+                  key={type.name}
+                  className={`relative overflow-hidden group rounded-[2rem] border p-8 transition-all h-full flex flex-col justify-between ${
+                    isReceived 
+                      ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40' 
+                      : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+                  }`}
+                >
+                  <div className="space-y-6 relative z-10">
+                    <div className="flex items-start justify-between">
+                      <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${isReceived ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                        <type.icon size={24} />
+                      </div>
+                      <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
+                        isReceived ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground border-white/10'
+                      }`}>
+                        {isReceived ? '✅ Received' : '⏳ Pending'}
+                      </Badge>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">{type.name}</h3>
+                      <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                        {isReceived 
+                          ? `Verification complete. Document is secured and ready for production review.` 
+                          : `Awaiting transmission from the artist. Requirement has been flagged in their portal.`
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 relative z-10">
+                    {isReceived ? (
+                      <Button 
+                        onClick={() => handleViewDocument(doc)}
+                        className="w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-xs uppercase tracking-widest shadow-xl shadow-white/5"
+                      >
+                         <Eye size={16} className="mr-2" /> View Document
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="outline"
+                        disabled
+                        className="w-full h-12 rounded-xl border-white/5 bg-white/5 text-muted-foreground/40 font-bold text-xs uppercase tracking-widest"
+                      >
+                         Waiting for Upload
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Aesthetic backgrounds */}
+                  {isReceived && (
+                    <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                      <type.icon size={160} />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* DOCUMENTS SECTION (ORIGINAL LIST) */}
         <div className="lg:col-span-8 space-y-6">
           <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-            Show Documents
+            <FileSearch className="text-primary" size={24} />
+            All Logistics
             <span className="h-6 px-3 rounded-full bg-white/5 border border-white/10 text-[10px] flex items-center justify-center text-muted-foreground font-pro-data tracking-[0.2em]">
               {deliveredCount} OF {documents.length} DELIVERED
             </span>
@@ -458,7 +596,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                         {isDelivered ? (
                           <>
                             {doc.fileUrl && (
-                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => window.open(doc.fileUrl, '_blank')}>
+                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => handleViewDocument(doc)}>
                                 <Eye size={14} /> Preview File
                               </Button>
                             )}
