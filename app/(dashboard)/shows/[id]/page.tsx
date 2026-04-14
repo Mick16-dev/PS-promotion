@@ -460,180 +460,155 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: 'Stage Plot', icon: MapIcon, key: 'stage plot' },
-              { name: 'Catering', icon: Utensils, key: 'catering' },
-              { name: 'Press Kit', icon: ImageIcon, key: 'press kit' }
-            ].map((type) => {
-              const doc = documents.find(d => d.name.toLowerCase().includes(type.key))
-              const isReceived = doc && doc.status === 'delivered'
-              
-              return (
-                <div 
-                  key={type.name}
-                  className={`relative overflow-hidden group rounded-[2rem] border p-8 transition-all h-full flex flex-col justify-between ${
-                    isReceived 
-                      ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40' 
-                      : 'bg-white/[0.02] border-white/5 hover:border-white/10'
-                  }`}
-                >
-                  <div className="space-y-6 relative z-10">
-                    <div className="flex items-start justify-between">
-                      <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${isReceived ? 'text-emerald-400' : 'text-muted-foreground'}`}>
-                        <type.icon size={24} />
+            {documents.length === 0 ? (
+              <div className="col-span-full rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01] p-24 text-center">
+                 <Loader2 className="mx-auto mb-4 animate-spin text-muted-foreground/20" size={32} />
+                 <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Awaiting Material Configuration</p>
+              </div>
+            ) : (
+              documents.map((doc) => {
+                const isReceived = doc.status === 'delivered'
+                
+                const getNameIcon = (name: string) => {
+                  const n = name.toLowerCase()
+                  if (n.includes('stage') || n.includes('plot')) return MapIcon
+                  if (n.includes('cater') || n.includes('hospitality')) return Utensils
+                  if (n.includes('press') || n.includes('photo') || n.includes('epk')) return ImageIcon
+                  return FileSearch
+                }
+                const Icon = getNameIcon(doc.name)
+
+                return (
+                  <div 
+                    key={doc.id}
+                    className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
+                      isReceived 
+                        ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
+                        : 'bg-white/[0.01] border-white/5 hover:border-white/10'
+                    }`}
+                  >
+                    <div className="space-y-6 relative z-10">
+                      <div className="flex items-start justify-between">
+                        <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${isReceived ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
+                          <Icon size={24} />
+                        </div>
+                        <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
+                          isReceived ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
+                        }`}>
+                          {isReceived ? '✅ Received' : '⏳ Pending'}
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
-                        isReceived ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground border-white/10'
-                      }`}>
-                        {isReceived ? '✅ Received' : '⏳ Pending'}
-                      </Badge>
+
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
+                        <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
+                          {isReceived 
+                            ? `Verification complete. Document is secured and available for production review.` 
+                            : doc.daysInfo 
+                              ? `Requirement is ${doc.daysInfo}. The artist is currently flagged in the portal.`
+                              : `Awaiting transmission. Material initialized in the production workspace.`
+                          }
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-xl font-bold text-white mb-2">{type.name}</h3>
-                      <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                        {isReceived 
-                          ? `Verification complete. Document is secured and ready for production review.` 
-                          : `Awaiting transmission from the artist. Requirement has been flagged in their portal.`
-                        }
-                      </p>
+                    <div className="mt-8 relative z-10">
+                      {isReceived ? (
+                        <div className="flex gap-2">
+                           <Button 
+                             onClick={() => handleViewDocument(doc)}
+                             className="flex-1 h-12 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-xs uppercase tracking-widest shadow-xl shadow-white/5"
+                           >
+                              <Eye size={16} className="mr-2" /> View
+                           </Button>
+                           <Button 
+                             onClick={() => handleViewDocument(doc)}
+                             variant="outline"
+                             className="w-12 h-12 p-0 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10"
+                           >
+                              <Download size={16} />
+                           </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          onClick={() => handleReminder(doc)}
+                          disabled={isSendingReminder === doc.id || lockouts[doc.id]}
+                          className={`w-full h-12 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${
+                            doc.status === 'late' 
+                              ? 'bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20' 
+                              : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                          }`}
+                        >
+                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="mr-2" />}
+                           {isSendingReminder === doc.id ? 'Sending...' : 'Remind Artist'}
+                        </Button>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="mt-8 relative z-10">
-                    {isReceived ? (
-                      <Button 
-                        onClick={() => handleViewDocument(doc)}
-                        className="w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-xs uppercase tracking-widest shadow-xl shadow-white/5"
-                      >
-                         <Eye size={16} className="mr-2" /> View Document
-                      </Button>
-                    ) : (
-                      <Button 
-                        variant="outline"
-                        disabled
-                        className="w-full h-12 rounded-xl border-white/5 bg-white/5 text-muted-foreground/40 font-bold text-xs uppercase tracking-widest"
-                      >
-                         Waiting for Upload
-                      </Button>
+                    {isReceived && (
+                      <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.04] transition-opacity">
+                        <Icon size={160} />
+                      </div>
                     )}
                   </div>
-
-                  {/* Aesthetic backgrounds */}
-                  {isReceived && (
-                    <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                      <type.icon size={160} />
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                )
+              })
+            )}
           </div>
         </div>
 
-        {/* DOCUMENTS SECTION (ORIGINAL LIST) */}
-        <div className="lg:col-span-8 space-y-6">
-          <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-            <FileSearch className="text-primary" size={24} />
-            All Logistics
-            <span className="h-6 px-3 rounded-full bg-white/5 border border-white/10 text-[10px] flex items-center justify-center text-muted-foreground font-pro-data tracking-[0.2em]">
-              {deliveredCount} OF {documents.length} DELIVERED
-            </span>
-          </h2>
-          
-          {documents.length === 0 ? (
-            <div className="glass-card rounded-3xl p-12 flex flex-col items-center justify-center text-center border-white/5 bg-muted/5">
-              <p className="text-muted-foreground font-medium">No documents have been set up for this show yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {documents.map((doc) => {
-                const isDelivered = doc.status === 'delivered'
-                const isLate = doc.status === 'late'
-                const isAwaiting = doc.status === 'awaiting'
+        {/* LOGISTICS LOG TABLE */}
+        <div className="lg:col-span-12 pt-12 border-t border-white/5">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+              <FileSearch size={22} className="text-primary/50" />
+              Submission Log
+            </h2>
+          </div>
 
-                return (
-                  <div
-                    key={doc.id}
-                    className={`glass-card rounded-3xl p-6 transition-all bg-muted/5 ${
-                      isDelivered ? 'border-emerald-500/20 hover:border-emerald-500/40 shadow-[0_4px_30px_rgba(16,185,129,0.05)]' :
-                      isLate ? 'border-red-500/30 hover:border-red-500/50 bg-red-500/[0.02] shadow-[0_4px_30px_rgba(239,68,68,0.08)]' :
-                      'border-amber-500/20 hover:border-amber-500/40 shadow-[0_4px_30px_rgba(245,158,11,0.05)]'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          {isDelivered && <CheckCircle2 className="text-emerald-400 h-6 w-6" />}
-                          {isAwaiting && <Clock3 className="text-amber-500 h-6 w-6" />}
-                          {isLate && <AlertTriangle className="text-red-500 h-6 w-6" />}
-                          <h3 className="text-xl font-bold tracking-tight text-white">{doc.name}</h3>
-                          <Badge variant="outline" className={`font-bold uppercase tracking-widest text-[10px] ${
-                            isDelivered ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                            isLate ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                            'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                          }`}>
-                            {isDelivered ? 'Delivered' : isLate ? 'Late' : 'Awaiting'}
-                          </Badge>
-                        </div>
-                        <div className="mt-2 ml-9 space-y-1">
-                          {isDelivered && doc.submittedAt && (
-                            <p className="text-sm text-muted-foreground font-medium">Submitted {doc.submittedAt}</p>
-                          )}
-                          {!isDelivered && doc.deadline && (
-                            <p className="text-sm text-muted-foreground font-medium">
-                              {isLate ? `Was due ${doc.deadline}` : `Due by ${doc.deadline}`}
-                            </p>
-                          )}
-                          {!isDelivered && doc.daysInfo && (
-                            <p className={`text-xs font-bold font-pro-data uppercase tracking-widest ${
-                              isLate ? 'text-red-500' : 'text-amber-500/80'
-                            }`}>{doc.daysInfo}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="ml-9 sm:ml-0 flex items-center gap-3">
-                        {isDelivered ? (
-                          <>
-                            {doc.fileUrl && (
-                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => handleViewDocument(doc)}>
-                                <Eye size={14} /> Preview File
-                              </Button>
-                            )}
-                            {doc.fileUrl && (
-                              <Button variant="outline" className="border-white/10 hover:bg-white/10 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl" onClick={() => toast.success(`Downloading ${doc.name}...`)}>
-                                <Download size={14} /> Download
-                              </Button>
-                            )}
-                          </>
-                        ) : isLate ? (
-                          <Button
-                            variant="default"
-                            onClick={() => handleReminder(doc)}
-                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                            className="bg-red-500 text-white hover:bg-red-600 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-11 px-6 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95 min-w-[170px]"
-                          >
-                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />)}
-                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Urgent Reminder')}
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            onClick={() => handleReminder(doc)}
-                            disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                            className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-400 border-amber-500/20 gap-2 font-pro-data uppercase tracking-widest text-[10px] h-10 px-5 rounded-xl transition-colors min-w-[150px]"
-                          >
-                            {isSendingReminder === doc.id ? <Loader2 size={14} className="animate-spin" /> : (lockouts[doc.id] ? <CheckCircle2 size={14} /> : <Send size={14} />)}
-                            {isSendingReminder === doc.id ? 'Sending...' : (lockouts[doc.id] ? 'Reminder Sent' : 'Send Reminder')}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+          <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.01]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/5">
+                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Material Name</th>
+                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 text-center">Status</th>
+                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Deadline</th>
+                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {documents.map((doc) => {
+                  const isReceived = doc.status === 'delivered'
+                  return (
+                    <tr key={doc.id} className="hover:bg-white/[0.015] transition-colors">
+                      <td className="p-6">
+                        <span className="font-bold text-sm text-white">{doc.name}</span>
+                      </td>
+                      <td className="p-6 text-center">
+                         <Badge variant="outline" className={`font-bold uppercase tracking-widest text-[9px] ${
+                           isReceived ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' : 'text-amber-500 border-amber-500/20 bg-amber-500/5'
+                         }`}>
+                           {doc.status || 'Pending'}
+                         </Badge>
+                      </td>
+                      <td className="p-6">
+                        <span className="text-xs text-muted-foreground font-medium">{doc.deadline}</span>
+                      </td>
+                      <td className="p-6 text-right">
+                         <div className="flex justify-end gap-2">
+                           {isReceived ? (
+                             <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest" onClick={() => handleViewDocument(doc)}>View</Button>
+                           ) : (
+                             <Button size="sm" variant="outline" className="h-8 border-white/10 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest" onClick={() => handleReminder(doc)}>Remind</Button>
+                           )}
+                         </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* SIDEBAR */}
