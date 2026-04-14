@@ -247,7 +247,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [id, showInfo?.id])
+  }, [id])
 
   const handleViewDocument = async (doc: any) => {
     if (!doc.fileUrl) {
@@ -504,9 +504,9 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 return (
                   <motion.div 
                     key={doc.id}
-                    layoutProps={{ duration: 0.5 }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                     className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
                       doc.hasFile 
                         ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
