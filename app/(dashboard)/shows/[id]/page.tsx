@@ -133,6 +133,10 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           }
         }
 
+        // Resolve the effective portal token (Show token > Material token > Show ID)
+        const firstMatWithToken = (materialsData || []).find((m: any) => m.portal_token);
+        const effectivePortalToken = showData.portal_token || firstMatWithToken?.portal_token || id;
+
         setShowInfo({
           artist: artistInfo?.name || 'Unnamed Artist',
           artistEmail: artistInfo?.email || '',
@@ -143,17 +147,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
           status: computedStatus,
-          portal_token: show.portal_token,
+          portal_token: effectivePortalToken,
           portalUrl: (() => {
-            const firstMatWithToken = show.materials?.find((m: any) => m.portal_token);
-            const portalToken = show.portal_token || firstMatWithToken?.portal_token;
-            const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app';
+            const basePortalUrl = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '');
             
             let finalPortalUrl = show.portal_url || '';
-            if ((!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) && portalToken) {
-              finalPortalUrl = `${basePortalUrl}/?token=${portalToken}`;
-            } else if (!finalPortalUrl && !portalToken) {
-              finalPortalUrl = `${basePortalUrl}/?token=${show.id}`;
+            // If the URL is missing, invalid, or just a Supabase storage link, reconstruct it
+            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) {
+              finalPortalUrl = `${basePortalUrl}/?token=${effectivePortalToken}`;
             }
             return finalPortalUrl;
           })()
@@ -300,7 +301,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   }
 
   const handleReminder = async (doc: any) => {
-    if (lockouts[doc.id]) return
+    // We removed the lockout check to ensure the button remains functional as requested.
+
 
     setIsSendingReminder(doc.id)
     
@@ -335,13 +337,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         })
       })
 
-      if (!response.ok) throw new Error('Reminder failed')
-
       toast.success('Reminder Sent', {
         description: `Requested ${doc.name} update.`
       })
 
-      // Set 24h lockout
+      // We still track the "sent recently" state but don't hard-block the UI
       const expiry = Date.now() + 24 * 60 * 60 * 1000
       const newLockouts = { ...lockouts, [doc.id]: true }
       setLockouts(newLockouts)
@@ -377,6 +377,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           venue_name: showInfo.venue,
           city: showInfo.city,
           show_date: showInfo.rawDate,
+          show_time: showInfo.time,
+          show_name: showInfo.venue,
           portal_url: showInfo.portalUrl,
           portal_token: showInfo.portal_token
         })
@@ -564,18 +566,18 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                         </div>
                       ) : (
                         <motion.button 
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => handleReminder(doc)}
-                          disabled={isSendingReminder === doc.id || lockouts[doc.id]}
-                          className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 ${
+                          disabled={isSendingReminder === doc.id}
+                          className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 cursor-pointer relative z-20 ${
                             doc.status === 'late' 
-                              ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20' 
-                              : 'bg-white/5 border border-white/10 text-white/40 hover:bg-white/10'
-                          }`}
+                              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40 hover:border-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
+                              : 'bg-white/10 border border-white/20 text-white hover:border-white/40 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+                          } ${isSendingReminder === doc.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                           {isSendingReminder === doc.id ? 'Sending...' : 'Remind Artist'}
+                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin text-primary" /> : <Send size={16} className={doc.status === 'late' ? 'text-amber-500' : 'text-primary'} />}
+                           {isSendingReminder === doc.id ? 'Sending Request...' : 'Remind Artist'}
                         </motion.button>
                       )}
                     </div>
@@ -634,7 +636,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                            {doc.hasFile ? (
                              <Button size="sm" className="h-9 px-4 bg-destructive text-white hover:bg-destructive/90 text-[10px] font-black uppercase tracking-widest rounded-lg" onClick={() => handleViewDocument(doc)}>View File</Button>
                            ) : (
-                             <Button size="sm" variant="outline" className="h-9 px-4 border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest rounded-lg" onClick={() => handleReminder(doc)}>Remind</Button>
+                             <motion.button 
+                               whileHover={{ scale: 1.05 }}
+                               whileTap={{ scale: 0.95 }}
+                               disabled={isSendingReminder === doc.id}
+                               className="h-9 px-4 border border-white/20 bg-white/10 text-white hover:bg-white/20 text-[10px] font-black uppercase tracking-widest rounded-lg cursor-pointer transition-all flex items-center gap-2 shadow-sm"
+                               onClick={() => handleReminder(doc)}
+                             >
+                               {isSendingReminder === doc.id ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                               Remind
+                             </motion.button>
                            )}
                          </div>
                       </td>
@@ -668,14 +679,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 gap-2 h-12 rounded-xl text-xs font-bold bg-white/5" onClick={handleCopyLink}>
                   <Copy size={16} /> Copy Link
                 </Button>
-                <Button 
-                  className="flex-1 bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 gap-2 h-12 rounded-xl text-xs font-bold" 
+                <motion.button 
+                  whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(79, 70, 229, 0.4)' }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 bg-gradient-to-r from-primary to-indigo-600 text-white shadow-xl shadow-primary/20 gap-3 h-14 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-white/10" 
                   onClick={handleResendEmail}
                   disabled={isResendingEmail}
                 >
-                  {isResendingEmail ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />} 
-                  {isResendingEmail ? 'Sending...' : 'Resend Email'}
-                </Button>
+                  {isResendingEmail ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />} 
+                  {isResendingEmail ? 'Transmitting...' : 'Resend Portal Email'}
+                </motion.button>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const webhookUrl =
     process.env.N8N_RESEND_EMAIL_WEBHOOK ??
+    process.env.NEXT_PUBLIC_N8N_RESEND_EMAIL_WEBHOOK ??
     process.env.NEXT_PUBLIC_N8N_CREATE_SHOW_WEBHOOK?.replace('create-show', 'resend-email') ??
     ''
 
