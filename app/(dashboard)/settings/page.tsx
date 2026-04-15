@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
+import { supabase } from '@/lib/supabase'
 
 const settingsTabs = [
   { id: 'profile', name: 'Profile', icon: User },
@@ -27,20 +28,69 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  
+  // Profile State
+  const [fullName, setFullName] = useState('')
+  const [role, setRole] = useState('')
+  const [bio, setBio] = useState('')
+  const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
+
+  // Fetch Profile Data
+  React.useEffect(() => {
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserId(user.id)
+        setEmail(user.email || '')
+        
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (data && !error) {
+          setFullName(data.full_name || '')
+          setRole(data.role || '')
+          setBio(data.bio || '')
+        }
+      }
+    }
+    loadProfile()
+  }, [])
 
   const handleSaveChanges = async () => {
+    if (!userId) {
+      toast.error('User not authenticated')
+      return
+    }
+
     setIsSaving(true)
-    const promise = new Promise((resolve) => setTimeout(resolve, 1500))
     
-    toast.promise(promise, {
-        loading: 'Saving changes...',
-        success: () => {
-          setIsSaving(false)
-          setHasUnsavedChanges(false)
-          return 'Your settings have been updated.'
-        },
-        error: 'Error updating settings. Please try again.',
-    })
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          full_name: fullName,
+          role: role,
+          bio: bio,
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) {
+        throw error
+      }
+
+      toast.success('Your settings have been updated.')
+      setHasUnsavedChanges(false)
+    } catch (error: any) {
+      console.error('Error saving profile:', error)
+      toast.error(`Error: ${error.message || 'Could not update settings'}`)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -109,10 +159,13 @@ export default function SettingsPage() {
                     <Label htmlFor="fullname" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Full Name</Label>
                     <Input 
                       id="fullname" 
-                      defaultValue="" 
+                      value={fullName}
                       placeholder="Enter your full name"
                       className="bg-white/5 border-white/10 h-16 focus-visible:ring-primary/50 text-xl font-bold tracking-tight rounded-3xl p-6 transition-all hover:border-white/20"
-                      onChange={() => setHasUnsavedChanges(true)}
+                      onChange={(e) => {
+                        setFullName(e.target.value)
+                        setHasUnsavedChanges(true)
+                      }}
                     />
                   </div>
                   
@@ -121,7 +174,7 @@ export default function SettingsPage() {
                     <Input 
                       id="email" 
                       readOnly
-                      defaultValue="Signed-in email"
+                      value={email}
                       className="bg-black/40 border-white/5 h-16 text-xl tracking-tight rounded-3xl p-6 focus-visible:ring-0 select-none shadow-inner text-muted-foreground"
                     />
                   </div>
@@ -130,10 +183,13 @@ export default function SettingsPage() {
                     <Label htmlFor="role" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Your Role</Label>
                     <Input 
                       id="role" 
-                      defaultValue="" 
+                      value={role}
                       placeholder="Promoter, manager, or coordinator"
                       className="bg-white/5 border-white/10 h-16 focus-visible:ring-primary/50 text-xl font-bold tracking-tight rounded-3xl p-6 transition-all hover:border-white/20"
-                      onChange={() => setHasUnsavedChanges(true)}
+                      onChange={(e) => {
+                        setRole(e.target.value)
+                        setHasUnsavedChanges(true)
+                      }}
                     />
                   </div>
                   
@@ -141,9 +197,13 @@ export default function SettingsPage() {
                     <Label htmlFor="bio" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Bio</Label>
                     <textarea 
                       id="bio"
+                      value={bio}
                       className="w-full h-40 rounded-[2rem] bg-white/5 border-white/10 border p-6 focus:ring-2 focus:ring-primary/50 focus:outline-none focus:border-primary/50 text-white font-medium placeholder:text-muted-foreground/30 transition-all text-lg leading-relaxed hover:border-white/20 shadow-inner"
                       placeholder="Add a short profile bio"
-                      onChange={() => setHasUnsavedChanges(true)}
+                      onChange={(e) => {
+                        setBio(e.target.value)
+                        setHasUnsavedChanges(true)
+                      }}
                     />
                   </div>
                 </div>

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Music, ArrowRight, Github } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -150,7 +151,7 @@ export default function LoginPage() {
           <div className="space-y-1">
             <div className="flex items-center justify-between px-1">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Password</label>
-              <a href="#" className="text-[10px] font-bold text-primary/80 hover:text-primary transition-colors uppercase tracking-tight">Forgot?</a>
+              <Link href="/forgot-password" className="text-[10px] font-bold text-primary/80 hover:text-primary transition-colors uppercase tracking-tight">Forgot?</Link>
             </div>
             <input
               type="password"

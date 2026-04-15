@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 const PROTECTED_ROUTES = ['/', '/shows', '/artists', '/calendar', '/settings']
-const AUTH_ROUTES = ['/login']
+const AUTH_ROUTES = ['/login', '/forgot-password', '/reset-password']
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
@@ -12,7 +12,7 @@ function isAuthPath(pathname: string) {
   return AUTH_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
 
   const supabaseUrl =
