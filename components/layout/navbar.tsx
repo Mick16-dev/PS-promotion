@@ -20,12 +20,38 @@ export function Navbar() {
   const router = useRouter()
   const [notifications, setNotifications] = useState<any[]>([])
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
+  const [profileName, setProfileName] = useState<string>('')
   const notificationCount = notifications.length
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
+
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (data?.full_name) setProfileName(data.full_name)
+      }
+    }
+    loadProfile()
+
+    // Realtime update for navbar too
+    const channel = supabase
+      .channel('navbar-profile')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
+        if (payload.new.full_name) setProfileName(payload.new.full_name)
+      })
+      .subscribe()
+    
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -160,6 +186,9 @@ export function Navbar() {
         </DropdownMenu>
         
         <div className="flex items-center space-x-4 pl-6 border-l border-white/5">
+          {profileName && (
+            <span className="text-xs font-bold text-white/40 uppercase tracking-widest mr-2">{profileName}</span>
+          )}
           <Button 
             variant="ghost" 
             className="text-muted-foreground hover:text-white hover:bg-white/5 gap-2 px-4 rounded-xl font-pro-data uppercase tracking-widest text-xs font-bold h-11"
