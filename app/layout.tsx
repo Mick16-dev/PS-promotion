@@ -25,12 +25,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'PS-promotion | ShowReady Dashboard',
-    template: '%s | PS-promotion'
+    default: 'PS Promotion | Production Control',
+    template: '%s | PS Promotion'
   },
-  description: 'Professional music promoter dashboard for managing artists, shows, and materials with high-performance tracking.',
+  description: 'Pro-grade music promotion dashboard for artist advancement, material tracking, and show logistics management.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.svg',
   },
 }
 
