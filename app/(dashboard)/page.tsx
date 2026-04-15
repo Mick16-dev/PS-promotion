@@ -124,9 +124,6 @@ export default function DashboardHome() {
            </h1>
         </div>
         <div className="flex items-center gap-3">
-           <Button variant="outline" className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 font-semibold text-xs px-4 rounded-lg">
-             Customize View
-           </Button>
            <Button 
              onClick={() => setIsCreateModalOpen(true)}
              className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2 transition-all active:scale-95"
