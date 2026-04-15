@@ -15,7 +15,9 @@ import {
   ArrowRight,
   RefreshCw,
   Layers,
-  Filter
+  Filter,
+  Trash2,
+  Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
@@ -40,6 +42,7 @@ export default function ShowsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   async function fetchShows() {
     try {
@@ -89,6 +92,41 @@ export default function ShowsPage() {
     setIsRefreshing(true)
     fetchShows()
     toast.success('Syncing...', { description: 'Updating production metadata from backend.' })
+  }
+
+  async function handleDeleteShow(e: React.MouseEvent, id: string) {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!confirm('Are you sure you want to delete this show? This will also remove all associated materials and cannot be undone.')) {
+      return
+    }
+
+    setIsDeleting(id)
+    try {
+      // First delete materials to ensure clean cascade if FK is not set to cascade
+      const { error: matErr } = await supabase
+        .from('materials')
+        .delete()
+        .eq('show_id', id)
+      
+      if (matErr) console.error('Error deleting materials:', matErr)
+
+      const { error } = await supabase
+        .from('shows')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setShows(prev => prev.filter(s => s.id !== id))
+      toast.success('Show Deleted', { description: 'The engagement has been removed from the roster.' })
+    } catch (err: any) {
+      console.error('DELETE_SHOW_ERROR:', err)
+      toast.error('Deletion Failed', { description: err.message || 'Could not remove the show.' })
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   useEffect(() => {
@@ -189,9 +227,20 @@ export default function ShowsPage() {
                           </div>
                        </div>
                        
-                       <Button variant="ghost" size="icon" className="text-zinc-700 hover:text-white group-hover:bg-zinc-800 transition-all rounded-lg">
-                          <ArrowRight size={20} />
-                       </Button>
+                       <div className="flex items-center gap-3">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            disabled={isDeleting === show.id}
+                            onClick={(e) => handleDeleteShow(e, show.id)}
+                            className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-lg h-10 w-10"
+                          >
+                             {isDeleting === show.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={18} />}
+                          </Button>
+                          <Button variant="ghost" size="icon" className="text-zinc-700 hover:text-white group-hover:bg-zinc-800 transition-all rounded-lg h-10 w-10">
+                             <ArrowRight size={20} />
+                          </Button>
+                       </div>
                     </div>
                  </div>
               </Link>

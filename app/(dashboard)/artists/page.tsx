@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Search, Plus, User, Mail, Star, ChevronRight, MoreVertical, X, Loader2 } from 'lucide-react'
+import { Search, Plus, User, Mail, Star, ChevronRight, MoreVertical, X, Loader2, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ export default function ArtistsPage() {
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   async function fetchArtists() {
     try {
@@ -38,6 +39,24 @@ export default function ArtistsPage() {
       setNewName(''); setNewEmail(''); setShowModal(false)
       toast.success('Artist added to roster.')
     } catch (err: any) { toast.error('Failed: ' + (err.message || '')) } finally { setIsSaving(false) }
+  }
+
+  const handleDeleteArtist = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove ${name} from the roster?`)) return
+    
+    setIsDeleting(id)
+    try {
+      const { error } = await supabase.from('artists').delete().eq('id', id)
+      if (error) throw error
+      
+      setArtists(prev => prev.filter(a => a.id !== id))
+      toast.success('Artist Removed', { description: `${name} has been removed from the directory.` })
+    } catch (err: any) {
+      console.error('DELETE_ARTIST_ERROR:', err)
+      toast.error('Removal Failed', { description: err.message || 'Could not remove artist.' })
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   const filtered = artists.filter(a => a.name?.toLowerCase().includes(searchQuery.toLowerCase()) || a.email?.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -71,7 +90,21 @@ export default function ArtistsPage() {
           <div key={artist.id} className="bg-[#151618] border border-white/[0.04] rounded-xl p-6 hover:border-white/[0.08] transition-all group cursor-pointer shadow-xl">
             <div className="flex items-start justify-between mb-8">
               <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-2xl font-black">{artist.name?.[0] || '?'}</div>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreVertical size={16} /></Button>
+              <div className="flex gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  disabled={isDeleting === artist.id}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleDeleteArtist(artist.id, artist.name)
+                  }}
+                  className="h-8 w-8 rounded-lg text-zinc-600 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                >
+                  {isDeleting === artist.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={16} />}
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-600 hover:text-white"><MoreVertical size={16} /></Button>
+              </div>
             </div>
             <h3 className="text-xl font-bold text-white mb-1">{artist.name}</h3>
             <div className="flex items-center gap-2 text-zinc-500 mb-6"><Mail size={12} /><span className="text-xs">{artist.email || 'no-email@roster.com'}</span></div>
