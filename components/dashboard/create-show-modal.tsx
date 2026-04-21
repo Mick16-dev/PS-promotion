@@ -20,7 +20,8 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CalendarIcon, MapPin, Music, User, Send, Loader2, X } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
+import { CalendarIcon, MapPin, Music, User, Send, Loader2, X, Clock, Utensils, Info } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 
@@ -53,6 +54,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [city, setCity] = useState('')
   const [showDate, setShowDate] = useState('')
   const [showTime, setShowTime] = useState('')
+  const [loadInTime, setLoadInTime] = useState('')
+  const [soundcheckTime, setSoundcheckTime] = useState('')
+  const [doorsTime, setDoorsTime] = useState('')
+  const [cateringNotes, setCateringNotes] = useState('')
+  const [syncToCalendar, setSyncToCalendar] = useState(true)
 
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -177,6 +183,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         show_id,
         show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
+        load_in_time: loadInTime || null,
+        soundcheck_time: soundcheckTime || null,
+        doors_time: doorsTime || null,
+        catering_notes: cateringNotes || null,
+        sync_to_calendar: syncToCalendar,
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
@@ -221,6 +232,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
     setCity('')
     setShowDate('')
     setShowTime('')
+    setLoadInTime('')
+    setSoundcheckTime('')
+    setDoorsTime('')
+    setCateringNotes('')
+    setSyncToCalendar(true)
     setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
     setDocDates({})
   } catch {
@@ -340,6 +356,81 @@ return (
                   onChange={(e) => setShowTime(e.target.value)}
                   className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20 pl-5"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Logistics Section */}
+          <div className="pt-6 border-t border-white/5 space-y-6">
+            <div className="flex items-center gap-2">
+              <Clock className="text-primary h-4 w-4" />
+              <Label className="text-sm font-black uppercase tracking-widest text-white italic">Event Logistics</Label>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="loadIn" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Load In</Label>
+                <Input
+                  id="loadIn"
+                  type="time"
+                  value={loadInTime}
+                  onChange={(e) => setLoadInTime(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="soundcheck" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Soundcheck</Label>
+                <Input
+                  id="soundcheck"
+                  type="time"
+                  value={soundcheckTime}
+                  onChange={(e) => setSoundcheckTime(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="doors" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Doors</Label>
+                <Input
+                  id="doors"
+                  type="time"
+                  value={doorsTime}
+                  onChange={(e) => setDoorsTime(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="catering" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Catering & Hospitality Notes</Label>
+              <div className="relative group">
+                <Utensils className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+                <Textarea
+                  id="catering"
+                  value={cateringNotes}
+                  onChange={(e) => setCateringNotes(e.target.value)}
+                  placeholder="e.g. Vegetarian options required, specific arrival snacks..."
+                  className="pl-12 bg-white/5 border-white/10 min-h-[100px] focus-visible:ring-primary/50 rounded-2xl font-medium text-sm transition-colors group-hover:border-white/20"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
+              <Checkbox
+                id="sync-calendar"
+                checked={syncToCalendar}
+                onCheckedChange={(checked) => setSyncToCalendar(checked as boolean)}
+                className="border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-5 w-5 rounded-md"
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="sync-calendar"
+                  className="text-xs font-bold text-white uppercase tracking-widest cursor-pointer flex items-center gap-2"
+                >
+                  Sync to Promoter Calendar
+                </label>
+                <p className="text-[10px] text-muted-foreground">
+                  Automatically create a booked event with this schedule and the artist portal link.
+                </p>
               </div>
             </div>
           </div>

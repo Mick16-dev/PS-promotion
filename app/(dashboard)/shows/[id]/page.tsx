@@ -146,6 +146,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           date: dateStr,
           rawDate: show.show_date,
           time: show.show_time || 'TBD',
+          loadIn: show.load_in_time || 'TBD',
+          soundcheck: show.soundcheck_time || 'TBD',
+          doors: show.doors_time || 'TBD',
+          catering: show.catering_notes || '',
+          syncToCalendar: show.sync_to_calendar,
           status: computedStatus,
           portal_token: effectivePortalToken,
           portalUrl: (() => {
@@ -592,6 +597,56 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
               })
             )}
           </div>
+        </div>
+
+        {/* LOGISTICS & LIVE SCHEDULE (NEW SECTION) */}
+        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
+           {/* Schedule Card */}
+           <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+                  <Clock3 size={22} className="text-primary/50" />
+                  Live Schedule
+                </h2>
+                {showInfo.syncToCalendar && (
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-1">
+                    Calendar Synced
+                  </Badge>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-1">
+                 {[
+                   { label: 'Load In', time: showInfo.loadIn, icon: Download },
+                   { label: 'Soundcheck', time: showInfo.soundcheck, icon: Music },
+                   { label: 'Doors', time: showInfo.doors, icon: Clock }
+                 ].map((item, i) => (
+                   <div key={i} className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-3">
+                      <item.icon size={18} className="text-primary/40" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{item.label}</span>
+                      <span className="text-xl font-black italic text-white">{item.time}</span>
+                   </div>
+                 ))}
+              </div>
+           </div>
+
+           {/* Catering & Notes Card */}
+           <div className="space-y-6">
+              <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+                <Utensils size={22} className="text-primary/50" />
+                Hospitality & Notes
+              </h2>
+              <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] h-full min-h-[160px] relative overflow-hidden group">
+                 <div className="relative z-10">
+                   {showInfo.catering ? (
+                     <p className="text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">{showInfo.catering}</p>
+                   ) : (
+                     <p className="text-muted-foreground/30 font-bold uppercase tracking-widest text-xs italic">No hospitality requirements specified.</p>
+                   )}
+                 </div>
+                 <Utensils size={120} className="absolute -right-8 -bottom-8 text-white/[0.02] group-hover:text-white/[0.04] transition-all" />
+              </div>
+           </div>
         </div>
 
         {/* LOGISTICS LOG TABLE */}
