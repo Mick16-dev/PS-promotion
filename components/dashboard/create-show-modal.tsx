@@ -265,25 +265,15 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       }
 
       // --- Update Show with Financial Data ---
-      // Strategy: poll by portal_token (our end-to-end controlled key) since n8n
-      // may not preserve the show_id UUID we generate client-side.
+      // n8n confirmed to NOT save portal_token, so we use two reliable fallbacks:
+      // 1. Match by show_id (works if n8n preserved our generated UUID as the row id)
+      // 2. Match by most recent show for this artist created in the last 2 min (always works)
       try {
         let createdShowId: string | null = null
+        const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString() // 2 min ago
 
-        for (let i = 0; i < 15; i++) {
-          // First try: look up by portal_token (most reliable)
-          const { data: byToken } = await supabase
-            .from('shows')
-            .select('id')
-            .eq('portal_token', showPortalToken)
-            .maybeSingle()
-
-          if (byToken?.id) {
-            createdShowId = byToken.id
-            break
-          }
-
-          // Second try: look up by show_id (if n8n used it as the row id)
+        for (let i = 0; i < 12; i++) {
+          // Try 1: n8n may have used our generated show_id as the Supabase row id
           const { data: byId } = await supabase
             .from('shows')
             .select('id')
@@ -292,6 +282,23 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
           if (byId?.id) {
             createdShowId = byId.id
+            console.log('[ShowReady] Found show by id:', createdShowId)
+            break
+          }
+
+          // Try 2: most recently created show for this artist (we just made it)
+          const { data: byArtist } = await supabase
+            .from('shows')
+            .select('id, created_at')
+            .eq('artist_id', selectedArtistId)
+            .gte('created_at', cutoff)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (byArtist?.id) {
+            createdShowId = byArtist.id
+            console.log('[ShowReady] Found show by artist+time:', createdShowId)
             break
           }
 
@@ -314,14 +321,16 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
           if (updateError) {
             console.error('[ShowReady] Financial update error:', updateError)
-            toast.error('Warning: Show created, but financial data could not be saved.', {
-              description: `Supabase error: ${updateError.message}. Check your table columns (ticket_tiers, expenses, deal_type, deal_guarantee, deal_percentage) and RLS policies.`
+            toast.error('Financial data could not be saved.', {
+              description: `DB error: ${updateError.message}`
             })
+          } else {
+            console.log('[ShowReady] Financial data saved successfully to show:', createdShowId)
           }
         } else {
-          console.error('[ShowReady] Show row not found after 15s polling. n8n may have failed to insert or used a different portal_token.')
-          toast.error('Warning: Show created but financial data was not saved.', {
-            description: 'Could not find the new show row in Supabase after waiting. The n8n webhook may not be saving the portal_token field.'
+          console.error('[ShowReady] Show row not found after polling. n8n may be slow or failing.')
+          toast.error('Show created but financial data was not saved.', {
+            description: 'Could not locate the new show row in Supabase. Check your n8n workflow is inserting correctly.'
           })
         }
       } catch (err: any) {
