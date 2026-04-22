@@ -265,19 +265,67 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       }
 
       // --- Update Show with Financial Data ---
+      // Strategy: poll by portal_token (our end-to-end controlled key) since n8n
+      // may not preserve the show_id UUID we generate client-side.
       try {
-        // Wait briefly for n8n webhook to finish inserting if async
-        await new Promise(r => setTimeout(r, 1500))
-        await supabase.from('shows').update({
-          ticket_tiers: ticketTiers,
-          expenses: expenses,
-          deal_type: dealType,
-          deal_guarantee: dealGuarantee,
-          deal_percentage: dealPercentage,
-          venue_id: finalVenueId
-        }).eq('id', show_id)
-      } catch (err) {
-        console.error('Failed to update show with financial data:', err)
+        let createdShowId: string | null = null
+
+        for (let i = 0; i < 15; i++) {
+          // First try: look up by portal_token (most reliable)
+          const { data: byToken } = await supabase
+            .from('shows')
+            .select('id')
+            .eq('portal_token', showPortalToken)
+            .maybeSingle()
+
+          if (byToken?.id) {
+            createdShowId = byToken.id
+            break
+          }
+
+          // Second try: look up by show_id (if n8n used it as the row id)
+          const { data: byId } = await supabase
+            .from('shows')
+            .select('id')
+            .eq('id', show_id)
+            .maybeSingle()
+
+          if (byId?.id) {
+            createdShowId = byId.id
+            break
+          }
+
+          // Wait 1s before next poll
+          await new Promise(r => setTimeout(r, 1000))
+        }
+
+        if (createdShowId) {
+          const { error: updateError } = await supabase
+            .from('shows')
+            .update({
+              ticket_tiers: ticketTiers,
+              expenses: expenses,
+              deal_type: dealType,
+              deal_guarantee: dealGuarantee,
+              deal_percentage: dealPercentage,
+              venue_id: finalVenueId
+            })
+            .eq('id', createdShowId)
+
+          if (updateError) {
+            console.error('[ShowReady] Financial update error:', updateError)
+            toast.error('Warning: Show created, but financial data could not be saved.', {
+              description: `Supabase error: ${updateError.message}. Check your table columns (ticket_tiers, expenses, deal_type, deal_guarantee, deal_percentage) and RLS policies.`
+            })
+          }
+        } else {
+          console.error('[ShowReady] Show row not found after 15s polling. n8n may have failed to insert or used a different portal_token.')
+          toast.error('Warning: Show created but financial data was not saved.', {
+            description: 'Could not find the new show row in Supabase after waiting. The n8n webhook may not be saving the portal_token field.'
+          })
+        }
+      } catch (err: any) {
+        console.error('[ShowReady] Financial update crashed:', err)
       }
       
       toast.success('Show created.', {
