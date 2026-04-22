@@ -25,7 +25,11 @@ import {
   ShieldCheck,
   Utensils,
   Image as ImageIcon,
-  Map as MapIcon
+  Map as MapIcon,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  PieChart
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -137,6 +141,42 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         const firstMatWithToken = (materialsData || []).find((m: any) => m.portal_token);
         const effectivePortalToken = showData.portal_token || firstMatWithToken?.portal_token || id;
 
+        // Financial logic
+        let maxCap = 0
+        let projectedGross = 0
+        let totalExpenses = 0
+        
+        if (Array.isArray(show.ticket_tiers)) {
+          show.ticket_tiers.forEach((t: any) => {
+            maxCap += Number(t.capacity) || 0
+            projectedGross += (Number(t.capacity) || 0) * (Number(t.price) || 0)
+          })
+        }
+        
+        if (Array.isArray(show.expenses)) {
+          show.expenses.forEach((e: any) => {
+            totalExpenses += Number(e.amount) || 0
+          })
+        }
+        
+        let artistPayout = 0
+        const guarantee = Number(show.deal_guarantee) || 0
+        const percentage = (Number(show.deal_percentage) || 0) / 100
+        
+        if (show.deal_type === 'flat') {
+          artistPayout = guarantee
+        } else if (show.deal_type === 'split') {
+          artistPayout = Math.max(0, (projectedGross - totalExpenses) * percentage)
+        } else if (show.deal_type === 'versus') {
+          const splitAmount = Math.max(0, (projectedGross - totalExpenses) * percentage)
+          artistPayout = Math.max(guarantee, splitAmount)
+        }
+        
+        const promoterTakeHome = projectedGross - totalExpenses - artistPayout
+        const avgPrice = maxCap > 0 ? projectedGross / maxCap : 0
+        const fixedCosts = totalExpenses + (show.deal_type === 'split' ? 0 : guarantee)
+        const breakEvenTickets = avgPrice > 0 ? Math.ceil(fixedCosts / avgPrice) : 0
+
         setShowInfo({
           artist: artistInfo?.name || 'Unnamed Artist',
           artistEmail: artistInfo?.email || '',
@@ -153,6 +193,18 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           syncToCalendar: show.sync_to_calendar,
           status: computedStatus,
           portal_token: effectivePortalToken,
+          financials: {
+            maxCap,
+            projectedGross,
+            totalExpenses,
+            artistPayout,
+            promoterTakeHome,
+            breakEvenTickets,
+            avgPrice,
+            dealType: show.deal_type,
+            dealGuarantee: guarantee,
+            dealPercentage: Number(show.deal_percentage) || 0
+          },
           portalUrl: (() => {
             const basePortalUrl = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '');
             
@@ -480,6 +532,65 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
+        {/* FINANCIAL DASHBOARD */}
+        {showInfo.financials && (
+          <div className="lg:col-span-12 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
+                 <Activity className="text-emerald-400" size={24} />
+                 Financial Dashboard
+              </h2>
+              {showInfo.financials.dealType && (
+                <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none pt-0.5">
+                     {showInfo.financials.dealType === 'flat' ? 'Flat Guarantee Deal' : showInfo.financials.dealType === 'split' ? 'Door Split Deal' : 'Versus Deal'}
+                   </span>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Projected Gross</span>
+                  <span className="text-3xl font-black italic text-white">${showInfo.financials.projectedGross.toLocaleString()}</span>
+                  <span className="text-[10px] text-muted-foreground/60 mt-1">At {showInfo.financials.maxCap} max capacity</span>
+                </div>
+                <DollarSign size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-emerald-500/10 transition-colors" />
+              </div>
+
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Est. Expenses & Payout</span>
+                  <span className="text-3xl font-black italic text-white">${(showInfo.financials.totalExpenses + showInfo.financials.artistPayout).toLocaleString()}</span>
+                  <span className="text-[10px] text-muted-foreground/60 mt-1">Exp: ${showInfo.financials.totalExpenses.toLocaleString()} / Payout: ${showInfo.financials.artistPayout.toLocaleString()}</span>
+                </div>
+                <PieChart size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-primary/10 transition-colors" />
+              </div>
+
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Break-Even Point</span>
+                  <span className="text-3xl font-black italic text-white">{showInfo.financials.breakEvenTickets}</span>
+                  <span className="text-[10px] text-muted-foreground/60 mt-1">Avg ${showInfo.financials.avgPrice.toFixed(2)} / Ticket</span>
+                </div>
+                <Activity size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-amber-500/10 transition-colors" />
+              </div>
+
+              <div className={`border p-6 rounded-3xl relative overflow-hidden group ${showInfo.financials.promoterTakeHome >= 0 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+                <div className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Est. Promoter Profit</span>
+                  <span className={`text-3xl font-black italic ${showInfo.financials.promoterTakeHome >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    ${showInfo.financials.promoterTakeHome.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground/60 mt-1">Take-home potential</span>
+                </div>
+                <TrendingUp size={80} className={`absolute -right-4 -bottom-4 transition-colors ${showInfo.financials.promoterTakeHome >= 0 ? 'text-emerald-500/10 group-hover:text-emerald-500/20' : 'text-red-500/10 group-hover:text-red-500/20'}`} />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* PRODUCTION DOCUMENTS GRID (NEW SECTION) */}
         <div className="lg:col-span-12 space-y-6">
           <div className="flex items-center justify-between">

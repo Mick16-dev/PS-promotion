@@ -66,6 +66,16 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   })
   const [docDates, setDocDates] = useState<Record<string, string>>({})
 
+  // --- Financial State ---
+  const [ticketTiers, setTicketTiers] = useState([{ name: 'General Admission', price: 0, capacity: 0 }])
+  const [expenses, setExpenses] = useState([{ name: 'Rent', amount: 0 }])
+  const [dealType, setDealType] = useState('flat')
+  const [dealGuarantee, setDealGuarantee] = useState(0)
+  const [dealPercentage, setDealPercentage] = useState(0)
+  
+  // --- Venue State ---
+  const [venuesList, setVenuesList] = useState<any[]>([])
+
   useEffect(() => {
     if (isOpen) {
       const fetchArtists = async () => {
@@ -97,7 +107,16 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           setIsLoadingArtists(false)
         }
       }
+
+      const fetchVenues = async () => {
+        try {
+          const { data } = await supabase.from('venues').select('*')
+          if (data) setVenuesList(data)
+        } catch (e) {}
+      }
+
       fetchArtists()
+      fetchVenues()
     }
   }, [isOpen])
 
@@ -220,6 +239,42 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
     }
       
+      // --- Handle Venue Memory ---
+      let finalVenueId = null
+      try {
+        const existingVenue = venuesList.find(v => v.name.toLowerCase() === venue.toLowerCase())
+        if (existingVenue) {
+          finalVenueId = existingVenue.id
+        } else {
+          const { data: newVenue, error } = await supabase.from('venues').insert({
+            name: venue,
+            city: city,
+            default_capacity: ticketTiers.reduce((acc, t) => acc + (Number(t.capacity) || 0), 0)
+          }).select().single()
+          if (!error && newVenue) {
+            finalVenueId = newVenue.id
+          }
+        }
+      } catch (err) {
+        console.error('Failed to upsert venue:', err)
+      }
+
+      // --- Update Show with Financial Data ---
+      try {
+        // Wait briefly for n8n webhook to finish inserting if async
+        await new Promise(r => setTimeout(r, 1500))
+        await supabase.from('shows').update({
+          ticket_tiers: ticketTiers,
+          expenses: expenses,
+          deal_type: dealType,
+          deal_guarantee: dealGuarantee,
+          deal_percentage: dealPercentage,
+          venue_id: finalVenueId
+        }).eq('id', show_id)
+      } catch (err) {
+        console.error('Failed to update show with financial data:', err)
+      }
+      
       toast.success('Show created.', {
       description: `Portal link sent to the artist. They'll receive an email shortly.`
     })
@@ -239,6 +294,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
     setSyncToCalendar(true)
     setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
     setDocDates({})
+    setTicketTiers([{ name: 'General Admission', price: 0, capacity: 0 }])
+    setExpenses([{ name: 'Rent', amount: 0 }])
+    setDealType('flat')
+    setDealGuarantee(0)
+    setDealPercentage(0)
   } catch {
     console.error('Submission error')
     toast.error('Failed to create show. Please try again or check n8n connection.')
@@ -313,12 +373,26 @@ return (
                   <Input
                     id="venue"
                     name="venue"
+                    list="venue-list"
                     value={venue}
-                    onChange={(e) => setVenue(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setVenue(val)
+                      const existing = venuesList.find(v => v.name.toLowerCase() === val.toLowerCase())
+                      if (existing) {
+                        if (existing.city) setCity(existing.city)
+                        if (existing.default_expenses) setExpenses(existing.default_expenses)
+                      }
+                    }}
                     required
                     placeholder="Venue Name"
                     className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30"
                   />
+                  <datalist id="venue-list">
+                    {venuesList.map(v => (
+                      <option key={v.id} value={v.name} />
+                    ))}
+                  </datalist>
                   <Input
                     id="city"
                     name="city"
@@ -357,6 +431,94 @@ return (
                   className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20 pl-5"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Financials & Deal Structure */}
+          <div className="pt-6 border-t border-white/5 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Music className="text-primary h-4 w-4" />
+                <Label className="text-sm font-black uppercase tracking-widest text-white italic">Financials & Deal</Label>
+              </div>
+            </div>
+
+            {/* Deal Type */}
+            <div className="space-y-4 bg-muted/10 p-5 rounded-3xl border border-white/5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Deal Type</Label>
+                  <Select value={dealType} onValueChange={setDealType}>
+                    <SelectTrigger className="bg-white/5 border-white/10 h-12 focus:ring-primary/50 text-foreground w-full rounded-xl px-4 font-bold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-ebony-900 border-white/10 rounded-xl">
+                      <SelectItem value="flat">Flat Guarantee</SelectItem>
+                      <SelectItem value="split">Door Split</SelectItem>
+                      <SelectItem value="versus">Versus Deal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(dealType === 'flat' || dealType === 'versus') && (
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Guarantee ($)</Label>
+                    <Input
+                      type="number"
+                      value={dealGuarantee || ''}
+                      onChange={e => setDealGuarantee(Number(e.target.value))}
+                      className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold"
+                    />
+                  </div>
+                )}
+
+                {(dealType === 'split' || dealType === 'versus') && (
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist Split (%)</Label>
+                    <Input
+                      type="number"
+                      value={dealPercentage || ''}
+                      onChange={e => setDealPercentage(Number(e.target.value))}
+                      className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Ticket Tiers */}
+            <div className="space-y-4 bg-muted/10 p-5 rounded-3xl border border-white/5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-widest text-white">Ticket Tiers</Label>
+                <Button type="button" variant="outline" size="sm" onClick={() => setTicketTiers([...ticketTiers, { name: '', price: 0, capacity: 0 }])} className="h-7 text-[10px] uppercase font-bold border-white/10 bg-white/5">
+                  + Add Tier
+                </Button>
+              </div>
+              {ticketTiers.map((tier, idx) => (
+                <div key={idx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
+                  <Input placeholder="Tier Name" value={tier.name} onChange={e => { const t = [...ticketTiers]; t[idx].name = e.target.value; setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 text-xs flex-1 min-w-[120px]" />
+                  <Input type="number" placeholder="Price" value={tier.price || ''} onChange={e => { const t = [...ticketTiers]; t[idx].price = Number(e.target.value); setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 w-24 text-xs" />
+                  <Input type="number" placeholder="Cap" value={tier.capacity || ''} onChange={e => { const t = [...ticketTiers]; t[idx].capacity = Number(e.target.value); setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 w-24 text-xs" />
+                  <Button type="button" variant="ghost" onClick={() => setTicketTiers(ticketTiers.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-300 h-10 px-2 shrink-0"><X size={14} /></Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Expenses */}
+            <div className="space-y-4 bg-muted/10 p-5 rounded-3xl border border-white/5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-widest text-white">Estimated Expenses</Label>
+                <Button type="button" variant="outline" size="sm" onClick={() => setExpenses([...expenses, { name: '', amount: 0 }])} className="h-7 text-[10px] uppercase font-bold border-white/10 bg-white/5">
+                  + Add Expense
+                </Button>
+              </div>
+              {expenses.map((exp, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <Input placeholder="Expense Name" value={exp.name} onChange={e => { const ex = [...expenses]; ex[idx].name = e.target.value; setExpenses(ex) }} className="bg-white/5 border-white/10 h-10 text-xs flex-1" />
+                  <Input type="number" placeholder="Amount" value={exp.amount || ''} onChange={e => { const ex = [...expenses]; ex[idx].amount = Number(e.target.value); setExpenses(ex) }} className="bg-white/5 border-white/10 h-10 w-32 text-xs" />
+                  <Button type="button" variant="ghost" onClick={() => setExpenses(expenses.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-300 h-10 px-2 shrink-0"><X size={14} /></Button>
+                </div>
+              ))}
             </div>
           </div>
 
