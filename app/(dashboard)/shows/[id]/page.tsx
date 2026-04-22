@@ -783,7 +783,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 {documents.map((doc) => {
                   const isReceived = doc.status === 'delivered'
                   return (
-                    <tr key={doc.id} className="hover:bg-white/[0.015] transition-colors">
+                    <tr key={doc.id} className="hover:bg-primary/10 hover:shadow-inner transition-colors">
                       <td className="p-6">
                         <span className="font-bold text-sm text-white">{doc.name}</span>
                       </td>

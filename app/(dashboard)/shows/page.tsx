@@ -192,7 +192,7 @@ export default function ShowsPage() {
          <div className="divide-y divide-white/[0.01]">
             {shows.map((show) => (
               <Link key={show.id} href={`/shows/${show.id}`}>
-                 <div className="group flex flex-col md:flex-row md:items-center justify-between px-8 py-6 hover:bg-white/[0.02] transition-all border-l-2 border-l-transparent hover:border-l-primary cursor-pointer">
+                 <div className="group flex flex-col md:flex-row md:items-center justify-between px-8 py-6 hover:bg-primary/10 hover:shadow-inner transition-all border-l-2 border-l-transparent hover:border-l-primary cursor-pointer">
                     <div className="flex items-center gap-8">
                        {/* High-Contrast Avatar Icon */}
                        <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors relative overflow-hidden shadow-inner">

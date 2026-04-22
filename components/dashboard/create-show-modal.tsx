@@ -611,7 +611,7 @@ return (
 
             <div className="space-y-3 bg-muted/10 p-5 rounded-3xl border border-white/5">
               {defaultDocs.map((doc) => (
-                <div key={doc.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/[0.02] transition-colors">
+                <div key={doc.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl hover:bg-primary/10 transition-colors cursor-pointer">
                   <div className="flex items-center space-x-3">
                     <Checkbox
                       id={`doc-${doc.id}`}
