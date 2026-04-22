@@ -218,7 +218,12 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         required_documents: docs,
         timestamp: new Date().toISOString(),
         portal_token: showPortalToken, // Consistent use of short token
-        portal_url: primaryPortalUrl
+        portal_url: primaryPortalUrl,
+        deal_type: dealType,
+        deal_guarantee: dealGuarantee,
+        deal_percentage: dealPercentage,
+        ticket_tiers: ticketTiers,
+        expenses: expenses
       };
 
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
