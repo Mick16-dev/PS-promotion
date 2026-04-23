@@ -112,7 +112,7 @@ export default function LoginPage() {
             Welcome Back
           </h2>
           <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-mono">
-            ShowTime Dashboard
+            ShowReady Dashboard
           </p>
         </div>
 

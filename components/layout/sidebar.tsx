@@ -75,12 +75,12 @@ export function Sidebar() {
       {/* Branding Header */}
       <div className="flex items-center h-16 px-6 border-b border-border mb-4">
         {!isCollapsed && (
-          <span className="text-xl font-bold tracking-tighter text-foreground">
-            PS<span className="text-primary">.P</span>
+          <span className="text-xl font-black uppercase italic tracking-tighter text-foreground">
+            Show<span className="text-primary">Ready</span>
           </span>
         )}
         {isCollapsed && (
-          <span className="text-xl font-bold tracking-tighter text-primary">P</span>
+          <span className="text-xl font-black italic tracking-tighter text-primary">SR</span>
         )}
       </div>
 

@@ -25,8 +25,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'ShowTime | Production Control',
-    template: '%s | ShowTime'
+    default: 'ShowReady | Production Control',
+    template: '%s | ShowReady'
   },
   description: 'Pro-grade music promotion dashboard for artist advancement, material tracking, and show logistics management.',
   icons: {
