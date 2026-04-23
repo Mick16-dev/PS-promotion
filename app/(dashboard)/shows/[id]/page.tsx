@@ -424,31 +424,39 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
     setIsResendingEmail(true)
     try {
+      const payload = {
+        show_id: id,
+        artist_email: showInfo.artistEmail,
+        artist_name: showInfo.artist,
+        venue_name: showInfo.venue,
+        city: showInfo.city,
+        show_date: showInfo.rawDate,
+        show_time: showInfo.time,
+        portal_url: showInfo.portalUrl,
+        portal_token: showInfo.portal_token
+      }
+
+      console.log('Resending Portal Email with payload:', payload)
+
       const response = await fetch('/api/n8n/resend-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          show_id: id,
-          artist_email: showInfo.artistEmail,
-          artist_name: showInfo.artist,
-          venue_name: showInfo.venue,
-          city: showInfo.city,
-          show_date: showInfo.rawDate,
-          show_time: showInfo.time,
-          show_name: showInfo.venue,
-          portal_url: showInfo.portalUrl,
-          portal_token: showInfo.portal_token
-        })
+        body: JSON.stringify(payload)
       })
 
-      if (!response.ok) throw new Error('Failed to resend')
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('RESEND_EMAIL_API_ERROR:', result)
+        throw new Error(result.error || 'Failed to resend')
+      }
 
       toast.success('Portal Link Re-sent', {
         description: `Link sent to ${showInfo.artistEmail}`
       })
-    } catch (err) {
+    } catch (err: any) {
       console.error('RESEND_EMAIL_ERROR:', err)
-      toast.error('Failed to resend portal email.')
+      toast.error(`Failed to resend portal email: ${err.message || 'Unknown error'}`)
     } finally {
       setIsResendingEmail(false)
     }

@@ -22,6 +22,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log('Hitting n8n resend-email webhook:', webhookUrl)
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
     })
 
     const text = await res.text()
+    console.log('n8n response status:', res.status, 'body:', text)
 
     return NextResponse.json(
       {
@@ -40,6 +42,7 @@ export async function POST(request: Request) {
       { status: res.ok ? 200 : 502 },
     )
   } catch (e: any) {
+    console.error('n8n fetch error:', e)
     return NextResponse.json(
       { error: 'Failed to reach n8n.', details: e?.message ?? String(e) },
       { status: 502 },
