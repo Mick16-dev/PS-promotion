@@ -183,6 +183,10 @@ export default function LoginPage() {
 
         {/* Footer Area */}
         <div className="text-center pt-8 border-t border-border/50">
+           <p className="text-xs font-medium text-muted-foreground mb-6">
+             Don't have an account?{' '}
+             <Link href="/register" className="text-primary font-bold hover:underline transition-all">Register Now</Link>
+           </p>
            <button disabled className="flex items-center justify-center w-full space-x-2 text-xs font-medium text-muted-foreground/50 cursor-not-allowed mb-4">
              <Github size={14} />
              <span>GitHub sign-in unavailable</span>

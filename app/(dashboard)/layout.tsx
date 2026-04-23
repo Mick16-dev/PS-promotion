@@ -1,6 +1,7 @@
 import React from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Navbar } from '@/components/layout/navbar'
+import { AccessGuard } from '@/components/context/access-guard'
 
 export default function DashboardLayout({
   children,
@@ -8,21 +9,23 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar Navigation */}
-      <Sidebar />
-      
-      <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-        {/* Top Navbar */}
-        <Navbar />
+    <AccessGuard>
+      <div className="flex h-screen overflow-hidden bg-background">
+        {/* Sidebar Navigation */}
+        <Sidebar />
         
-        {/* Main Dashboard Content */}
-        <main className="flex-1 p-6 md:p-8">
-          <div className="mx-auto max-w-7xl">
-            {children}
-          </div>
-        </main>
+        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+          {/* Top Navbar */}
+          <Navbar />
+          
+          {/* Main Dashboard Content */}
+          <main className="flex-1 p-6 md:p-8">
+            <div className="mx-auto max-w-7xl">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </AccessGuard>
   )
 }

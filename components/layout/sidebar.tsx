@@ -28,7 +28,7 @@ const navigation = [
 export function Sidebar() {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const [profile, setProfile] = useState<{ full_name: string; role: string } | null>(null)
+  const [profile, setProfile] = useState<{ full_name: string; role: string; is_super_admin: boolean } | null>(null)
 
   useEffect(() => {
     async function loadProfile() {
@@ -36,12 +36,12 @@ export function Sidebar() {
       if (user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, role')
+          .select('full_name, role, is_super_admin')
           .eq('id', user.id)
           .single()
         
         if (data) {
-          setProfile(data)
+          setProfile(data as any)
         }
       }
     }
@@ -59,6 +59,12 @@ export function Sidebar() {
       supabase.removeChannel(channel)
     }
   }, [])
+
+  // Dynamic navigation items
+  const menuItems = [...navigation]
+  if (profile?.is_super_admin) {
+    menuItems.push({ name: 'Admin', href: '/admin', icon: ShieldAlert as any })
+  }
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -86,7 +92,7 @@ export function Sidebar() {
 
       {/* Navigation Items */}
       <nav className="flex-1 px-3 space-y-1">
-        {navigation.map((item) => {
+        {menuItems.map((item) => {
           const isActive = pathname === item.href
           return (
             <Link
