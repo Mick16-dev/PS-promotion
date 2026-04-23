@@ -12,16 +12,19 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  User 
+  User,
+  BarChart3,
+  ShieldAlert
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Overview', href: '/overview', icon: LayoutDashboard },
   { name: 'Shows', href: '/shows', icon: Music },
   { name: 'Artists', href: '/artists', icon: Users },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
