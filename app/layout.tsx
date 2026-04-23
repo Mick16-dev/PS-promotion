@@ -30,7 +30,12 @@ export const metadata: Metadata = {
   },
   description: 'Pro-grade music promotion dashboard for artist advancement, material tracking, and show logistics management.',
   icons: {
-    icon: '/icon.svg',
+    icon: [
+      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/icon.svg?v=2', type: 'image/svg+xml' },
+    ],
   },
 }
 
