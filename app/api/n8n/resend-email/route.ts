@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   const webhookUrl =
     process.env.N8N_RESEND_EMAIL_WEBHOOK ??
