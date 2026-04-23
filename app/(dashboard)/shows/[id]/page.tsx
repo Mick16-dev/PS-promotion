@@ -424,21 +424,34 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
     setIsResendingEmail(true)
     try {
+      // Reconstruct the payload to match the create-show webhook exactly
       const payload = {
         show_id: id,
+        show_name: `${showInfo.artist} @ ${showInfo.venue}`,
+        show_time: showInfo.time,
+        load_in_time: showInfo.loadIn,
+        soundcheck_time: showInfo.soundcheck,
+        doors_time: showInfo.doors,
+        catering_notes: showInfo.catering,
         artist_email: showInfo.artistEmail,
         artist_name: showInfo.artist,
         venue_name: showInfo.venue,
         city: showInfo.city,
-        show_date: showInfo.rawDate,
-        show_time: showInfo.time,
+        date: showInfo.rawDate,
         portal_url: showInfo.portalUrl,
-        portal_token: showInfo.portal_token
+        portal_token: showInfo.portal_token,
+        required_documents: documents.map(d => ({
+          name: d.name,
+          deadline: d.rawDeadline,
+          portal_token: d.portal_token || showInfo.portal_token
+        })),
+        is_resend: true, // Signal to n8n that this is a resend request
+        timestamp: new Date().toISOString()
       }
 
-      console.log('Resending Portal Email with payload:', payload)
+      console.log('Resending Portal via Main Webhook:', payload)
 
-      const response = await fetch('/api/n8n/resend-email', {
+      const response = await fetch('/api/n8n/create-show', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -447,7 +460,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
       const result = await response.json()
 
       if (!response.ok) {
-        console.error('RESEND_EMAIL_API_ERROR:', result)
+        console.error('RESEND_PORTAL_WEBHOOK_ERROR:', result)
         throw new Error(result.error || 'Failed to resend')
       }
 
