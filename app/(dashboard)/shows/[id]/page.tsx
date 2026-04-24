@@ -494,12 +494,44 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
       toast.success('Portal Link Re-sent', {
         description: `Link sent to ${showInfo.artistEmail}`
-      })
-    } catch (err: any) {
+} catch (err: any) {
       console.error('RESEND_EMAIL_ERROR:', err)
       toast.error(`Failed to resend portal email: ${err.message || 'Unknown error'}`)
     } finally {
-      setIsResendingEmail(false)
+      setIsGeneratingSheet(false)
+    }
+  }
+
+  const handleDownloadCSV = () => {
+    try {
+      // 1. Prepare headers and row
+      const headers = Object.values(mapping)
+      const row = Object.keys(mapping).map(key => {
+        let val = showInfo[key]
+        if (key === 'show_date' && val) val = new Date(val).toLocaleDateString()
+        return `"${(val || '').toString().replace(/"/g, '""')}"`
+      })
+
+      // 2. Create CSV content
+      const csvContent = [
+        headers.map(h => `"${(h as string).replace(/"/g, '""')}"`).join(','),
+        row.join(',')
+      ].join('\n')
+
+      // 3. Trigger download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `Show_Export_${showInfo.artist_name.replace(/\s+/g, '_')}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      toast.success('CSV Downloaded!')
+    } catch (e: any) {
+      toast.error('Download failed: ' + e.message)
     }
   }
 
@@ -646,42 +678,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         )}
 
         {/* PRODUCTION DOCUMENTS GRID (NEW SECTION) */}
-        <div className="lg:col-span-12 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-               <LayoutGrid className="text-primary" size={24} />
-               Artist Document Viewer
-            </h2>
-            <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-white/5 border border-white/10">
-               <ShieldCheck className="text-emerald-400" size={14} />
-               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none pt-0.5">Secure Storage Active</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {documents.length === 0 ? (
-              <div className="col-span-full rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01] p-24 text-center">
-                 <Loader2 className="mx-auto mb-4 animate-spin text-muted-foreground/20" size={32} />
-                 <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Awaiting Material Configuration</p>
-              </div>
-            ) : (
-              documents.map((doc) => {
-                const isReceived = doc.status === 'delivered'
-                
-                const getNameIcon = (name: string) => {
-                  const n = name.toLowerCase()
-                  if (n.includes('stage') || n.includes('plot')) return MapIcon
-                  if (n.includes('cater') || n.includes('hospitality')) return Utensils
-                  if (n.includes('press') || n.includes('photo') || n.includes('epk')) return ImageIcon
-                  return FileSearch
-                }
-                const Icon = getNameIcon(doc.name)
-
-                return (
-                  <motion.div 
-                    key={doc.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
         {activeTab === 'documents' && (
           <div className="lg:col-span-12 space-y-6">
             <div className="flex items-center justify-between">
