@@ -92,56 +92,56 @@ export default function SettingsPage() {
       }
     }
     
-    async function checkIntegrations() {
-      setIsLoadingIntegrations(true)
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        console.log("Checking integrations for user:", user?.id)
-        if (user) {
-          const { data, error } = await supabase
-            .from('user_integrations')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('provider', 'google')
-            .maybeSingle()
-          
-          if (error) {
-            console.error("Supabase error checking integrations:", error)
-          }
-          
-          console.log("Integration data found:", data)
-          if (data) {
-            setIsGoogleConnected(true)
-          }
-        }
-      } catch (e) {
-        console.error('Failed to check integrations:', e)
-      } finally {
-        setIsLoadingIntegrations(false)
-      }
-    }
-
-    async function fetchTemplates() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { data } = await supabase
-            .from('export_templates')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-          
-          if (data) setExportTemplates(data)
-        }
-      } catch (e) {
-        console.error('Failed to fetch templates:', e)
-      }
-    }
-
     loadProfile()
     checkIntegrations()
     fetchTemplates()
   }, [])
+
+  async function checkIntegrations() {
+    setIsLoadingIntegrations(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      console.log("Checking integrations for user:", user?.id)
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_integrations')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('provider', 'google')
+          .maybeSingle()
+        
+        if (error) {
+          console.error("Supabase error checking integrations:", error)
+        }
+        
+        console.log("Integration data found:", data)
+        if (data) {
+          setIsGoogleConnected(true)
+        }
+      }
+    } catch (e) {
+      console.error('Failed to check integrations:', e)
+    } finally {
+      setIsLoadingIntegrations(false)
+    }
+  }
+
+  async function fetchTemplates() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from('export_templates')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+        
+        if (data) setExportTemplates(data)
+      }
+    } catch (e) {
+      console.error('Failed to fetch templates:', e)
+    }
+  }
 
   const handleCreateTemplate = async () => {
     if (!newTemplateName || !userId) return
