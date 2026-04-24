@@ -41,6 +41,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
+  const [targetShowName, setTargetShowName] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -49,6 +50,21 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         try {
           const { data: { user } } = await supabase.auth.getUser()
           if (!user) return
+
+          // 0. If single show, get its name
+          if (selectedShowIds && selectedShowIds.length === 1) {
+            const { data: show } = await supabase
+              .from('shows')
+              .select('artist_name, venue_name')
+              .eq('id', selectedShowIds[0])
+              .single()
+            
+            if (show) {
+              setTargetShowName(`${show.artist_name} @ ${show.venue_name}`)
+            }
+          } else {
+            setTargetShowName(null)
+          }
 
           // 1. Load Templates
           const { data: templatesData } = await supabase
@@ -170,7 +186,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           ) : (
             <>
               <div className="space-y-3">
-                <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black ml-2">Choose Export Profile</Label>
+                <div className="flex items-center justify-between px-2">
+                  <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black">Choose Export Profile</Label>
+                  <button 
+                    onClick={() => { onClose(); window.location.href = '/settings?tab=integrations' }}
+                    className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Edit Templates
+                  </button>
+                </div>
                 <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
                   <SelectTrigger className="bg-white/5 border-white/10 h-16 rounded-2xl px-5 text-lg font-bold transition-all focus:ring-primary/50">
                     <SelectValue placeholder="Select a template..." />
@@ -198,12 +222,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Selected Shows</span>
-                       <p className="text-xl font-black italic text-white">{selectedShowIds?.length || 'ALL ACTIVE'}</p>
+                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Syncing Target</span>
+                       <p className="text-sm font-black italic text-white truncate">
+                         {targetShowName || (selectedShowIds?.length ? `${selectedShowIds.length} Selected Shows` : 'All Active Shows')}
+                       </p>
                     </div>
                     <div className="space-y-1">
                        <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Provider</span>
-                       <p className="text-xl font-black italic text-white flex items-center gap-2">Google <Table size={14} className="text-[#0F9D58]" /></p>
+                       <p className="text-sm font-black italic text-white flex items-center gap-2">Google Sheets <Table size={12} className="text-[#0F9D58]" /></p>
                     </div>
                  </div>
               </div>

@@ -29,8 +29,16 @@ import {
   DollarSign,
   TrendingUp,
   Activity,
-  PieChart
+  PieChart,
+  RefreshCw,
+  User,
+  ArrowUpRight,
+  Paperclip,
+  MoreVertical,
+  Plus,
+  Table
 } from 'lucide-react'
+import { UniversalSyncModal } from '@/components/dashboard/universal-sync-modal'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { motion } from 'framer-motion'
@@ -48,6 +56,8 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   const id = resolvedParams ? (resolvedParams as any).id : null;
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
   const [isResendingEmail, setIsResendingEmail] = useState(false)
+  const [activeTab, setActiveTab] = useState('itinerary')
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
@@ -534,10 +544,15 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-7xl mx-auto">
       {/* HEADER SECTION */}
       <div className="space-y-6">
-        <Link href="/shows" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-white transition-colors font-bold group">
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
-          All Shows
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/shows" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-white transition-colors font-bold group">
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
+            All Shows
+          </Link>
+          <Button variant="outline" className="gap-2 border-white/10 hover:bg-white/5" onClick={() => setIsSyncModalOpen(true)}>
+            <Table size={16} className="text-[#0F9D58]" /> Export
+          </Button>
+        </div>
         
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-4">
@@ -989,6 +1004,11 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           )}
         </div>
       </div>
+      <UniversalSyncModal 
+        isOpen={isSyncModalOpen} 
+        onClose={() => setIsSyncModalOpen(false)} 
+        selectedShowIds={id ? [id as string] : []}
+      />
     </div>
   )
 }
