@@ -6,6 +6,8 @@ import {
   Bell, 
   Settings, 
   Save,
+  ChevronRight,
+  ShieldAlert,
   Lock,
   Zap,
   Link2,
