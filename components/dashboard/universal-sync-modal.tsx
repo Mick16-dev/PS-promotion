@@ -11,20 +11,12 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { 
   Table, 
   Zap, 
-  CheckCircle2, 
   Loader2, 
   AlertCircle,
-  ExternalLink,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
@@ -32,16 +24,20 @@ import { supabase } from '@/lib/supabase'
 interface UniversalSyncModalProps {
   isOpen: boolean
   onClose: () => void
-  selectedShowIds?: string[] // Optional: if we want to sync specific shows
+  selectedShowIds?: string[]
 }
 
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
-  const [templates, setTemplates] = useState<any[]>([])
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [targetShowName, setTargetShowName] = useState<string | null>(null)
+  const [globalMapping, setGlobalMapping] = useState<any[]>([
+    { id: '1', field: 'artist_name', header: 'Artist' },
+    { id: '2', field: 'show_date', header: 'Date' },
+    { id: '3', field: 'venue_name', header: 'Venue' },
+    { id: '4', field: 'city', header: 'City' },
+    { id: '5', field: 'deal_guarantee', header: 'Fee' }
+  ])
 
   useEffect(() => {
     if (isOpen) {
@@ -51,33 +47,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           const { data: { user } } = await supabase.auth.getUser()
           if (!user) return
 
-          // 0. If single show, get its name
-          if (selectedShowIds && selectedShowIds.length === 1) {
-            const { data: show } = await supabase
-              .from('shows')
-              .select('artist_name, venue_name')
-              .eq('id', selectedShowIds[0])
-              .single()
-            
-            if (show) {
-              setTargetShowName(`${show.artist_name} @ ${show.venue_name}`)
-            }
-          } else {
-            setTargetShowName(null)
-          }
-
-          // 1. Load Templates
-          const { data: templatesData } = await supabase
-            .from('export_templates')
-            .select('*')
-            .eq('user_id', user.id)
-          
-          if (templatesData) {
-            setTemplates(templatesData)
-            if (templatesData.length > 0) setSelectedTemplateId(templatesData[0].id)
-          }
-
-          // 2. Check Google Connection
+          // Check Google Connection
           const { data: integration } = await supabase
             .from('user_integrations')
             .select('id')
@@ -86,6 +56,17 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             .maybeSingle()
           
           setIsGoogleConnected(!!integration)
+
+          // Load Global Mapping from User Profile or similar (fallback to defaults)
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('global_export_mapping')
+            .eq('id', user.id)
+            .single()
+          
+          if (profile?.global_export_mapping) {
+            setGlobalMapping(profile.global_export_mapping)
+          }
         } catch (err) {
           console.error('Sync Modal Error:', err)
         } finally {
@@ -97,48 +78,35 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   }, [isOpen])
 
   const handleSync = async () => {
-    if (!selectedTemplateId) return
-    
     setIsSyncing(true)
     try {
-      const template = templates.find(t => t.id === selectedTemplateId)
+      const { data: { user } } = await supabase.auth.getUser()
       
-      // 1. Fetch all shows (or selected ones)
-      let query = supabase.from('shows').select('*, venue:venue_id(*)')
+      // 1. Fetch shows
+      let query = supabase.from('shows').select('*')
       if (selectedShowIds && selectedShowIds.length > 0) {
         query = query.in('id', selectedShowIds)
       }
-      
       const { data: shows, error: fetchErr } = await query
       if (fetchErr) throw fetchErr
 
-      // 2. Prepare payload for n8n
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      const payload = {
-        user_id: user?.id,
-        template_name: template.name,
-        google_sheet_id: template.google_sheet_id,
-        mapping: template.mapping,
-        shows: shows.map(show => ({
-          ...show,
-          venue_name: show.venue?.name || show.venue_name || 'TBD',
-          city: show.venue?.city || show.city || ''
-        })),
-        timestamp: new Date().toISOString()
-      }
-
-      // 3. Trigger n8n Universal Sync Webhook
+      // 2. Trigger n8n
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          user_id: user?.id,
+          mode: 'universal_bulk_export',
+          mapping: globalMapping,
+          shows: shows,
+          timestamp: new Date().toISOString()
+        })
       })
 
-      if (!response.ok) throw new Error('n8n request failed')
+      if (!response.ok) throw new Error('Sync failed')
 
-      toast.success('Sync Successful!', {
-        description: `Exported ${shows.length} shows to "${template.name}".`
+      toast.success('Universal Sync Successful!', {
+        description: `Exported ${shows.length} shows to your master sheet.`
       })
       onClose()
     } catch (err: any) {
@@ -150,120 +118,84 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] bg-ebony-900/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
-        
-        <div className="p-8 pb-6 relative z-10 border-b border-white/5">
+      <DialogContent className="sm:max-w-[500px] bg-[#0b0c0d] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
+        <div className="p-8 pb-6 border-b border-white/5">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3">
+            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
               <Table className="text-primary" size={24} />
-              Universal Sync
+              Universal Export
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-2 font-medium">
-              Synchronize your Advancement Pipeline with external spreadsheets.
+              Export your roster into your master production spreadsheet.
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        <div className="p-8 space-y-8 relative z-10">
+        <div className="p-8 space-y-8">
           {!isGoogleConnected ? (
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 space-y-4">
                <div className="flex items-center gap-3 text-amber-500">
                   <AlertCircle size={20} />
-                  <h4 className="font-bold uppercase tracking-tight text-sm">Google Account Not Connected</h4>
+                  <h4 className="font-bold uppercase tracking-tight text-sm">Google Offline</h4>
                </div>
                <p className="text-xs text-muted-foreground leading-relaxed">
-                 You need to connect your Google account in Settings to enable spreadsheet synchronization.
+                 Please connect your Google account in Settings to enable this feature.
                </p>
                <Button 
                  variant="outline" 
-                 onClick={() => { onClose(); window.location.href = '/settings?tab=integrations' }}
-                 className="w-full border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 text-amber-500 font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl"
+                 onClick={() => { onClose(); window.location.href = '/settings' }}
+                 className="w-full border-amber-500/20 bg-amber-500/5 text-amber-500 font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl"
                >
-                 Connect Now <ChevronRight size={14} />
+                 Go to Integrations <ChevronRight size={14} />
                </Button>
             </div>
           ) : (
-            <>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between px-2">
-                  <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-black">Choose Export Profile</Label>
-                  <button 
-                    onClick={() => { onClose(); window.location.href = '/settings?tab=integrations' }}
-                    className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Edit Templates
-                  </button>
-                </div>
-                <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-                  <SelectTrigger className="bg-white/5 border-white/10 h-16 rounded-2xl px-5 text-lg font-bold transition-all focus:ring-primary/50">
-                    <SelectValue placeholder="Select a template..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-ebony-900 border-white/10 rounded-2xl">
-                    {templates.map(t => (
-                      <SelectItem key={t.id} value={t.id} className="py-4 font-bold">
-                        {t.name}
-                      </SelectItem>
-                    ))}
-                    {templates.length === 0 && !isLoading && (
-                      <SelectItem value="none" disabled className="py-4 text-muted-foreground italic">No templates found</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                <p className="text-[10px] text-muted-foreground/60 italic ml-2 mt-2">
-                  This profile defines the column names and the target Google Sheet.
-                </p>
-              </div>
-
-              <div className="bg-black/40 rounded-3xl p-6 border border-white/5 space-y-4">
+            <div className="space-y-6">
+              <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
                  <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Sync Details</span>
-                    <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase px-2 py-0">READY</Badge>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Master Sync Ready</span>
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Syncing Target</span>
+                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Selected Roster</span>
                        <p className="text-sm font-black italic text-white truncate">
-                         {targetShowName || (selectedShowIds?.length ? `${selectedShowIds.length} Selected Shows` : 'All Active Shows')}
+                         {selectedShowIds?.length ? `${selectedShowIds.length} Shows` : 'All Active Shows'}
                        </p>
                     </div>
                     <div className="space-y-1">
-                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Provider</span>
-                       <p className="text-sm font-black italic text-white flex items-center gap-2">Google Sheets <Table size={12} className="text-[#0F9D58]" /></p>
+                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Format</span>
+                       <p className="text-sm font-black italic text-white">Universal Layout</p>
                     </div>
                  </div>
               </div>
-            </>
+              
+              <div className="space-y-3">
+                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest ml-2">Columns included</p>
+                 <div className="flex flex-wrap gap-2">
+                    {globalMapping.slice(0, 4).map(m => (
+                      <div key={m.id} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[9px] font-black uppercase text-zinc-500 italic">{m.header}</div>
+                    ))}
+                    <div className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[9px] font-black uppercase text-zinc-500 italic">+{globalMapping.length - 4} more</div>
+                 </div>
+              </div>
+            </div>
           )}
         </div>
 
         <DialogFooter className="p-8 bg-black/20 border-t border-white/5">
-          <Button 
-            variant="ghost" 
-            onClick={onClose}
-            className="hover:bg-white/5 h-12 px-6 rounded-xl font-pro-data uppercase tracking-widest text-[10px]"
-            disabled={isSyncing}
-          >
+          <Button variant="ghost" onClick={onClose} className="h-12 px-6 rounded-xl font-bold uppercase tracking-widest text-[10px] text-zinc-500" disabled={isSyncing}>
             Cancel
           </Button>
           <Button 
             onClick={handleSync}
-            disabled={!isGoogleConnected || !selectedTemplateId || isSyncing || isLoading}
-            className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-14 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3 transition-all active:scale-95"
+            disabled={!isGoogleConnected || isSyncing || isLoading}
+            className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-14 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3"
           >
             {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
-            {isSyncing ? 'Synchronizing Data...' : 'Execute Universal Sync'}
+            {isSyncing ? 'Exporting...' : 'Export to Master Sheet'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
-
-function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <div className={`rounded-full ${className}`}>
-      {children}
-    </div>
   )
 }
