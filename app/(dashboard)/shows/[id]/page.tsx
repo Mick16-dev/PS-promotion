@@ -40,26 +40,18 @@ import {
   Plus,
   Table
 } from 'lucide-react'
-import { UniversalSyncModal } from '@/components/dashboard/universal-sync-modal'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
-const REMINDER_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_SEND_REMINDER_WEBHOOK || ''
-
-interface ShowDetailPageProps {
-  params: Promise<{ id: string }>
-}
-
-export default function ShowDetailPage({ params }: ShowDetailPageProps) {
-  // Safe extraction of ID from params (handling both Promise and plain object patterns)
-  const resolvedParams = (params && typeof (params as any).then === 'function') ? React.use(params) : params;
-  const id = resolvedParams ? (resolvedParams as any).id : null;
+export default function ShowDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params)
+  const id = resolvedParams.id
+  
   const [isSendingReminder, setIsSendingReminder] = useState<string | null>(null)
   const [isResendingEmail, setIsResendingEmail] = useState(false)
   const [activeTab, setActiveTab] = useState('itinerary')
-  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
@@ -73,432 +65,93 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
     show_time: 'Show Time',
     deal_guarantee: 'Fee'
   })
-  const [reliability, setReliability] = useState<any>(null)
-  const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    // Load lockouts from local storage
-    const savedLockouts = localStorage.getItem('reminder_lockouts')
-    if (savedLockouts) {
+    async function loadData() {
+      setIsLoading(true)
       try {
-        const parsed = JSON.parse(savedLockouts)
-        const now = Date.now()
-        const active = Object.keys(parsed).reduce((acc: any, key) => {
-          if (parsed[key] > now) acc[key] = true
-          return acc
-        }, {})
-        setLockouts(active)
-      } catch (e) {
-        // ignore parse error
-      }
-    }
-
-    async function fetchShowDetail() {
-      if (!id) return
-      
-      try {
-        // Only set loading on initial fetch
-        if (!showInfo) setIsLoading(true)
-
-        // 1. Fetch Show details
-        const { data: showData, error: showErr } = await supabase
+        // Fetch Show Info
+        const { data: show, error: showErr } = await supabase
           .from('shows')
           .select('*')
           .eq('id', id)
           .single()
+        
+        if (showErr) throw showErr
+        setShowInfo(show)
+        if (show.export_mapping) setMapping(show.export_mapping)
 
-        if (showErr) {
-          console.error('SUPABASE_SHOW_FETCH_ERROR. ID:', id, 'ERROR:', showErr)
-          if (!showInfo) setIsLoading(false)
-          return
-        }
-
-        if (!showData) {
-          if (!showInfo) setIsLoading(false)
-          return
-        }
-
-        // 2. Fetch associated materials
-        const { data: materialsData, error: matsErr } = await supabase
+        // Fetch Materials
+        const { data: materials, error: matErr } = await supabase
           .from('materials')
           .select('*')
           .eq('show_id', id)
-          .order('deadline', { ascending: true })
-
-        // Merge into the local show object
-        const show = { ...showData, materials: materialsData || [] }
-        const artistInfo = { name: show.artist_name, email: show.artist_email, id: show.artist_id }
-        const now = new Date()
-
-        // Calculate show status
-        let computedStatus = show.status || 'Upcoming'
-        if (show.show_date) {
-          const showDate = new Date(show.show_date)
-          const isToday = showDate.toDateString() === now.toDateString()
-          const isPast = showDate < now && !isToday
-          const allMats = show.materials || []
-          const allDelivered = allMats.length > 0 && allMats.every(
-            (m: any) => m.status?.toLowerCase() === 'delivered' || m.status?.toLowerCase() === 'submitted'
-          )
-
-          if (isPast) computedStatus = 'Complete'
-          else if (isToday) computedStatus = 'Show Day'
-          else if (allDelivered) computedStatus = 'Ready'
-          else computedStatus = 'Awaiting Documents'
-        }
-
-        // Format date
-        let dateStr = 'TBD'
-        if (show.show_date) {
-          try {
-            dateStr = new Date(show.show_date).toLocaleDateString(undefined, {
-              year: 'numeric', month: 'short', day: 'numeric'
-            })
-          } catch (e) {
-            // ignore date format error
-          }
-        }
-
-        // Resolve the effective portal token (Show token > Material token > Show ID)
-        const firstMatWithToken = (materialsData || []).find((m: any) => m.portal_token);
-        const effectivePortalToken = showData.portal_token || firstMatWithToken?.portal_token || id;
-
-        // Financial logic
-        let maxCap = 0
-        let projectedGross = 0
-        let totalExpenses = 0
         
-        if (Array.isArray(show.ticket_tiers)) {
-          show.ticket_tiers.forEach((t: any) => {
-            maxCap += Number(t.capacity) || 0
-            projectedGross += (Number(t.capacity) || 0) * (Number(t.price) || 0)
-          })
+        if (matErr) throw matErr
+        setDocuments(materials || [])
+
+        // Check Google Connection
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: integration } = await supabase
+            .from('user_integrations')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('provider', 'google')
+            .maybeSingle()
+          
+          if (integration) setIsGoogleConnected(true)
         }
-        
-        if (Array.isArray(show.expenses)) {
-          show.expenses.forEach((e: any) => {
-            totalExpenses += Number(e.amount) || 0
-          })
-        }
-        
-        let artistPayout = 0
-        const guarantee = Number(show.deal_guarantee) || 0
-        const percentage = (Number(show.deal_percentage) || 0) / 100
-        
-        if (show.deal_type === 'flat') {
-          artistPayout = guarantee
-        } else if (show.deal_type === 'split') {
-          artistPayout = Math.max(0, (projectedGross - totalExpenses) * percentage)
-        } else if (show.deal_type === 'versus') {
-          const splitAmount = Math.max(0, (projectedGross - totalExpenses) * percentage)
-          artistPayout = Math.max(guarantee, splitAmount)
-        }
-        
-        const promoterTakeHome = projectedGross - totalExpenses - artistPayout
-        const avgPrice = maxCap > 0 ? projectedGross / maxCap : 0
-        const fixedCosts = totalExpenses + (show.deal_type === 'split' ? 0 : guarantee)
-        const breakEvenTickets = avgPrice > 0 ? Math.ceil(fixedCosts / avgPrice) : 0
-
-        setShowInfo({
-          artist: artistInfo?.name || 'Unnamed Artist',
-          artistEmail: artistInfo?.email || '',
-          artistId: artistInfo?.id || show.artist_id,
-          venue: show.venue || 'Venue TBD',
-          city: show.city || '',
-          date: dateStr,
-          rawDate: show.show_date,
-          time: show.show_time || 'TBD',
-          loadIn: show.load_in_time || 'TBD',
-          soundcheck: show.soundcheck_time || 'TBD',
-          doors: show.doors_time || 'TBD',
-          catering: show.catering_notes || '',
-          syncToCalendar: show.sync_to_calendar,
-          status: computedStatus,
-          portal_token: effectivePortalToken,
-          financials: {
-            maxCap,
-            projectedGross,
-            totalExpenses,
-            artistPayout,
-            promoterTakeHome,
-            breakEvenTickets,
-            avgPrice,
-            dealType: show.deal_type,
-            dealGuarantee: guarantee,
-            dealPercentage: Number(show.deal_percentage) || 0
-          },
-          showEndTime: show.show_end_time || 'TBD',
-          changeover: show.changeover_time || 'TBD',
-          musicians: show.musicians_count || 0,
-          host: show.host_name || 'TBD',
-          epk: show.artist_epk_url || '',
-          stageplot: show.stageplot_url || '',
-          techNotes: show.technical_notes || '',
-          artistComment: show.artist_comment || '',
-          portalUrl: (() => {
-            const basePortalUrl = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '');
-            
-            let finalPortalUrl = show.portal_url || '';
-            // If the URL is missing, invalid, or just a Supabase storage link, reconstruct it
-            if (!finalPortalUrl || finalPortalUrl.includes('supabase.co') || !finalPortalUrl.includes('?token=')) {
-              finalPortalUrl = `${basePortalUrl}/?token=${effectivePortalToken}`;
-            }
-            return finalPortalUrl;
-          })()
-        })
-
-        // Process show documents
-        const mats = show.materials || []
-        const now2 = new Date()
-        const formattedDocs = mats.map((mat: any) => {
-          const isDelivered = mat.status?.toLowerCase() === 'delivered' || mat.status?.toLowerCase() === 'submitted'
-          let docStatus: 'delivered' | 'awaiting' | 'late' = 'awaiting'
-
-          if (isDelivered) {
-            docStatus = 'delivered'
-          } else if (mat.deadline && new Date(mat.deadline) < now2) {
-            docStatus = 'late'
-          }
-
-          let deadlineStr = ''
-          let daysInfo = ''
-          if (mat.deadline) {
-            const dl = new Date(mat.deadline)
-            deadlineStr = dl.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-            const diffMs = dl.getTime() - now2.getTime()
-            const diffDays = Math.ceil(diffMs / (1000 * 3600 * 24))
-            if (!isDelivered) {
-              if (diffDays < 0) daysInfo = `${Math.abs(diffDays)} days overdue`
-              else if (diffDays === 0) daysInfo = 'Due today'
-              else daysInfo = `${diffDays} days remaining`
-            }
-          }
-
-          let submittedStr = ''
-          if (mat.submitted_at) {
-            submittedStr = new Date(mat.submitted_at).toLocaleDateString(undefined, {
-              year: 'numeric', month: 'long', day: 'numeric'
-            })
-          }
-
-          return {
-            id: mat.id,
-            name: mat.item_name || 'Document',
-            status: isDelivered ? 'delivered' : (mat.deadline && new Date(mat.deadline) < now2 ? 'late' : 'awaiting'),
-            deadline: deadlineStr,
-            rawDeadline: mat.deadline,
-            submittedAt: submittedStr,
-            daysInfo,
-            fileUrl: mat.file_url || '',
-            hasFile: !!mat.file_url,
-            portal_token: mat.portal_token || ''
-          }
-        })
-
-        setDocuments(formattedDocs)
-
-        // Set reliability if artist info exists
-        setReliability({
-          score: show.artist_reliability ?? 100
-        })
-
       } catch (err) {
-        console.error('FETCH_DETAIL_CRASH. ID:', id, 'ERROR:', err)
+        console.error('FETCH_ERROR:', err)
+        toast.error('Failed to load show details')
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchShowDetail()
-
-    // Realtime subscription for live updates
-    const channel = supabase
-      .channel(`show-${id}-updates`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'materials',
-          filter: `show_id=eq.${id}`
-        },
-        (payload) => {
-          console.log('Realtime material update detected:', payload)
-          fetchShowDetail()
-          toast('Live Update', {
-            description: 'The artist has updated document status.',
-            icon: <Loader2 size={14} className="animate-spin text-primary" />
-          })
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    if (id) loadData()
   }, [id])
 
-  const handleViewDocument = async (doc: any) => {
-    if (!doc.fileUrl) {
-      toast.error('No file associated with this document.')
+  const handleGenerateSheet = async () => {
+    if (!isGoogleConnected) {
+      toast.error('Google account not connected.', { description: 'Please go to Settings > Integrations first.' })
       return
     }
 
+    setIsGeneratingSheet(true)
     try {
-      let path = doc.fileUrl
-      
-      // If it's an external link (like Google Drive or another domain) not hosted in our Supabase storage
-      if (!path.includes('/storage/v1/object/') && path.startsWith('http')) {
-         window.open(path, '_blank')
-         return
-      }
-
-      let bucket = 'production-materials' // Default assumption
-
-      if (path.includes('/storage/v1/object/')) {
-        const parts = path.split('/storage/v1/object/')
-        if (parts.length > 1) {
-          const subParts = parts[1].split('/')
-          // Remove 'public/' or 'authenticated/' prefix if present
-          if (subParts[0] === 'public' || subParts[0] === 'authenticated' || subParts[0] === 'sign') {
-            bucket = subParts[1]
-            path = subParts.slice(2).join('/')
-          } else {
-            bucket = subParts[0]
-            path = subParts.slice(1).join('/')
-          }
-        }
-      }
-
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(path, 3600)
-
-      if (error) throw error
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank')
-      } else {
-        throw new Error('Could not generate signed URL')
-      }
-    } catch (err) {
-      console.error('SIGNED_URL_ERROR:', err)
-      // Fallback to direct URL if signed URL fails, maybe it's public
-      window.open(doc.fileUrl, '_blank')
-    }
-  }
-
-  const handleReminder = async (doc: any) => {
-    // We removed the lockout check to ensure the button remains functional as requested.
-
-
-    setIsSendingReminder(doc.id)
-    
-    try {
-      const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
-      const showToken = String(showInfo?.portal_token || '').trim()
-      const docToken = String(doc.portal_token || '').trim()
-      const token = showToken || docToken || String(id || '').trim()
-      
-      const fullPortalUrl = `${basePortalUrl}/?token=${token}`
-      const artistName = showInfo?.artist || 'Artist'
-      const venueName = showInfo?.venue || 'Venue'
-
-      // Use the internal proxy route instead of hitting n8n directly to avoid CORS/environment issues
-      const response = await fetch('/api/n8n/send-reminder', {
+      const { data: { user } } = await supabase.auth.getUser()
+      const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          material_id: doc.id,
-          artist_email: showInfo?.artistEmail,
-          artist_name: artistName,
-          item_name: doc.name,
-          deadline: doc.rawDeadline,
-          show_name: venueName,
-          portal_url: fullPortalUrl,
-          portal_token: token,
-          show_id: id,
-          venue_name: venueName,
-          city: showInfo?.city || '',
-          show_date: showInfo?.rawDate || '',
-          show_time: showInfo?.time || 'TBD'
+          user_id: user?.id,
+          mode: 'create_new_sheet',
+          mapping,
+          shows: [showInfo]
         })
       })
 
-      toast.success('Reminder Sent', {
-        description: `Requested ${doc.name} update.`
-      })
-
-      // We still track the "sent recently" state but don't hard-block the UI
-      const expiry = Date.now() + 24 * 60 * 60 * 1000
-      const newLockouts = { ...lockouts, [doc.id]: true }
-      setLockouts(newLockouts)
-
-      const savedLockouts = localStorage.getItem('reminder_lockouts')
-      const parsed = savedLockouts ? JSON.parse(savedLockouts) : {}
-      parsed[doc.id] = expiry
-      localStorage.setItem('reminder_lockouts', JSON.stringify(parsed))
-
-    } catch (err) {
-      console.error('REMINDER_ERROR:', err)
-      toast.error('Failed to send reminder. Internal error.')
-    } finally {
-      setIsSendingReminder(null)
-    }
-  }
-
-  const handleResendEmail = async () => {
-    if (!showInfo?.artistEmail) {
-      toast.error('No artist email found.')
-      return
-    }
-
-    setIsResendingEmail(true)
-    try {
-      // Reconstruct the payload to match the create-show webhook exactly
-      const payload = {
-        show_id: id,
-        show_name: `${showInfo.artist} @ ${showInfo.venue}`,
-        show_time: showInfo.time,
-        load_in_time: showInfo.loadIn,
-        soundcheck_time: showInfo.soundcheck,
-        doors_time: showInfo.doors,
-        catering_notes: showInfo.catering,
-        artist_email: showInfo.artistEmail,
-        artist_name: showInfo.artist,
-        venue_name: showInfo.venue,
-        city: showInfo.city,
-        date: showInfo.rawDate,
-        portal_url: showInfo.portalUrl,
-        portal_token: showInfo.portal_token,
-        required_documents: documents.map(d => ({
-          name: d.name,
-          deadline: d.rawDeadline,
-          portal_token: d.portal_token || showInfo.portal_token
-        })),
-        is_resend: true, // Signal to n8n that this is a resend request
-        timestamp: new Date().toISOString()
-      }
-
-      console.log('Resending Portal via Main Webhook:', payload)
-
-      const response = await fetch('/api/n8n/create-show', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
       const result = await response.json()
-
-      if (!response.ok) {
-        console.error('RESEND_PORTAL_WEBHOOK_ERROR:', result)
-        throw new Error(result.error || 'Failed to resend')
+      if (result.success && result.spreadsheet_url) {
+        const { error } = await supabase
+          .from('shows')
+          .update({ 
+            google_sheet_url: result.spreadsheet_url,
+            export_mapping: mapping 
+          })
+          .eq('id', id)
+        
+        if (error) throw error
+        
+        setShowInfo({ ...showInfo, google_sheet_url: result.spreadsheet_url })
+        toast.success('Spreadsheet generated successfully!')
+      } else {
+        throw new Error(result.error || 'Failed to generate spreadsheet')
       }
-
-      toast.success('Portal Link Re-sent', {
-        description: `Link sent to ${showInfo.artistEmail}`
-} catch (err: any) {
-      console.error('RESEND_EMAIL_ERROR:', err)
-      toast.error(`Failed to resend portal email: ${err.message || 'Unknown error'}`)
+    } catch (e: any) {
+      toast.error('Sync failed: ' + e.message)
     } finally {
       setIsGeneratingSheet(false)
     }
@@ -506,7 +159,6 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
 
   const handleDownloadCSV = () => {
     try {
-      // 1. Prepare headers and row
       const headers = Object.values(mapping)
       const row = Object.keys(mapping).map(key => {
         let val = showInfo[key]
@@ -514,23 +166,17 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
         return `"${(val || '').toString().replace(/"/g, '""')}"`
       })
 
-      // 2. Create CSV content
       const csvContent = [
         headers.map(h => `"${(h as string).replace(/"/g, '""')}"`).join(','),
         row.join(',')
       ].join('\n')
 
-      // 3. Trigger download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
       link.setAttribute('href', url)
-      link.setAttribute('download', `Show_Export_${showInfo.artist_name.replace(/\s+/g, '_')}.csv`)
-      link.style.visibility = 'hidden'
-      document.body.appendChild(link)
+      link.setAttribute('download', `Export_${showInfo.artist_name.replace(/\s+/g, '_')}.csv`)
       link.click()
-      document.body.removeChild(link)
-      
       toast.success('CSV Downloaded!')
     } catch (e: any) {
       toast.error('Download failed: ' + e.message)
@@ -538,523 +184,276 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   }
 
   const handleCopyLink = () => {
-    if (!showInfo?.portalUrl) return
-    navigator.clipboard.writeText(showInfo.portalUrl)
-    toast.success('Portal Link Copied', { description: 'Link copied to clipboard.' })
-  }
-
-  const getReliabilityStatus = (score: number) => {
-    if (score >= 80) return { label: 'Reliable', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', barColor: 'bg-emerald-500' }
-    if (score >= 50) return { label: 'Inconsistent', color: 'text-amber-500', bg: 'bg-amber-500/10 border-amber-500/20', barColor: 'bg-amber-500' }
-    return { label: 'Unreliable', color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/20', barColor: 'bg-red-500' }
-  }
-
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'Ready': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-      case 'Awaiting Documents': return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-      case 'Show Day': return 'bg-primary/20 text-primary border-primary/30'
-      case 'Complete': return 'bg-muted text-muted-foreground border-border'
-      default: return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+    if (showInfo?.portalUrl) {
+      navigator.clipboard.writeText(showInfo.portalUrl)
+      toast.success('Copied to clipboard!')
     }
+  }
+
+  const handleResendEmail = async () => {
+    setIsResendingEmail(true)
+    try {
+      const response = await fetch('/api/n8n/resend-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showId: id })
+      })
+      if (!response.ok) throw new Error('Network response was not ok')
+      toast.success('Email re-sent successfully')
+    } catch (err) {
+      toast.error('Failed to send email')
+    } finally {
+      setIsResendingEmail(false)
+    }
+  }
+
+  const handleReminder = async (doc: any) => {
+    setIsSendingReminder(doc.id)
+    try {
+      const response = await fetch('/api/n8n/send-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ materialId: doc.id })
+      })
+      if (!response.ok) throw new Error('Failed to send reminder')
+      toast.success('Reminder sent to artist')
+    } catch (err) {
+      toast.error('Failed to send reminder')
+    } finally {
+      setIsSendingReminder(null)
+    }
+  }
+
+  const handleViewDocument = (doc: any) => {
+    if (doc.fileUrl) window.open(doc.fileUrl, '_blank')
   }
 
   if (isLoading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
-          <Music className="h-8 w-8 animate-bounce text-primary/50" />
-          <p className="font-pro-data uppercase tracking-widest text-xs font-bold">Loading Show...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 size={40} className="animate-spin text-primary" />
+        <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Initializing production workspace...</p>
       </div>
     )
   }
 
-  if (!showInfo) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center text-center">
-        <div>
-          <p className="text-xl font-bold text-white">Show not found.</p>
-          <Link href="/shows" className="text-primary mt-4 inline-block hover:underline">← Back to All Shows</Link>
-        </div>
-      </div>
-    )
-  }
+  if (!showInfo) return <div className="text-center py-20">Show not found</div>
 
-  const relStatus = reliability ? getReliabilityStatus(reliability.score) : getReliabilityStatus(100)
-  const deliveredCount = documents.filter(d => d.status === 'delivered').length
+  const relStatus = showInfo.artist_reliability >= 80 ? { label: 'Trusted', color: 'text-emerald-400', bg: 'bg-emerald-500/10' } :
+                   showInfo.artist_reliability >= 50 ? { label: 'Average', color: 'text-amber-500', bg: 'bg-amber-500/10' } :
+                   { label: 'Unreliable', color: 'text-red-500', bg: 'bg-red-500/10' }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-7xl mx-auto">
-      {/* HEADER SECTION */}
+      {/* HEADER */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Link href="/shows" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-white transition-colors font-bold group">
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
-            All Shows
-          </Link>
-          <Button variant="outline" className="gap-2 border-white/10 hover:bg-white/5" onClick={() => setIsSyncModalOpen(true)}>
-            <Table size={16} className="text-[#0F9D58]" /> Export
-          </Button>
-        </div>
+        <Link href="/shows" className="inline-flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-white transition-colors font-bold group">
+          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> All Shows
+        </Link>
         
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-4">
-            <h1 className="text-5xl font-black uppercase tracking-tighter italic text-white leading-none">
-              {showInfo.artist}
+            <div className="flex items-center gap-3">
+              <Badge className="bg-primary/10 text-primary border-primary/20 font-black tracking-widest text-[10px] py-1 px-4 rounded-full uppercase">
+                {showInfo.status || 'Active Production'}
+              </Badge>
+              <span className="text-muted-foreground/40 font-bold text-xs uppercase tracking-widest">Show ID: {id?.slice(0, 8)}</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter italic text-white leading-none">
+              {showInfo.artist_name}
             </h1>
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-medium text-lg">
-              <span className="flex items-center gap-2 text-white"><MapPin size={18} className="text-primary" /> {showInfo.venue}</span>
-              {showInfo.city && <><span className="text-white/20">•</span><span className="text-foreground">{showInfo.city}</span></>}
-              <span className="text-white/20">•</span>
-              <span className="flex items-center gap-2 font-pro-data uppercase tracking-widest text-sm font-bold"><Calendar size={18} className="text-primary" /> {showInfo.date}</span>
-              <span className="text-white/20">•</span>
-              <span className="flex items-center gap-2 font-pro-data uppercase tracking-widest text-sm font-bold"><Clock size={18} className="text-primary" /> {showInfo.time}</span>
+            <div className="flex flex-wrap items-center gap-6 text-muted-foreground font-bold">
+              <span className="flex items-center gap-2"><Calendar size={18} className="text-primary" /> {new Date(showInfo.show_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span className="flex items-center gap-2"><MapPin size={18} className="text-primary" /> {showInfo.venue_name}, {showInfo.city}</span>
             </div>
           </div>
-          <Badge variant="outline" className={`${getStatusBadgeClass(showInfo.status)} text-sm py-2 px-6 rounded-full font-bold uppercase tracking-widest self-start lg:self-auto`}>
-            {showInfo.status}
-          </Badge>
+
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="h-14 border-white/10 bg-white/5 hover:bg-white/10 gap-3 px-8 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+              Edit Show
+            </Button>
+            <Button className="h-14 bg-white hover:bg-zinc-200 text-black shadow-xl shadow-white/5 gap-3 px-8 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+              Save Changes
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* FINANCIAL DASHBOARD */}
-        {showInfo.financials && (
-          <div className="lg:col-span-12 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-                 <Activity className="text-emerald-400" size={24} />
-                 Financial Dashboard
-              </h2>
-              {showInfo.financials.dealType && (
-                <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest leading-none pt-0.5">
-                     {showInfo.financials.dealType === 'flat' ? 'Flat Guarantee Deal' : showInfo.financials.dealType === 'split' ? 'Door Split Deal' : 'Versus Deal'}
-                   </span>
-                </div>
-              )}
-            </div>
+      {/* TABS */}
+      <div className="space-y-10">
+        <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-2xl border border-white/5 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'itinerary', name: 'Itinerary' },
+            { id: 'financials', name: 'Financials' },
+            { id: 'tech', name: 'Tech & Logistics' },
+            { id: 'documents', name: 'Documents' },
+            { id: 'sync', name: 'Sync & Spreadsheet', icon: Table }
+          ].map((tab) => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${activeTab === tab.id ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-muted-foreground hover:text-white'}`}
+            >
+              {tab.icon && <tab.icon size={14} className={activeTab === tab.id ? 'text-[#0F9D58]' : 'text-primary'} />}
+              {tab.name}
+            </button>
+          ))}
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
-                <div className="relative z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Projected Gross</span>
-                  <span className="text-3xl font-black italic text-white">${showInfo.financials.projectedGross.toLocaleString()}</span>
-                  <span className="text-[10px] text-muted-foreground/60 mt-1">At {showInfo.financials.maxCap} max capacity</span>
-                </div>
-                <DollarSign size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-emerald-500/10 transition-colors" />
-              </div>
-
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
-                <div className="relative z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Est. Expenses & Payout</span>
-                  <span className="text-3xl font-black italic text-white">${(showInfo.financials.totalExpenses + showInfo.financials.artistPayout).toLocaleString()}</span>
-                  <span className="text-[10px] text-muted-foreground/60 mt-1">Exp: ${showInfo.financials.totalExpenses.toLocaleString()} / Payout: ${showInfo.financials.artistPayout.toLocaleString()}</span>
-                </div>
-                <PieChart size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-primary/10 transition-colors" />
-              </div>
-
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
-                <div className="relative z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Break-Even Point</span>
-                  <span className="text-3xl font-black italic text-white">{showInfo.financials.breakEvenTickets}</span>
-                  <span className="text-[10px] text-muted-foreground/60 mt-1">Avg ${showInfo.financials.avgPrice.toFixed(2)} / Ticket</span>
-                </div>
-                <Activity size={80} className="absolute -right-4 -bottom-4 text-white/[0.02] group-hover:text-amber-500/10 transition-colors" />
-              </div>
-
-              <div className={`border p-6 rounded-3xl relative overflow-hidden group ${showInfo.financials.promoterTakeHome >= 0 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                <div className="relative z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Est. Promoter Profit</span>
-                  <span className={`text-3xl font-black italic ${showInfo.financials.promoterTakeHome >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    ${showInfo.financials.promoterTakeHome.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground/60 mt-1">Take-home potential</span>
-                </div>
-                <TrendingUp size={80} className={`absolute -right-4 -bottom-4 transition-colors ${showInfo.financials.promoterTakeHome >= 0 ? 'text-emerald-500/10 group-hover:text-emerald-500/20' : 'text-red-500/10 group-hover:text-red-500/20'}`} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* PRODUCTION DOCUMENTS GRID (NEW SECTION) */}
-        {activeTab === 'documents' && (
-          <div className="lg:col-span-12 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
-                 <LayoutGrid className="text-primary" size={24} />
-                 Artist Document Viewer
-              </h2>
-              <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-white/5 border border-white/10">
-                 <ShieldCheck className="text-emerald-400" size={14} />
-                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none pt-0.5">Secure Storage Active</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {documents.length === 0 ? (
-                <div className="col-span-full rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01] p-24 text-center">
-                   <Loader2 className="mx-auto mb-4 animate-spin text-muted-foreground/20" size={32} />
-                   <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Awaiting Material Configuration</p>
-                </div>
-              ) : (
-                documents.map((doc) => {
-                  const isReceived = doc.status === 'delivered'
+        {/* ITINERARY TAB */}
+        {activeTab === 'itinerary' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-8 space-y-10">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-zinc-900/50 border border-white/5 p-8 rounded-[2.5rem] space-y-4">
+                     <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                       <Clock size={16} /> Schedule
+                     </h3>
+                     <div className="space-y-4 pt-2">
+                        {[
+                          { label: 'Load In', time: showInfo.load_in_time },
+                          { label: 'Soundcheck', time: showInfo.soundcheck_time },
+                          { label: 'Doors', time: showInfo.doors_time },
+                          { label: 'Show Starts', time: showInfo.show_time }
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center justify-between group">
+                            <span className="text-sm font-bold text-muted-foreground/60">{item.label}</span>
+                            <span className="text-lg font-black text-white group-hover:text-primary transition-colors italic">{item.time || 'TBD'}</span>
+                          </div>
+                        ))}
+                     </div>
+                  </div>
                   
-                  const getNameIcon = (name: string) => {
-                    const n = name.toLowerCase()
-                    if (n.includes('stage') || n.includes('plot')) return MapIcon
-                    if (n.includes('cater') || n.includes('hospitality')) return Utensils
-                    if (n.includes('press') || n.includes('photo') || n.includes('epk')) return ImageIcon
-                    return FileSearch
-                  }
-                  const Icon = getNameIcon(doc.name)
-
-                  return (
-                    <motion.div 
-                      key={doc.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
-                        doc.hasFile 
-                          ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
-                          : 'bg-white/[0.01] border-white/5 hover:border-white/10'
-                      }`}
-                    >
-                      <div className="space-y-6 relative z-10">
-                        <div className="flex items-start justify-between">
-                          <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${doc.hasFile ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
-                            <Icon size={24} />
-                          </div>
-                          <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
-                            doc.hasFile ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
-                          }`}>
-                            {doc.hasFile ? '✅ Received' : '⏳ Pending'}
-                          </Badge>
+                  <div className="bg-zinc-900/50 border border-white/5 p-8 rounded-[2.5rem] space-y-4">
+                     <h3 className="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
+                       <Activity size={16} /> Real-time Status
+                     </h3>
+                     <div className="space-y-6 pt-4">
+                        <div className="flex flex-col gap-2">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Portal Status</span>
+                           <div className="flex items-center gap-2">
+                             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                             <span className="text-sm font-bold text-white uppercase tracking-tighter">Artist Online</span>
+                           </div>
                         </div>
-
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
-                          <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
-                            {doc.hasFile 
-                              ? `Verification complete. Document is secured and available for production review.` 
-                              : doc.daysInfo 
-                                ? `Requirement is ${doc.daysInfo}. The artist is currently flagged in the portal.`
-                                : `Awaiting transmission. Material initialized in the production workspace.`
-                            }
-                          </p>
+                        <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                           <p className="text-[11px] text-emerald-400/80 font-bold leading-relaxed">
+                             All materials are currently being monitored for automated deadline compliance.
+                           </p>
                         </div>
-                      </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
 
-                      <div className="mt-8 relative z-10 flex flex-col gap-3">
-                        {doc.hasFile ? (
-                          <div className="flex gap-2">
-                             <motion.button 
-                               whileHover={{ scale: 1.02 }}
-                               whileTap={{ scale: 0.98 }}
-                               onClick={() => handleViewDocument(doc)}
-                               className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/20 active:scale-95 transition-all flex items-center justify-center"
-                             >
-                                <Eye size={20} className="mr-2" /> View
-                             </motion.button>
-                             <motion.button 
-                               whileHover={{ scale: 1.02 }}
-                               whileTap={{ scale: 0.98 }}
-                               onClick={() => handleViewDocument(doc)}
-                               className="w-14 h-14 p-0 rounded-2xl border border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center justify-center transition-colors"
-                             >
-                                <Download size={20} />
-                             </motion.button>
-                          </div>
-                        ) : (
-                          <motion.button 
-                            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleReminder(doc)}
-                            disabled={isSendingReminder === doc.id}
-                            className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 cursor-pointer relative z-20 ${
-                              doc.status === 'late' 
-                                ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40 hover:border-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
-                                : 'bg-white/10 border border-white/20 text-white hover:border-white/40 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                            } ${isSendingReminder === doc.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          >
-                             {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin text-primary" /> : <Send size={16} className={doc.status === 'late' ? 'text-amber-500' : 'text-primary'} />}
-                             {isSendingReminder === doc.id ? 'Sending Request...' : 'Remind Artist'}
-                          </motion.button>
-                        )}
-                      </div>
-
-                      {doc.hasFile && (
-                        <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.04] transition-opacity">
-                          <Icon size={160} />
-                        </div>
-                      )}
-                    </motion.div>
-                  )
-                })
-              )}
+            <div className="lg:col-span-4 space-y-8">
+              <div className="glass-card rounded-3xl p-8 border-white/5 bg-muted/10 space-y-6">
+                <div>
+                  <h3 className="text-lg font-black uppercase tracking-tighter italic text-white flex items-center gap-3">
+                    <ExternalLink size={20} className="text-primary" /> Artist Portal
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 font-medium">Link for artist document uploads.</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/10 overflow-hidden group">
+                    <p className="text-xs font-mono text-muted-foreground/80 truncate group-hover:text-white select-all">{showInfo.portal_url}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button variant="outline" className="flex-1 border-white/10 h-12 rounded-xl text-xs font-bold" onClick={handleCopyLink}><Copy size={16} className="mr-2"/> Copy</Button>
+                    <Button className="flex-1 bg-primary text-white h-12 rounded-xl text-xs font-bold uppercase tracking-widest" onClick={handleResendEmail} disabled={isResendingEmail}>
+                       {isResendingEmail ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} className="mr-2"/>} Resend
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* LOGISTICS & LIVE SCHEDULE */}
-        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
-           {/* Schedule Card */}
-           <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                  <Clock3 size={22} className="text-primary/50" />
-                  Live Schedule
-                </h2>
-                {showInfo.syncToCalendar && (
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-1">
-                    Calendar Synced
+        {/* SYNC TAB */}
+        {activeTab === 'sync' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] p-8 space-y-6">
+                   <div className="flex items-center justify-between">
+                     <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Spreadsheet Mapping</h3>
+                     {isGoogleConnected ? (
+                       <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1">
+                         <CheckCircle size={10} /> Connected
+                       </Badge>
+                     ) : (
+                       <Badge variant="outline" className="text-amber-500 border-amber-500/20 gap-1">
+                         <ShieldAlert size={10} /> Not Connected
+                       </Badge>
+                     )}
+                   </div>
+                   <p className="text-sm text-muted-foreground font-medium">Define the column headers for your generated spreadsheet.</p>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {Object.entries(mapping).map(([key, value]) => (
+                       <div key={key} className="space-y-2">
+                         <Label className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground ml-2">{key.replace(/_/g, ' ')}</Label>
+                         <Input value={value as string} onChange={(e) => setMapping({ ...mapping, [key]: e.target.value })} className="bg-black/40 border-white/10 h-12 rounded-xl text-sm font-bold" />
+                       </div>
+                     ))}
+                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 text-center space-y-6">
+                   <div className="h-20 w-20 bg-white/5 rounded-[2rem] flex items-center justify-center mx-auto text-[#0F9D58]"><Table size={40} /></div>
+                   <div className="space-y-2">
+                     <h4 className="text-lg font-black italic uppercase text-white">Google Sheets Export</h4>
+                     <p className="text-xs text-muted-foreground font-medium px-4 leading-relaxed">
+                       {showInfo?.google_sheet_url ? "Your spreadsheet is ready and synced." : "Generate a dedicated production spreadsheet instantly."}
+                     </p>
+                   </div>
+
+                   {showInfo?.google_sheet_url ? (
+                     <div className="space-y-3">
+                       <Button onClick={() => window.open(showInfo.google_sheet_url, '_blank')} className="w-full bg-[#0F9D58] text-white h-14 rounded-2xl font-black italic uppercase tracking-tighter shadow-xl">Open Spreadsheet</Button>
+                       <Button variant="outline" disabled={isGeneratingSheet} onClick={handleGenerateSheet} className="w-full border-white/10 h-12 rounded-xl text-xs font-bold gap-2">
+                         {isGeneratingSheet ? <RefreshCw className="animate-spin" size={14} /> : <RefreshCw size={14} />} Update Data
+                       </Button>
+                     </div>
+                   ) : (
+                     <div className="space-y-4">
+                       <Button disabled={isGeneratingSheet || !isGoogleConnected} onClick={handleGenerateSheet} className="w-full bg-white text-black h-14 rounded-2xl font-black italic uppercase tracking-tighter shadow-xl disabled:opacity-50">
+                         {isGeneratingSheet ? <div className="flex items-center gap-2"><RefreshCw size={18} className="animate-spin" /> Generating...</div> : "Generate Google Sheet"}
+                       </Button>
+                       <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-white/5"></span></div><div className="relative flex justify-center text-[8px] font-black tracking-[0.3em] text-muted-foreground"><span className="bg-[#0c0c0c] px-2">OR</span></div></div>
+                       <Button variant="outline" onClick={handleDownloadCSV} className="w-full border-white/10 h-12 rounded-xl text-xs font-bold gap-2"><Download size={14} /> Download as CSV</Button>
+                     </div>
+                   )}
+                   {!isGoogleConnected && <p className="text-[10px] text-amber-500/80 font-bold uppercase tracking-widest animate-pulse">Connect Google in Settings</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DOCUMENTS TAB */}
+        {activeTab === 'documents' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {documents.map((doc) => (
+              <div key={doc.id} className="bg-zinc-900/50 border border-white/5 p-8 rounded-[2.5rem] space-y-6">
+                <div className="flex items-start justify-between">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-primary"><FileSearch size={24} /></div>
+                  <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${doc.hasFile ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'}`}>
+                    {doc.hasFile ? '✅ Received' : '⏳ Pending'}
                   </Badge>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                 {[
-                   { label: 'Load In', time: showInfo.loadIn, icon: Download },
-                   { label: 'Soundcheck', time: showInfo.soundcheck, icon: Music },
-                   { label: 'Doors', time: showInfo.doors, icon: Clock },
-                   { label: 'Changeover', time: showInfo.changeover, icon: RefreshCw },
-                   { label: 'Curfew', time: showInfo.showEndTime, icon: AlertCircle }
-                 ].map((item, i) => (
-                   <div key={i} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col items-center gap-2 text-center">
-                      <item.icon size={16} className="text-primary/40" />
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">{item.label}</span>
-                      <span className="text-lg font-black italic text-white leading-none">{item.time}</span>
-                   </div>
-                 ))}
-              </div>
-           </div>
-
-           {/* Production Personnel & Artist Info */}
-           <div className="space-y-6">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                <User size={22} className="text-primary/50" />
-                Production & Talent
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Musicians</span>
-                    <span className="text-2xl font-black italic text-white">{showInfo.musicians} On Stage</span>
-                 </div>
-                 <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Presenter / Host</span>
-                    <span className="text-xl font-black italic text-white truncate">{showInfo.host}</span>
-                 </div>
-              </div>
-           </div>
-        </div>
-
-        {/* TECHNICAL & LINKS SECTION */}
-        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-10 pt-10 border-t border-white/5">
-           {/* Technical Notes */}
-           <div className="space-y-6">
-              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                <ShieldCheck size={20} className="text-primary/50" />
-                Technical Notes
-              </h2>
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-[2rem] min-h-[120px]">
-                 {showInfo.techNotes ? (
-                   <p className="text-sm text-muted-foreground leading-relaxed">{showInfo.techNotes}</p>
-                 ) : (
-                   <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No technical notes provided.</p>
-                 )}
-              </div>
-           </div>
-
-           {/* Hospitality Notes */}
-           <div className="space-y-6">
-              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                <Utensils size={20} className="text-primary/50" />
-                Hospitality
-              </h2>
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-[2rem] min-h-[120px]">
-                 {showInfo.catering ? (
-                   <p className="text-sm text-muted-foreground leading-relaxed">{showInfo.catering}</p>
-                 ) : (
-                   <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No catering requirements.</p>
-                 )}
-              </div>
-           </div>
-
-           {/* Artist Materials & Links */}
-           <div className="space-y-6">
-              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                <Paperclip size={20} className="text-primary/50" />
-                Production Assets
-              </h2>
-              <div className="space-y-3">
-                 {showInfo.epk && (
-                   <Button variant="outline" className="w-full justify-between h-12 bg-white/5 border-white/10 rounded-xl hover:bg-white/10 group px-4" asChild>
-                      <a href={showInfo.epk} target="_blank" rel="noopener noreferrer">
-                        <span className="flex items-center gap-2 font-bold text-xs"><ExternalLink size={14} className="text-primary" /> Artist Website</span>
-                        <ArrowUpRight size={14} className="text-muted-foreground group-hover:text-white transition-colors" />
-                      </a>
-                   </Button>
-                 )}
-                 {showInfo.stageplot && (
-                   <Button variant="outline" className="w-full justify-between h-12 bg-white/5 border-white/10 rounded-xl hover:bg-white/10 group px-4" asChild>
-                      <a href={showInfo.stageplot} target="_blank" rel="noopener noreferrer">
-                        <span className="flex items-center gap-2 font-bold text-xs"><ImageIcon size={14} className="text-primary" /> Stageplot / Tech</span>
-                        <ArrowUpRight size={14} className="text-muted-foreground group-hover:text-white transition-colors" />
-                      </a>
-                   </Button>
-                 )}
-                 {!showInfo.epk && !showInfo.stageplot && (
-                   <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] flex items-center justify-center text-center">
-                      <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No primary links attached.</p>
-                   </div>
-                 )}
-              </div>
-           </div>
-        </div>
-
-        {/* LOGISTICS LOG TABLE */}
-        <div className="lg:col-span-12 pt-12 border-t border-white/5">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-              <FileSearch size={22} className="text-primary/50" />
-              Submission Log
-            </h2>
-          </div>
-
-          <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.01]">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-white/5 bg-white/5">
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Material Name</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 text-center">Status</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Deadline</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {documents.map((doc) => {
-                  const isReceived = doc.status === 'delivered'
-                  return (
-                    <tr key={doc.id} className="hover:bg-primary/10 hover:shadow-inner transition-colors">
-                      <td className="p-6">
-                        <span className="font-bold text-sm text-white">{doc.name}</span>
-                      </td>
-                      <td className="p-6 text-center">
-                         <Badge variant="outline" className={`font-bold uppercase tracking-widest text-[9px] ${
-                           isReceived ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' : 'text-amber-500 border-amber-500/20 bg-amber-500/5'
-                         }`}>
-                           {doc.status || 'Pending'}
-                         </Badge>
-                      </td>
-                      <td className="p-6">
-                        <span className="text-xs text-muted-foreground font-medium">{doc.deadline}</span>
-                      </td>
-                      <td className="p-6 text-right">
-                         <div className="flex justify-end gap-2">
-                           {doc.hasFile ? (
-                             <Button size="sm" className="h-9 px-4 bg-destructive text-white hover:bg-destructive/90 text-[10px] font-black uppercase tracking-widest rounded-lg" onClick={() => handleViewDocument(doc)}>View File</Button>
-                           ) : (
-                             <motion.button 
-                               whileHover={{ scale: 1.05 }}
-                               whileTap={{ scale: 0.95 }}
-                               disabled={isSendingReminder === doc.id}
-                               className="h-9 px-4 border border-white/20 bg-white/10 text-white hover:bg-white/20 text-[10px] font-black uppercase tracking-widest rounded-lg cursor-pointer transition-all flex items-center gap-2 shadow-sm"
-                               onClick={() => handleReminder(doc)}
-                             >
-                               {isSendingReminder === doc.id ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-                               Remind
-                             </motion.button>
-                           )}
-                         </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* SIDEBAR */}
-        <div className="lg:col-span-4 space-y-8">
-            
-          {/* ARTIST PORTAL SECTION */}
-          <div className="glass-card rounded-3xl p-8 border-white/5 bg-muted/10 space-y-6">
-            <div>
-              <h3 className="text-lg font-black uppercase tracking-tighter italic text-white flex items-center gap-3">
-                <ExternalLink size={20} className="text-primary" /> Artist Portal Link
-              </h3>
-              <p className="text-sm text-muted-foreground mt-2 font-medium">This is the secure link the artist uses to upload documents.</p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-black/40 border border-white/10 overflow-hidden group">
-                <p className="text-xs font-mono text-muted-foreground/80 truncate group-hover:text-white transition-colors select-all">
-                  {showInfo.portalUrl}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 gap-2 h-12 rounded-xl text-xs font-bold bg-white/5" onClick={handleCopyLink}>
-                  <Copy size={16} /> Copy Link
-                </Button>
-                <motion.button 
-                  whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(79, 70, 229, 0.4)' }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-primary to-indigo-600 text-white shadow-xl shadow-primary/20 gap-3 h-14 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-white/10" 
-                  onClick={handleResendEmail}
-                  disabled={isResendingEmail}
-                >
-                  {isResendingEmail ? <Loader2 size={18} className="animate-spin" /> : <Mail size={18} />} 
-                  {isResendingEmail ? 'Transmitting...' : 'Resend Portal Email'}
-                </motion.button>
-              </div>
-            </div>
-          </div>
-
-          {/* ARTIST RELIABILITY SECTION */}
-          {reliability && (
-            <div className="glass-card rounded-3xl p-8 border-white/5 bg-muted/10 space-y-6 relative overflow-hidden">
-              <div className="absolute -right-4 -top-4 opacity-5 rotate-12">
-                <CheckCircle2 size={120} className={relStatus.color} />
-              </div>
-              
-              <div className="relative z-10">
-                <h3 className="text-lg font-black uppercase tracking-tighter italic text-white flex items-center justify-between">
-                  Artist Reliability
-                  <Badge variant="outline" className={`${relStatus.bg} ${relStatus.color} uppercase tracking-widest text-[10px] font-bold`}>{relStatus.label}</Badge>
-                </h3>
-                
-                <div className="mt-8 flex items-end gap-3">
-                  <span className="text-7xl font-black tracking-tighter italic font-pro-data leading-none text-white">{reliability.score}</span>
-                  <span className="text-sm font-pro-data text-muted-foreground uppercase tracking-widest font-bold mb-2">Out of 100</span>
                 </div>
-
-                <div className="mt-6 flex-1 h-3 bg-black/40 rounded-full overflow-hidden border border-white/5 shadow-inner">
-                  <div 
-                    className={`h-full rounded-full opacity-80 ${relStatus.barColor}`}
-                    style={{ width: `${reliability.score}%`, transition: 'width 1s ease-in-out' }}
-                  />
-                </div>
-
-                <div className="mt-8">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Reliability is pulled directly from the backend as verified by automated submission monitoring.
-                  </p>
+                <div><h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3><p className="text-sm text-muted-foreground/60 leading-relaxed">Awaiting transmission. Material initialized in the production workspace.</p></div>
+                <div className="flex gap-3">
+                  {doc.hasFile ? <Button className="flex-1 bg-primary text-white h-12 rounded-xl text-xs font-bold" onClick={() => handleViewDocument(doc)}>View</Button> :
+                  <Button variant="outline" className="flex-1 border-white/10 h-12 rounded-xl text-xs font-bold" onClick={() => handleReminder(doc)} disabled={isSendingReminder === doc.id}>Remind</Button>}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-      <UniversalSyncModal 
-        isOpen={isSyncModalOpen} 
-        onClose={() => setIsSyncModalOpen(false)} 
-        selectedShowIds={id ? [id as string] : []}
-      />
     </div>
   )
 }
