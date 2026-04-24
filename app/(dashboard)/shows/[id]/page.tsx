@@ -205,6 +205,14 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
             dealGuarantee: guarantee,
             dealPercentage: Number(show.deal_percentage) || 0
           },
+          showEndTime: show.show_end_time || 'TBD',
+          changeover: show.changeover_time || 'TBD',
+          musicians: show.musicians_count || 0,
+          host: show.host_name || 'TBD',
+          epk: show.artist_epk_url || '',
+          stageplot: show.stageplot_url || '',
+          techNotes: show.technical_notes || '',
+          artistComment: show.artist_comment || '',
           portalUrl: (() => {
             const basePortalUrl = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '');
             
@@ -731,7 +739,7 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
           </div>
         </div>
 
-        {/* LOGISTICS & LIVE SCHEDULE (NEW SECTION) */}
+        {/* LOGISTICS & LIVE SCHEDULE */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
            {/* Schedule Card */}
            <div className="space-y-6">
@@ -747,36 +755,102 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                 )}
               </div>
 
-              <div className="grid grid-cols-3 gap-1">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                  {[
                    { label: 'Load In', time: showInfo.loadIn, icon: Download },
                    { label: 'Soundcheck', time: showInfo.soundcheck, icon: Music },
-                   { label: 'Doors', time: showInfo.doors, icon: Clock }
+                   { label: 'Doors', time: showInfo.doors, icon: Clock },
+                   { label: 'Changeover', time: showInfo.changeover, icon: RefreshCw },
+                   { label: 'Curfew', time: showInfo.showEndTime, icon: AlertCircle }
                  ].map((item, i) => (
-                   <div key={i} className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-3">
-                      <item.icon size={18} className="text-primary/40" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{item.label}</span>
-                      <span className="text-xl font-black italic text-white">{item.time}</span>
+                   <div key={i} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col items-center gap-2 text-center">
+                      <item.icon size={16} className="text-primary/40" />
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">{item.label}</span>
+                      <span className="text-lg font-black italic text-white leading-none">{item.time}</span>
                    </div>
                  ))}
               </div>
            </div>
 
-           {/* Catering & Notes Card */}
+           {/* Production Personnel & Artist Info */}
            <div className="space-y-6">
               <h2 className="text-xl font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
-                <Utensils size={22} className="text-primary/50" />
-                Hospitality & Notes
+                <User size={22} className="text-primary/50" />
+                Production & Talent
               </h2>
-              <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] h-full min-h-[160px] relative overflow-hidden group">
-                 <div className="relative z-10">
-                   {showInfo.catering ? (
-                     <p className="text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">{showInfo.catering}</p>
-                   ) : (
-                     <p className="text-muted-foreground/30 font-bold uppercase tracking-widest text-xs italic">No hospitality requirements specified.</p>
-                   )}
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Musicians</span>
+                    <span className="text-2xl font-black italic text-white">{showInfo.musicians} On Stage</span>
                  </div>
-                 <Utensils size={120} className="absolute -right-8 -bottom-8 text-white/[0.02] group-hover:text-white/[0.04] transition-all" />
+                 <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl flex flex-col gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Presenter / Host</span>
+                    <span className="text-xl font-black italic text-white truncate">{showInfo.host}</span>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        {/* TECHNICAL & LINKS SECTION */}
+        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-10 pt-10 border-t border-white/5">
+           {/* Technical Notes */}
+           <div className="space-y-6">
+              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+                <ShieldCheck size={20} className="text-primary/50" />
+                Technical Notes
+              </h2>
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-[2rem] min-h-[120px]">
+                 {showInfo.techNotes ? (
+                   <p className="text-sm text-muted-foreground leading-relaxed">{showInfo.techNotes}</p>
+                 ) : (
+                   <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No technical notes provided.</p>
+                 )}
+              </div>
+           </div>
+
+           {/* Hospitality Notes */}
+           <div className="space-y-6">
+              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+                <Utensils size={20} className="text-primary/50" />
+                Hospitality
+              </h2>
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-[2rem] min-h-[120px]">
+                 {showInfo.catering ? (
+                   <p className="text-sm text-muted-foreground leading-relaxed">{showInfo.catering}</p>
+                 ) : (
+                   <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No catering requirements.</p>
+                 )}
+              </div>
+           </div>
+
+           {/* Artist Materials & Links */}
+           <div className="space-y-6">
+              <h2 className="text-lg font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-4">
+                <Paperclip size={20} className="text-primary/50" />
+                Production Assets
+              </h2>
+              <div className="space-y-3">
+                 {showInfo.epk && (
+                   <Button variant="outline" className="w-full justify-between h-12 bg-white/5 border-white/10 rounded-xl hover:bg-white/10 group px-4" asChild>
+                      <a href={showInfo.epk} target="_blank" rel="noopener noreferrer">
+                        <span className="flex items-center gap-2 font-bold text-xs"><ExternalLink size={14} className="text-primary" /> Artist Website</span>
+                        <ArrowUpRight size={14} className="text-muted-foreground group-hover:text-white transition-colors" />
+                      </a>
+                   </Button>
+                 )}
+                 {showInfo.stageplot && (
+                   <Button variant="outline" className="w-full justify-between h-12 bg-white/5 border-white/10 rounded-xl hover:bg-white/10 group px-4" asChild>
+                      <a href={showInfo.stageplot} target="_blank" rel="noopener noreferrer">
+                        <span className="flex items-center gap-2 font-bold text-xs"><ImageIcon size={14} className="text-primary" /> Stageplot / Tech</span>
+                        <ArrowUpRight size={14} className="text-muted-foreground group-hover:text-white transition-colors" />
+                      </a>
+                   </Button>
+                 )}
+                 {!showInfo.epk && !showInfo.stageplot && (
+                   <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] flex items-center justify-center text-center">
+                      <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No primary links attached.</p>
+                   </div>
+                 )}
               </div>
            </div>
         </div>

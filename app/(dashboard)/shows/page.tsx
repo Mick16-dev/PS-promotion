@@ -25,6 +25,8 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
+import { UniversalSyncModal } from '@/components/dashboard/universal-sync-modal'
+import { Table as TableIcon } from 'lucide-react'
 
 interface Show {
   id: string;
@@ -42,6 +44,7 @@ export default function ShowsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   async function fetchShows() {
@@ -168,7 +171,13 @@ export default function ShowsPage() {
             disabled={isRefreshing}
             className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 font-bold text-xs px-4 rounded-lg gap-2"
            >
-             <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> Sync Engagements
+             <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> Sync
+           </Button>
+           <Button 
+             onClick={() => setIsSyncModalOpen(true)}
+             className="h-10 bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-zinc-300 font-bold text-xs px-4 rounded-lg gap-2"
+           >
+             <TableIcon size={14} className="text-[#0F9D58]" /> Universal Export
            </Button>
            <Button 
              onClick={() => setIsCreateModalOpen(true)}
@@ -252,6 +261,10 @@ export default function ShowsPage() {
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
         onSuccess={fetchShows}
+      />
+      <UniversalSyncModal 
+        isOpen={isSyncModalOpen} 
+        onClose={() => setIsSyncModalOpen(false)} 
       />
     </div>
   )

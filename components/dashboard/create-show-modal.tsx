@@ -54,9 +54,17 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [city, setCity] = useState('')
   const [showDate, setShowDate] = useState('')
   const [showTime, setShowTime] = useState('')
+  const [showEndTime, setShowEndTime] = useState('')
   const [loadInTime, setLoadInTime] = useState('')
   const [soundcheckTime, setSoundcheckTime] = useState('')
+  const [changeoverTime, setChangeoverTime] = useState('')
   const [doorsTime, setDoorsTime] = useState('')
+  const [musiciansCount, setMusiciansCount] = useState(0)
+  const [hostName, setHostName] = useState('')
+  const [artistEpkUrl, setArtistEpkUrl] = useState('')
+  const [stageplotUrl, setStageplotUrl] = useState('')
+  const [technicalNotes, setTechnicalNotes] = useState('')
+  const [artistComment, setArtistComment] = useState('')
   const [cateringNotes, setCateringNotes] = useState('')
   const [syncToCalendar, setSyncToCalendar] = useState(true)
 
@@ -200,11 +208,20 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
       const payload = {
         show_id,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
         show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
+        show_end_time: showEndTime || null,
         load_in_time: loadInTime || null,
         soundcheck_time: soundcheckTime || null,
+        changeover_time: changeoverTime || null,
         doors_time: doorsTime || null,
+        musicians_count: musiciansCount || 0,
+        host_name: hostName || null,
+        artist_epk_url: artistEpkUrl || null,
+        stageplot_url: stageplotUrl || null,
+        technical_notes: technicalNotes || null,
+        artist_comment: artistComment || null,
         catering_notes: cateringNotes || null,
         sync_to_calendar: syncToCalendar,
         status: 'pending',
@@ -315,7 +332,15 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
               deal_type: dealType,
               deal_guarantee: dealGuarantee,
               deal_percentage: dealPercentage,
-              venue_id: finalVenueId
+              venue_id: finalVenueId,
+              show_end_time: showEndTime || null,
+              changeover_time: changeoverTime || null,
+              musicians_count: musiciansCount || 0,
+              host_name: hostName || null,
+              artist_epk_url: artistEpkUrl || null,
+              stageplot_url: stageplotUrl || null,
+              technical_notes: technicalNotes || null,
+              artist_comment: artistComment || null
             })
             .eq('id', createdShowId)
 
@@ -351,7 +376,15 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
     setShowTime('')
     setLoadInTime('')
     setSoundcheckTime('')
+    setChangeoverTime('')
     setDoorsTime('')
+    setShowEndTime('')
+    setMusiciansCount(0)
+    setHostName('')
+    setArtistEpkUrl('')
+    setStageplotUrl('')
+    setTechnicalNotes('')
+    setArtistComment('')
     setCateringNotes('')
     setSyncToCalendar(true)
     setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
@@ -622,6 +655,98 @@ return (
                   className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="changeover" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Changeover</Label>
+                <Input
+                  id="changeover"
+                  type="time"
+                  value={changeoverTime}
+                  onChange={(e) => setChangeoverTime(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="endTime" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Curfew / End Time</Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  value={showEndTime}
+                  onChange={(e) => setShowEndTime(e.target.value)}
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="musicians" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Musicians On Stage</Label>
+                <Input
+                  id="musicians"
+                  type="number"
+                  value={musiciansCount || ''}
+                  onChange={(e) => setMusiciansCount(Number(e.target.value))}
+                  placeholder="0"
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="host" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Presenter / Host</Label>
+                <Input
+                  id="host"
+                  value={hostName}
+                  onChange={(e) => setHostName(e.target.value)}
+                  placeholder="e.g. Michele, Adrian"
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="epk" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist Website / URL</Label>
+                <Input
+                  id="epk"
+                  value={artistEpkUrl}
+                  onChange={(e) => setArtistEpkUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="stageplot" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Stageplot / Tech Link</Label>
+                <Input
+                  id="stageplot"
+                  value={stageplotUrl}
+                  onChange={(e) => setStageplotUrl(e.target.value)}
+                  placeholder="https://dropbox.com/..."
+                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="techNotes" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Technical / Stage Notes</Label>
+              <Textarea
+                id="techNotes"
+                value={technicalNotes}
+                onChange={(e) => setTechnicalNotes(e.target.value)}
+                placeholder="Rider notes, power requirements, etc."
+                className="bg-white/5 border-white/10 min-h-[80px] focus-visible:ring-primary/50 rounded-2xl font-medium text-sm transition-colors"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="artistComment" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Internal Artist Comments</Label>
+              <Textarea
+                id="artistComment"
+                value={artistComment}
+                onChange={(e) => setArtistComment(e.target.value)}
+                placeholder="Internal notes about the artist or performance history..."
+                className="bg-white/5 border-white/10 min-h-[80px] focus-visible:ring-primary/50 rounded-2xl font-medium text-sm transition-colors"
+              />
             </div>
 
             <div className="space-y-3">
