@@ -105,7 +105,7 @@ export default function ShowDetailPage({ params }: any) {
         .select('*')
         .eq('user_id', user.id)
         .eq('provider', 'google')
-        .single()
+        .maybeSingle()
       
       if (!integration?.access_token) {
         throw new Error('Google connection missing. Please reconnect in Settings.')
