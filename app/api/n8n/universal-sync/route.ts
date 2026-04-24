@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     )
   }
 
-  let payload: unknown
+  let payload: any
   try {
     payload = await request.json()
   } catch {
@@ -27,19 +27,21 @@ export async function POST(request: Request) {
       cache: 'no-store',
     })
 
-    const text = await res.text()
+    const data = await res.json()
 
+    // Pass the n8n result back to the frontend
+    // The frontend expects { success: true, spreadsheet_url: "..." }
     return NextResponse.json(
       {
-        ok: res.ok,
-        status: res.status,
-        body: text,
+        success: res.ok,
+        ...data
       },
       { status: res.ok ? 200 : 502 },
     )
   } catch (e: any) {
+    console.error('N8N_SYNC_ERROR:', e)
     return NextResponse.json(
-      { error: 'Failed to reach n8n.', details: e?.message ?? String(e) },
+      { success: false, error: 'Failed to reach n8n.', details: e?.message ?? String(e) },
       { status: 502 },
     )
   }
