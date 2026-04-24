@@ -26,6 +26,8 @@ import {
   Utensils,
   Image as ImageIcon,
   Map as MapIcon,
+  CheckCircle,
+  ShieldAlert,
   DollarSign,
   TrendingUp,
   Activity,
