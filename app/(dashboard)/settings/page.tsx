@@ -45,9 +45,12 @@ export default function SettingsPage() {
       const tab = params.get('tab')
       
       if (success === 'google_connected' || tab === 'integrations') {
+        console.log("URL param detected, switching to integrations tab")
         setActiveTab('integrations')
         if (success) {
           toast.success('Google Sheets Connected!')
+          // Re-check integrations specifically when coming back with a success param
+          checkIntegrations()
         }
       }
     }
@@ -93,17 +96,22 @@ export default function SettingsPage() {
       setIsLoadingIntegrations(true)
       try {
         const { data: { user } } = await supabase.auth.getUser()
+        console.log("Checking integrations for user:", user?.id)
         if (user) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from('user_integrations')
             .select('*')
             .eq('user_id', user.id)
             .eq('provider', 'google')
             .maybeSingle()
           
+          if (error) {
+            console.error("Supabase error checking integrations:", error)
+          }
+          
+          console.log("Integration data found:", data)
           if (data) {
             setIsGoogleConnected(true)
-            // Note: We don't store the google email yet, but we could if we wanted to
           }
         }
       } catch (e) {
