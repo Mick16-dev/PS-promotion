@@ -181,6 +181,23 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
     setMapping(mapping.map(m => m.id === id ? { ...m, ...updates } : m))
   }
 
+  const handleViewDocument = async (doc: any) => {
+    if (!doc.file_path) {
+      toast.error('No file path found for this document')
+      return
+    }
+    try {
+      const { data, error } = await supabase.storage
+        .from('materials')
+        .createSignedUrl(doc.file_path, 3600)
+      
+      if (error) throw error
+      window.open(data.signedUrl, '_blank')
+    } catch (err: any) {
+      toast.error('Could not open file: ' + err.message)
+    }
+  }
+
   const handleCopyLink = () => {
     const portalUrl = showInfo?.portal_url || `https://sr-artist-portal-live.vercel.app/portal/${showInfo?.portal_token || id}`
     navigator.clipboard.writeText(portalUrl)
