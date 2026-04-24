@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
 
   if (!code) {
-    return NextResponse.redirect(new URL('/settings', request.url))
+    return new Response('No code provided from Google', { status: 400 })
   }
 
   try {
@@ -18,8 +18,7 @@ export async function GET(request: Request) {
     const redirectUri = `${requestUrl.origin}/api/auth/google/callback`
 
     if (!clientId || !clientSecret) {
-      console.error('Google credentials missing in environment')
-      return NextResponse.redirect(new URL('/settings?error=missing_credentials', request.url))
+      return new Response(`Credentials missing. ID: ${!!clientId}, Secret: ${!!clientSecret}`, { status: 500 })
     }
 
     // 1. Exchange authorization code for tokens
@@ -38,8 +37,7 @@ export async function GET(request: Request) {
     const tokens = await tokenResponse.json()
 
     if (tokens.error) {
-      console.error('Google Token Exchange Error:', tokens)
-      return NextResponse.redirect(new URL('/settings?error=google_token_error', request.url))
+      return new Response(`Google Token Error: ${JSON.stringify(tokens)}`, { status: 500 })
     }
 
     // 2. Authenticate with Supabase
@@ -61,15 +59,14 @@ export async function GET(request: Request) {
         },
       }
     )
-    const { data: { user } } = await supabase.auth.getUser()
+    
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!user) {
-      console.error('User not found in callback')
-      return NextResponse.redirect(new URL('/login', request.url))
+    if (userError || !user) {
+      return new Response(`User Auth Error: ${userError?.message || 'No user found'}. Check if NEXT_PUBLIC_SUPABASE_URL is set in Vercel.`, { status: 401 })
     }
 
     // 3. Save integration to database
-    // Note: Google only sends the refresh_token on the FIRST authorization (prompt=consent)
     const integrationData: any = {
       user_id: user.id,
       provider: 'google',
@@ -82,19 +79,17 @@ export async function GET(request: Request) {
       integrationData.refresh_token = tokens.refresh_token
     }
 
-    const { error } = await supabase
+    const { error: dbError } = await supabase
       .from('user_integrations')
       .upsert(integrationData, { onConflict: 'user_id,provider' })
 
-    if (error) {
-      console.error('Supabase Upsert Error:', error)
-      return NextResponse.redirect(new URL('/settings?error=database_error', request.url))
+    if (dbError) {
+      return new Response(`Database Error: ${dbError.message}. Ensure user_integrations table exists.`, { status: 500 })
     }
 
     // Success! Redirect back to settings
     return NextResponse.redirect(new URL('/settings?success=google_connected', request.url))
   } catch (error: any) {
-    console.error('OAuth Callback Critical Error:', error)
-    return NextResponse.redirect(new URL('/settings?error=callback_error', request.url))
+    return new Response(`Critical Callback Error: ${error.message}`, { status: 500 })
   }
 }
