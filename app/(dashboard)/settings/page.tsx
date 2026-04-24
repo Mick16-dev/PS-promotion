@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   User, 
   Bell, 
@@ -36,6 +36,22 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Auto-switch to Integrations tab if returning from Google
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const success = params.get('success')
+      const tab = params.get('tab')
+      
+      if (success === 'google_connected' || tab === 'integrations') {
+        setActiveTab('integrations')
+        if (success) {
+          toast.success('Google Sheets Connected!')
+        }
+      }
+    }
+  }, [])
   
   // Profile State
   const [fullName, setFullName] = useState('')
