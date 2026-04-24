@@ -63,11 +63,6 @@ export default function SettingsPage() {
   const [email, setEmail] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   
-  // Integration & Template State
-  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
-  const [exportTemplates, setExportTemplates] = useState<any[]>([])
-  const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
-  const [newTemplateName, setNewTemplateName] = useState('')
   const [isLoadingIntegrations, setIsLoadingIntegrations] = useState(false)
 
   // Fetch Profile Data
@@ -135,66 +130,6 @@ export default function SettingsPage() {
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-        
-        if (data) setExportTemplates(data)
-      }
-    } catch (e) {
-      console.error('Failed to fetch templates:', e)
-    }
-  }
-
-  const handleCreateTemplate = async () => {
-    if (!newTemplateName || !userId) return
-    
-    setIsLoadingIntegrations(true)
-    try {
-      const { data, error } = await supabase
-        .from('export_templates')
-        .insert({
-          user_id: userId,
-          name: newTemplateName,
-          mapping: {
-            artist_name: 'Artist',
-            show_date: 'Date',
-            venue_name: 'Venue',
-            city: 'City',
-            show_time: 'Show Time',
-            deal_guarantee: 'Guarantee'
-          }
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      
-      setExportTemplates([data, ...exportTemplates])
-      setNewTemplateName('')
-      setIsCreatingTemplate(false)
-      toast.success('Template created.', { description: 'Now you can customize the column mappings.' })
-    } catch (e: any) {
-      toast.error('Failed to create template: ' + e.message)
-    } finally {
-      setIsLoadingIntegrations(false)
-    }
-  }
-
-  const handleDeleteTemplate = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this template?')) return
-    
-    try {
-      const { error } = await supabase
-        .from('export_templates')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-      setExportTemplates(exportTemplates.filter(t => t.id !== id))
-      toast.success('Template removed.')
-    } catch (e: any) {
-      toast.error('Failed to delete template: ' + e.message)
-    }
-  }
-
   const handleConnectGoogle = async () => {
     // Generate the Google OAuth URL
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
@@ -483,82 +418,6 @@ export default function SettingsPage() {
                         <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-3 py-1 border-white/10 text-muted-foreground">Coming Soon</Badge>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Export Templates Section */}
-                <div className="pt-12 border-t border-white/5 space-y-8">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white">Universal Export Templates</h3>
-                      <p className="text-sm text-muted-foreground mt-2 font-medium">Map internal show data to your specific spreadsheet column headers.</p>
-                    </div>
-                    <Button 
-                      onClick={() => setIsCreatingTemplate(true)}
-                      className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 h-12 px-6 rounded-xl font-bold text-xs gap-2"
-                    >
-                      <Plus size={16} /> Create Template
-                    </Button>
-                  </div>
-
-                  {isCreatingTemplate && (
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row gap-4 items-end animate-in slide-in-from-top-2 duration-300">
-                      <div className="flex-1 space-y-2">
-                        <Label className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground ml-2">Template Name</Label>
-                        <Input 
-                          placeholder="e.g. Finance Sheet Export, Production Schedule..." 
-                          value={newTemplateName}
-                          onChange={(e) => setNewTemplateName(e.target.value)}
-                          className="bg-black/40 border-white/10 h-12 rounded-xl text-sm"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" onClick={() => setIsCreatingTemplate(false)} className="h-12 rounded-xl px-6 text-xs font-bold">Cancel</Button>
-                        <Button onClick={handleCreateTemplate} className="bg-primary text-white h-12 rounded-xl px-8 text-xs font-bold shadow-lg shadow-primary/20">Save Profile</Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 gap-4">
-                    {exportTemplates.map((template) => (
-                      <div key={template.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between hover:bg-white/[0.04] transition-all group">
-                        <div className="flex items-center gap-5">
-                          <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-muted-foreground group-hover:text-white transition-colors">
-                            <Table size={20} />
-                          </div>
-                          <div>
-                            <h4 className="text-lg font-bold text-white">{template.name}</h4>
-                            <p className="text-xs text-muted-foreground font-medium mt-1">{Object.keys(template.mapping || {}).length} Columns Mapped</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-3 mt-4 md:mt-0">
-                          <Button 
-                            variant="outline" 
-                            className="h-10 border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold px-5 rounded-xl gap-2"
-                            onClick={() => window.location.href = `/settings/templates/${template.id}`}
-                          >
-                            Edit Mapping <ChevronRight size={14} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => handleDeleteTemplate(template.id)}
-                            className="h-10 w-10 text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-
-                    {exportTemplates.length === 0 && !isCreatingTemplate && (
-                      <div className="bg-white/[0.01] border border-dashed border-white/10 rounded-[3rem] p-16 text-center">
-                         <Table size={48} className="mx-auto text-muted-foreground/20 mb-4" />
-                         <p className="text-sm text-muted-foreground font-medium">You haven't created any export templates yet.</p>
-                         <p className="text-xs text-muted-foreground/40 mt-1 uppercase tracking-widest font-bold">Start by creating a mapping profile for your spreadsheets.</p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

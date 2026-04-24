@@ -61,6 +61,16 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [showInfo, setShowInfo] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
+  const [isGeneratingSheet, setIsGeneratingSheet] = useState(false)
+  const [mapping, setMapping] = useState<any>({
+    artist_name: 'Artist',
+    show_date: 'Date',
+    venue_name: 'Venue',
+    city: 'City',
+    show_time: 'Show Time',
+    deal_guarantee: 'Fee'
+  })
   const [reliability, setReliability] = useState<any>(null)
   const [lockouts, setLockouts] = useState<Record<string, boolean>>({})
 
@@ -672,87 +682,125 @@ export default function ShowDetailPage({ params }: ShowDetailPageProps) {
                     key={doc.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
-                      doc.hasFile 
-                        ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
-                        : 'bg-white/[0.01] border-white/5 hover:border-white/10'
-                    }`}
-                  >
-                    <div className="space-y-6 relative z-10">
-                      <div className="flex items-start justify-between">
-                        <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${doc.hasFile ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
-                          <Icon size={24} />
+        {activeTab === 'documents' && (
+          <div className="lg:col-span-12 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black uppercase tracking-tighter italic text-white flex items-center gap-4">
+                 <LayoutGrid className="text-primary" size={24} />
+                 Artist Document Viewer
+              </h2>
+              <div className="flex items-center gap-2 p-2 px-4 rounded-full bg-white/5 border border-white/10">
+                 <ShieldCheck className="text-emerald-400" size={14} />
+                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none pt-0.5">Secure Storage Active</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {documents.length === 0 ? (
+                <div className="col-span-full rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01] p-24 text-center">
+                   <Loader2 className="mx-auto mb-4 animate-spin text-muted-foreground/20" size={32} />
+                   <p className="text-muted-foreground font-medium uppercase tracking-[0.2em] text-[10px]">Awaiting Material Configuration</p>
+                </div>
+              ) : (
+                documents.map((doc) => {
+                  const isReceived = doc.status === 'delivered'
+                  
+                  const getNameIcon = (name: string) => {
+                    const n = name.toLowerCase()
+                    if (n.includes('stage') || n.includes('plot')) return MapIcon
+                    if (n.includes('cater') || n.includes('hospitality')) return Utensils
+                    if (n.includes('press') || n.includes('photo') || n.includes('epk')) return ImageIcon
+                    return FileSearch
+                  }
+                  const Icon = getNameIcon(doc.name)
+
+                  return (
+                    <motion.div 
+                      key={doc.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className={`relative overflow-hidden group rounded-[2.5rem] border p-8 transition-all h-full flex flex-col justify-between ${
+                        doc.hasFile 
+                          ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/30' 
+                          : 'bg-white/[0.01] border-white/5 hover:border-white/10'
+                      }`}
+                    >
+                      <div className="space-y-6 relative z-10">
+                        <div className="flex items-start justify-between">
+                          <div className={`p-4 rounded-2xl bg-white/5 border border-white/10 ${doc.hasFile ? 'text-emerald-400 border-emerald-500/20' : 'text-muted-foreground'}`}>
+                            <Icon size={24} />
+                          </div>
+                          <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
+                            doc.hasFile ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
+                          }`}>
+                            {doc.hasFile ? '✅ Received' : '⏳ Pending'}
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className={`font-black uppercase tracking-widest text-[9px] py-1 px-3 rounded-lg ${
-                          doc.hasFile ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted-foreground/60 border-white/10'
-                        }`}>
-                          {doc.hasFile ? '✅ Received' : '⏳ Pending'}
-                        </Badge>
+
+                        <div>
+                          <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
+                          <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
+                            {doc.hasFile 
+                              ? `Verification complete. Document is secured and available for production review.` 
+                              : doc.daysInfo 
+                                ? `Requirement is ${doc.daysInfo}. The artist is currently flagged in the portal.`
+                                : `Awaiting transmission. Material initialized in the production workspace.`
+                            }
+                          </p>
+                        </div>
                       </div>
 
-                      <div>
-                        <h3 className="text-xl font-bold text-white mb-2">{doc.name}</h3>
-                        <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed">
-                          {doc.hasFile 
-                            ? `Verification complete. Document is secured and available for production review.` 
-                            : doc.daysInfo 
-                              ? `Requirement is ${doc.daysInfo}. The artist is currently flagged in the portal.`
-                              : `Awaiting transmission. Material initialized in the production workspace.`
-                          }
-                        </p>
+                      <div className="mt-8 relative z-10 flex flex-col gap-3">
+                        {doc.hasFile ? (
+                          <div className="flex gap-2">
+                             <motion.button 
+                               whileHover={{ scale: 1.02 }}
+                               whileTap={{ scale: 0.98 }}
+                               onClick={() => handleViewDocument(doc)}
+                               className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/20 active:scale-95 transition-all flex items-center justify-center"
+                             >
+                                <Eye size={20} className="mr-2" /> View
+                             </motion.button>
+                             <motion.button 
+                               whileHover={{ scale: 1.02 }}
+                               whileTap={{ scale: 0.98 }}
+                               onClick={() => handleViewDocument(doc)}
+                               className="w-14 h-14 p-0 rounded-2xl border border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center justify-center transition-colors"
+                             >
+                                <Download size={20} />
+                             </motion.button>
+                          </div>
+                        ) : (
+                          <motion.button 
+                            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleReminder(doc)}
+                            disabled={isSendingReminder === doc.id}
+                            className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 cursor-pointer relative z-20 ${
+                              doc.status === 'late' 
+                                ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40 hover:border-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
+                                : 'bg-white/10 border border-white/20 text-white hover:border-white/40 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+                            } ${isSendingReminder === doc.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          >
+                             {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin text-primary" /> : <Send size={16} className={doc.status === 'late' ? 'text-amber-500' : 'text-primary'} />}
+                             {isSendingReminder === doc.id ? 'Sending Request...' : 'Remind Artist'}
+                          </motion.button>
+                        )}
                       </div>
-                    </div>
 
-                    <div className="mt-8 relative z-10 flex flex-col gap-3">
-                      {doc.hasFile ? (
-                        <div className="flex gap-2">
-                           <motion.button 
-                             whileHover={{ scale: 1.02 }}
-                             whileTap={{ scale: 0.98 }}
-                             onClick={() => handleViewDocument(doc)}
-                             className="flex-1 h-14 rounded-2xl bg-destructive text-white hover:bg-destructive/90 font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-destructive/20 active:scale-95 transition-all flex items-center justify-center"
-                           >
-                              <Eye size={20} className="mr-2" /> View
-                           </motion.button>
-                           <motion.button 
-                             whileHover={{ scale: 1.02 }}
-                             whileTap={{ scale: 0.98 }}
-                             onClick={() => handleViewDocument(doc)}
-                             className="w-14 h-14 p-0 rounded-2xl border border-white/10 bg-white/5 text-white hover:bg-white/10 flex items-center justify-center transition-colors"
-                           >
-                              <Download size={20} />
-                           </motion.button>
+                      {doc.hasFile && (
+                        <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.04] transition-opacity">
+                          <Icon size={160} />
                         </div>
-                      ) : (
-                        <motion.button 
-                          whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleReminder(doc)}
-                          disabled={isSendingReminder === doc.id}
-                          className={`w-full h-14 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 cursor-pointer relative z-20 ${
-                            doc.status === 'late' 
-                              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40 hover:border-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
-                              : 'bg-white/10 border border-white/20 text-white hover:border-white/40 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                          } ${isSendingReminder === doc.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                           {isSendingReminder === doc.id ? <Loader2 size={16} className="animate-spin text-primary" /> : <Send size={16} className={doc.status === 'late' ? 'text-amber-500' : 'text-primary'} />}
-                           {isSendingReminder === doc.id ? 'Sending Request...' : 'Remind Artist'}
-                        </motion.button>
                       )}
-                    </div>
-
-                    {doc.hasFile && (
-                      <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.04] transition-opacity">
-                        <Icon size={160} />
-                      </div>
-                    )}
-                  </motion.div>
-                )
-              })
-            )}
+                    </motion.div>
+                  )
+                })
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* LOGISTICS & LIVE SCHEDULE */}
         <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
