@@ -66,14 +66,14 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
   const [documents, setDocuments] = useState<any[]>([])
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isGeneratingSheet, setIsGeneratingSheet] = useState(false)
-  const [mapping, setMapping] = useState<any>({
-    artist_name: 'Artist',
-    show_date: 'Date',
-    venue_name: 'Venue',
-    city: 'City',
-    show_time: 'Show Time',
-    deal_guarantee: 'Fee'
-  })
+  const [mapping, setMapping] = useState<any[]>([
+    { id: '1', field: 'artist_name', header: 'Artist' },
+    { id: '2', field: 'show_date', header: 'Date' },
+    { id: '3', field: 'venue_name', header: 'Venue' },
+    { id: '4', field: 'city', header: 'City' },
+    { id: '5', field: 'show_time', header: 'Show Time' },
+    { id: '6', field: 'deal_guarantee', header: 'Fee' }
+  ])
 
   useEffect(() => {
     async function loadData() {
@@ -87,7 +87,9 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
         
         if (showErr) throw showErr
         setShowInfo(show)
-        if (show.export_mapping) setMapping(show.export_mapping)
+        if (show.export_mapping && Array.isArray(show.export_mapping)) {
+          setMapping(show.export_mapping)
+        }
 
         const { data: materials, error: matErr } = await supabase
           .from('materials')
@@ -143,10 +145,11 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
 
   const handleDownloadCSV = () => {
     try {
-      const headers = Object.values(mapping)
-      const row = Object.keys(mapping).map(key => {
-        let val = showInfo[key]
-        if (key === 'show_date' && val) val = new Date(val).toLocaleDateString()
+      const headers = mapping.map(m => m.header)
+      const row = mapping.map(m => {
+        if (m.field === 'custom') return `"${(m.value || '').toString().replace(/"/g, '""')}"`
+        let val = showInfo[m.field]
+        if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
         return `"${(val || '').toString().replace(/"/g, '""')}"`
       })
       const csvContent = [headers.map(h => `"${(h as string).replace(/"/g, '""')}"`).join(','), row.join(',')].join('\n')
@@ -157,6 +160,25 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
       link.click()
       toast.success('CSV Downloaded!')
     } catch (e: any) { toast.error('Download failed') }
+  }
+
+  const addCustomColumn = () => {
+    const newCol = {
+      id: Math.random().toString(36).substr(2, 9),
+      field: 'custom',
+      header: 'New Column',
+      value: ''
+    }
+    setMapping([...mapping, newCol])
+    toast.success('Custom column added!')
+  }
+
+  const removeColumn = (id: string) => {
+    setMapping(mapping.filter(m => m.id !== id))
+  }
+
+  const updateMapping = (id: string, updates: any) => {
+    setMapping(mapping.map(m => m.id === id ? { ...m, ...updates } : m))
   }
 
   const handleCopyLink = () => {
@@ -527,14 +549,59 @@ export default function ShowDetailPage({ params }: { params: Promise<{ id: strin
           <motion.div key="sync" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
              <div className="lg:col-span-8 bg-zinc-900/50 border border-white/5 p-10 rounded-[3rem] space-y-8 shadow-2xl">
                 <div className="flex items-center justify-between">
-                   <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Spreadsheet Mapping</h3>
-                   {isGoogleConnected ? <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-2"><CheckCircle size={12} /> Connected</Badge> : <Badge variant="outline" className="text-amber-500 border-amber-500/20"><ShieldAlert size={12} /> Offline</Badge>}
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black italic uppercase tracking-tighter text-white">Spreadsheet Mapping</h3>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Customize your export dialect</p>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <Button onClick={addCustomColumn} variant="outline" className="h-10 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 text-[10px] font-black uppercase tracking-widest rounded-xl px-4">
+                         <Plus size={14} className="mr-2" /> Add Column
+                      </Button>
+                      {isGoogleConnected ? <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-2"><CheckCircle size={12} /> Connected</Badge> : <Badge variant="outline" className="text-amber-500 border-amber-500/20"><ShieldAlert size={12} /> Offline</Badge>}
+                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {Object.entries(mapping).map(([key, value]) => (
-                    <div key={key} className="space-y-2">
-                      <Label className="text-[10px] font-pro-data uppercase tracking-widest text-muted-foreground ml-2">{key.replace(/_/g, ' ')}</Label>
-                      <Input value={value as string} onChange={(e) => setMapping({ ...mapping, [key]: e.target.value })} className="bg-black/40 border-white/10 h-14 rounded-2xl p-6 text-sm font-black italic" />
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {mapping.map((m) => (
+                    <div key={m.id} className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-6 group hover:border-white/20 transition-all">
+                       <div className="flex-1 space-y-2 w-full">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 ml-2">Internal Field</Label>
+                          <div className="bg-white/5 h-12 rounded-xl px-4 flex items-center text-xs font-bold text-white/60 border border-white/5">
+                             {m.field === 'custom' ? 'Custom Column' : m.field.replace(/_/g, ' ')}
+                          </div>
+                       </div>
+                       
+                       <ArrowRight size={16} className="text-muted-foreground/20 hidden md:block" />
+
+                       <div className="flex-[2] space-y-2 w-full">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-primary ml-2">Spreadsheet Header</Label>
+                          <Input 
+                            value={m.header} 
+                            onChange={(e) => updateMapping(m.id, { header: e.target.value })} 
+                            className="bg-white/5 border-white/10 h-12 rounded-xl px-5 text-sm font-black italic text-white" 
+                          />
+                       </div>
+
+                       {m.field === 'custom' && (
+                         <div className="flex-1 space-y-2 w-full">
+                            <Label className="text-[9px] font-black uppercase tracking-widest text-emerald-500 ml-2">Default Value</Label>
+                            <Input 
+                              value={m.value || ''} 
+                              placeholder="e.g. TBD"
+                              onChange={(e) => updateMapping(m.id, { value: e.target.value })} 
+                              className="bg-white/5 border-white/10 h-12 rounded-xl px-5 text-sm font-bold text-emerald-400" 
+                            />
+                         </div>
+                       )}
+
+                       <Button 
+                         variant="ghost" 
+                         size="icon" 
+                         onClick={() => removeColumn(m.id)}
+                         className="h-12 w-12 rounded-xl text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/10 self-end md:self-center"
+                       >
+                          <Trash2 size={18} />
+                       </Button>
                     </div>
                   ))}
                 </div>
