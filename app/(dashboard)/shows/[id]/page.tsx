@@ -97,10 +97,30 @@ export default function ShowDetailPage({ params }: any) {
     setIsGeneratingSheet(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      // Fetch the promoter's Google credentials
+      const { data: integration } = await supabase
+        .from('user_integrations')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('provider', 'google')
+        .single()
+      
+      if (!integration?.access_token) {
+        throw new Error('Google connection missing. Please reconnect in Settings.')
+      }
+
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user?.id, mode: 'create_new_sheet', mapping, shows: [showInfo] })
+        body: JSON.stringify({ 
+          user_id: user.id, 
+          access_token: integration.access_token,
+          mode: 'create_new_sheet', 
+          mapping, 
+          shows: [showInfo] 
+        })
       })
       const result = await response.json()
       if (result.success && result.spreadsheet_url) {
