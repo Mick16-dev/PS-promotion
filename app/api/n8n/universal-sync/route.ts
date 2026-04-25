@@ -85,7 +85,13 @@ export async function POST(request: Request) {
       cache: 'no-store',
     })
 
-    const data = await res.json()
+    const responseText = await res.text()
+    let data = {}
+    try {
+      data = JSON.parse(responseText)
+    } catch {
+      data = { message: responseText }
+    }
 
     return NextResponse.json(
       { success: res.ok, ...data },

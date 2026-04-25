@@ -103,7 +103,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         })
       })
 
-      if (!response.ok) throw new Error('Sync failed')
+      const result = await response.json().catch(() => ({}))
+      
+      if (!response.ok) {
+        throw new Error(result.details || result.error || result.message || 'Sync failed due to server error')
+      }
 
       toast.success('Universal Sync Successful!', {
         description: `Exported ${shows.length} shows to your master sheet.`
