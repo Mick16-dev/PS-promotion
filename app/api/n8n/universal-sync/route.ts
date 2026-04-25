@@ -3,13 +3,12 @@ import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
-// Create a service-role client to fetch integration tokens securely
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: Request) {
+  // Create a service-role client to fetch integration tokens securely
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const webhookUrl = process.env.N8N_UNIVERSAL_SYNC_WEBHOOK
   
   if (!webhookUrl) {
