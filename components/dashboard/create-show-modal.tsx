@@ -208,16 +208,17 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
       // Fetch promoter's Google access token so n8n can create the calendar event on their behalf
       const userId = (await supabase.auth.getUser()).data.user?.id
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('google_access_token')
-        .eq('id', userId)
-        .single()
+      const { data: integration } = await supabase
+        .from('user_integrations')
+        .select('access_token')
+        .eq('user_id', userId)
+        .eq('provider', 'google')
+        .maybeSingle()
 
       const payload = {
         show_id,
         user_id: userId,
-        access_token: profile?.google_access_token || null,
+        access_token: integration?.access_token || null,
         show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
         show_end_time: showEndTime || null,
