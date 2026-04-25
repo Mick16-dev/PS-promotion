@@ -22,6 +22,7 @@ import {
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
@@ -45,6 +46,7 @@ export default function ShowsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
+  const [selectedShowIds, setSelectedShowIds] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   async function fetchShows() {
@@ -132,6 +134,22 @@ export default function ShowsPage() {
     }
   }
 
+  function handleSelectShow(e: React.MouseEvent, id: string) {
+    e.preventDefault()
+    e.stopPropagation()
+    setSelectedShowIds(prev => 
+      prev.includes(id) ? prev.filter(sId => sId !== id) : [...prev, id]
+    )
+  }
+
+  function handleSelectAll() {
+    if (selectedShowIds.length === shows.length) {
+      setSelectedShowIds([])
+    } else {
+      setSelectedShowIds(shows.map(s => s.id))
+    }
+  }
+
   useEffect(() => {
     fetchShows()
   }, [])
@@ -191,7 +209,14 @@ export default function ShowsPage() {
       {/* Production Feed - High Density Row Pattern */}
       <div className="bg-[#151618] border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl">
          <div className="px-8 py-5 border-b border-white/[0.04] flex items-center justify-between bg-white/[0.01]">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Active Roster Advancements</h3>
+            <div className="flex items-center gap-4">
+              <Checkbox 
+                checked={shows.length > 0 && selectedShowIds.length === shows.length}
+                onCheckedChange={handleSelectAll}
+                className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-white"
+              />
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Active Roster Advancements</h3>
+            </div>
             <div className="flex items-center gap-4">
                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{shows.length} Total Engagements</span>
                <Filter size={14} className="text-zinc-700" />
@@ -201,8 +226,15 @@ export default function ShowsPage() {
          <div className="divide-y divide-white/[0.01]">
             {shows.map((show) => (
               <Link key={show.id} href={`/shows/${show.id}`}>
-                 <div className="group flex flex-col md:flex-row md:items-center justify-between px-8 py-6 hover:bg-primary/10 hover:shadow-inner transition-all border-l-2 border-l-transparent hover:border-l-primary cursor-pointer">
+                 <div className={`group flex flex-col md:flex-row md:items-center justify-between px-8 py-6 hover:bg-primary/10 hover:shadow-inner transition-all border-l-2 cursor-pointer ${selectedShowIds.includes(show.id) ? 'bg-primary/5 border-l-primary' : 'border-l-transparent hover:border-l-primary'}`}>
                     <div className="flex items-center gap-8">
+                       <div onClick={(e) => handleSelectShow(e, show.id)}>
+                         <Checkbox 
+                           checked={selectedShowIds.includes(show.id)}
+                           className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                         />
+                       </div>
+                       
                        {/* High-Contrast Avatar Icon */}
                        <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors relative overflow-hidden shadow-inner">
                           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent" />
@@ -265,6 +297,7 @@ export default function ShowsPage() {
       <UniversalSyncModal 
         isOpen={isSyncModalOpen} 
         onClose={() => setIsSyncModalOpen(false)} 
+        selectedShowIds={selectedShowIds}
       />
     </div>
   )

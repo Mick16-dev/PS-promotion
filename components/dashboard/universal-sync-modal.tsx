@@ -27,17 +27,35 @@ interface UniversalSyncModalProps {
   selectedShowIds?: string[]
 }
 
+const AVAILABLE_COLUMNS = [
+  { id: 'c1', field: 'artist_name', header: 'Artist' },
+  { id: 'c2', field: 'show_date', header: 'Date' },
+  { id: 'c3', field: 'venue_name', header: 'Venue' },
+  { id: 'c4', field: 'city', header: 'City' },
+  { id: 'c5', field: 'deal_guarantee', header: 'Fee' },
+  { id: 'c6', field: 'deal_type', header: 'Deal Type' },
+  { id: 'c7', field: 'capacity', header: 'Capacity' },
+  { id: 'c8', field: 'ticket_price', header: 'Ticket Price' },
+  { id: 'c9', field: 'status', header: 'Status' },
+  { id: 'c10', field: 'notes', header: 'Notes' },
+]
+
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [globalMapping, setGlobalMapping] = useState<any[]>([
-    { id: '1', field: 'artist_name', header: 'Artist' },
-    { id: '2', field: 'show_date', header: 'Date' },
-    { id: '3', field: 'venue_name', header: 'Venue' },
-    { id: '4', field: 'city', header: 'City' },
-    { id: '5', field: 'deal_guarantee', header: 'Fee' }
-  ])
+  const [globalMapping, setGlobalMapping] = useState<any[]>(AVAILABLE_COLUMNS.slice(0, 5))
+
+  const toggleColumn = (col: any) => {
+    setGlobalMapping(prev => {
+      const exists = prev.find(p => p.field === col.field)
+      if (exists) {
+        return prev.filter(p => p.field !== col.field)
+      } else {
+        return [...prev, col]
+      }
+    })
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -89,6 +107,9 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       }
       const { data: shows, error: fetchErr } = await query
       if (fetchErr) throw fetchErr
+
+      // Save global mapping to profile so it remembers the user's choices
+      await supabase.from('profiles').update({ global_export_mapping: globalMapping }).eq('id', user?.id)
 
       // 2. Trigger n8n
       const response = await fetch('/api/n8n/universal-sync', {
@@ -173,13 +194,21 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                  </div>
               </div>
               
-              <div className="space-y-3">
-                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest ml-2">Columns included</p>
+              <div className="space-y-3 pt-2">
+                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Customize Columns</p>
                  <div className="flex flex-wrap gap-2">
-                    {globalMapping.slice(0, 4).map(m => (
-                      <div key={m.id} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[9px] font-black uppercase text-zinc-500 italic">{m.header}</div>
-                    ))}
-                    <div className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[9px] font-black uppercase text-zinc-500 italic">+{globalMapping.length - 4} more</div>
+                    {AVAILABLE_COLUMNS.map(col => {
+                      const isSelected = globalMapping.some(m => m.field === col.field)
+                      return (
+                        <button
+                          key={col.id}
+                          onClick={() => toggleColumn(col)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase italic transition-all ${isSelected ? 'bg-primary/20 border-primary text-primary border shadow-[0_0_10px_rgba(var(--primary),0.3)]' : 'bg-white/5 border border-white/10 text-zinc-500 hover:text-zinc-300'}`}
+                        >
+                          {col.header}
+                        </button>
+                      )
+                    })}
                  </div>
               </div>
             </div>
