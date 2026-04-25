@@ -206,9 +206,18 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
+      // Fetch promoter's Google access token so n8n can create the calendar event on their behalf
+      const userId = (await supabase.auth.getUser()).data.user?.id
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('google_access_token')
+        .eq('id', userId)
+        .single()
+
       const payload = {
         show_id,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: userId,
+        access_token: profile?.google_access_token || null,
         show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
         show_end_time: showEndTime || null,
@@ -234,7 +243,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         required_documents: docs,
         timestamp: new Date().toISOString(),
-        portal_token: showPortalToken, // Consistent use of short token
+        portal_token: showPortalToken,
         portal_url: primaryPortalUrl,
         deal_type: dealType,
         deal_guarantee: dealGuarantee,
