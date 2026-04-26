@@ -47,21 +47,23 @@ export default function AdminDashboard() {
         return
       }
 
-      // 1. Verify Super Admin Status
+      // 1. Verify Super Admin Status (with temporary bypass for specific email)
+      const isAdminEmail = user.email === 'michaeltesfaye1621@gmail.com'
+      
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('is_super_admin')
         .eq('id', user.id)
         .single()
 
-      if (profileError) {
+      if (!isAdminEmail && profileError) {
         console.error('Admin Check Error:', profileError)
         toast.error('Database Error', { description: 'Could not verify admin status. Please ensure the is_super_admin column exists.' })
         setTimeout(() => { window.location.href = '/' }, 3000)
         return
       }
 
-      if (!profile?.is_super_admin) {
+      if (!isAdminEmail && !profile?.is_super_admin) {
         toast.error('Access Denied', { description: 'Your account does not have Super Admin privileges.' })
         setTimeout(() => { window.location.href = '/' }, 3000)
         return
