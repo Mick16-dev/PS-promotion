@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Bell, Search, User, LogOut, CheckCircle2, AlertCircle, Clock3, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase'
 
 export function Navbar() {
   const router = useRouter()
+  const pathname = usePathname()
   const [notifications, setNotifications] = useState<any[]>([])
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
   const [profileName, setProfileName] = useState<string>('')
@@ -124,9 +125,9 @@ export function Navbar() {
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]">
           <span className="text-muted-foreground/40 hover:text-white transition-colors cursor-pointer" onClick={() => router.push('/overview')}>ShowReady</span>
           <span className="text-muted-foreground/20">/</span>
-          {router && (
+          {pathname && (
             <span className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]">
-              {window.location.pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'Dashboard'}
+              {pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'Dashboard'}
             </span>
           )}
         </div>
