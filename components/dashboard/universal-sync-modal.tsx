@@ -203,7 +203,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                         <button
                           key={col.id}
                           onClick={() => toggleColumn(col)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase italic transition-all ${isSelected ? 'bg-primary/20 border-primary text-primary border shadow-[0_0_10px_rgba(var(--primary),0.3)]' : 'bg-white/5 border border-white/10 text-zinc-500 hover:text-zinc-300'}`}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase italic transition-all ${isSelected ? 'bg-primary/20 border-primary text-primary border shadow-[0_0_10px_theme(colors.primary/30%)]' : 'bg-white/5 border border-white/10 text-zinc-500 hover:text-zinc-300'}`}
                         >
                           {col.header}
                         </button>
@@ -224,7 +224,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             disabled={!isGoogleConnected || isSyncing || isLoading}
             className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-14 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3"
           >
-            {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+            {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
             {isSyncing ? 'Exporting...' : 'Export to Master Sheet'}
           </Button>
         </DialogFooter>
