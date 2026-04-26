@@ -9,9 +9,11 @@ import {
   CreditCard, 
   Clock,
   CheckCircle2,
-  XCircle,
-  MoreVertical,
-  Filter
+  XCircle, 
+  MoreVertical, 
+  Filter,
+  UserPlus,
+  Trash2
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -23,6 +25,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog"
 
 interface UserProfile {
   id: string
@@ -33,11 +43,14 @@ interface UserProfile {
   updated_at: string
 }
 
-export default function AdminDashboard() {
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
+  
+  // New Promoter Modal State
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [newEmail, setNewEmail] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [newName, setNewName] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
   useEffect(() => {
     async function checkAdminAndLoadUsers() {
@@ -88,6 +101,52 @@ export default function AdminDashboard() {
     checkAdminAndLoadUsers()
   }, [])
 
+  const deleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.')) return
+    
+    try {
+      const res = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+
+      const result = await res.json()
+      if (result.error) throw new Error(result.error)
+
+      setUsers(users.filter(u => u.id !== userId))
+      toast.success('User deleted permanently')
+    } catch (error: any) {
+      toast.error(`Delete failed: ${error.message}`)
+    }
+  }
+
+  const handleCreatePromoter = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsCreating(true)
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmail, password: newPassword, fullName: newName })
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Failed to create user')
+
+      toast.success('Promoter created successfully')
+      setIsCreateOpen(false)
+      setNewEmail(''); setNewPassword(''); setNewName('')
+      
+      // Refresh list
+      const { data } = await supabase.from('profiles').select('*').order('updated_at', { ascending: false })
+      setUsers(data || [])
+    } catch (error: any) {
+      toast.error(error.message)
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
   const updateUserStatus = async (userId: string, updates: Partial<UserProfile>) => {
     try {
       const res = await fetch('/api/admin/update-user', {
@@ -133,12 +192,44 @@ export default function AdminDashboard() {
           <p className="text-muted-foreground mt-2 font-medium">Manage promoter access, billing states, and platform security.</p>
         </div>
         
-        <div className="flex items-center gap-4">
-           <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-              <span className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground block mb-1">Total Promoters</span>
-              <span className="text-2xl font-black text-white">{users.length}</span>
-           </div>
-        </div>
+         <div className="flex items-center gap-4">
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white gap-2 h-12 rounded-xl font-bold uppercase tracking-widest text-[10px]">
+                  <UserPlus size={16} /> Add Promoter
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-zinc-950 border-white/10 p-8 rounded-[2rem]">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-white">Create Promoter</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreatePromoter} className="space-y-6 pt-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Full Name</Label>
+                    <Input required value={newName} onChange={e => setNewName(e.target.value)} className="bg-white/5 border-white/10 h-12 rounded-xl" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Email Address</Label>
+                    <Input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="bg-white/5 border-white/10 h-12 rounded-xl" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Password</Label>
+                    <Input required type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="bg-white/5 border-white/10 h-12 rounded-xl" />
+                  </div>
+                  <DialogFooter className="pt-4">
+                    <Button type="submit" disabled={isCreating} className="w-full bg-primary hover:bg-primary/90 text-white h-12 rounded-xl font-bold uppercase tracking-widest">
+                      {isCreating ? <Loader2 className="animate-spin" /> : "Create Account"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl hidden md:block">
+               <span className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground block mb-1">Total Promoters</span>
+               <span className="text-2xl font-black text-white">{users.length}</span>
+            </div>
+         </div>
       </div>
 
       {/* Controls */}
@@ -236,6 +327,14 @@ export default function AdminDashboard() {
                         >
                           <Clock size={18} className="text-amber-500" />
                           Set to Trial Mode
+                        </DropdownMenuItem>
+                        <div className="h-px bg-white/5 my-2" />
+                        <DropdownMenuItem 
+                           className="rounded-xl p-3 font-bold gap-3 focus:bg-red-500/10 text-red-500 cursor-pointer"
+                           onClick={() => deleteUser(user.id)}
+                        >
+                          <Trash2 size={18} />
+                          Delete Account
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
