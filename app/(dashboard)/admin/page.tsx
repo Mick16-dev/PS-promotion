@@ -48,15 +48,22 @@ export default function AdminDashboard() {
       }
 
       // 1. Verify Super Admin Status
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('is_super_admin')
         .eq('id', user.id)
         .single()
 
+      if (profileError) {
+        console.error('Admin Check Error:', profileError)
+        toast.error('Database Error', { description: 'Could not verify admin status. Please ensure the is_super_admin column exists.' })
+        setTimeout(() => { window.location.href = '/' }, 3000)
+        return
+      }
+
       if (!profile?.is_super_admin) {
-        toast.error('Access Denied: Super Admin Only')
-        window.location.href = '/'
+        toast.error('Access Denied', { description: 'Your account does not have Super Admin privileges.' })
+        setTimeout(() => { window.location.href = '/' }, 3000)
         return
       }
 
