@@ -21,39 +21,33 @@ export default function RegisterPage() {
     setError(null)
 
     try {
-      // 1. Auth Sign Up
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          }
-        }
+      // Call our custom registration API that uses the service role bypass
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName })
       })
 
-      if (authError) throw authError
+      const result = await res.json()
 
-      if (authData.user) {
-        // 2. Create Profile record (in case there is no DB trigger)
-        // We use upsert to be safe
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: authData.user.id,
-            full_name: fullName,
-            role: 'Promoter',
-            access_status: 'active',
-            subscription_status: 'trial',
-            updated_at: new Date().toISOString()
-          })
+      if (!res.ok) {
+        throw new Error(result.error || 'Registration failed')
+      }
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // We don't throw here because the user IS created in Auth
+      if (result.success) {
+        // Auto-login after registration
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password
+        })
+        
+        if (loginError) {
+          toast.info('Account created! Please log in manually.')
+          router.push('/login')
+          return
         }
 
-        toast.success('Account created successfully!')
+        toast.success('Welcome to ShowReady!')
         router.push('/')
       }
     } catch (err: any) {
