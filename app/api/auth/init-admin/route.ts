@@ -40,7 +40,6 @@ export async function GET() {
       .from('profiles')
       .upsert({
         id: userId,
-        email: adminEmail,
         full_name: 'Master Admin',
         role: 'Super Admin',
         is_super_admin: true,

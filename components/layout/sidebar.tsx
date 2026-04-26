@@ -31,7 +31,7 @@ const navigation = [
 export function Sidebar() {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const [profile, setProfile] = useState<{ full_name: string; role: string; email: string; is_super_admin: boolean } | null>(null)
+  const [profile, setProfile] = useState<{ full_name: string; role: string; is_super_admin: boolean } | null>(null)
 
   useEffect(() => {
     async function loadProfile() {
@@ -39,7 +39,7 @@ export function Sidebar() {
       if (user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, role, email, is_super_admin')
+          .select('full_name, role, is_super_admin')
           .eq('id', user.id)
           .single()
         
@@ -64,8 +64,16 @@ export function Sidebar() {
   }, [])
 
   // Dynamic navigation items
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserEmail(user.email || null)
+    })
+  }, [])
+
   const menuItems = [...navigation]
-  const isAdmin = profile?.is_super_admin || profile?.email === 'michaeltesfaye1621@gmail.com'
+  const isAdmin = profile?.is_super_admin || currentUserEmail === 'michaeltesfaye1621@gmail.com'
   
   if (isAdmin) {
     menuItems.push({ name: 'Admin', href: '/admin', icon: ShieldAlert as any })
