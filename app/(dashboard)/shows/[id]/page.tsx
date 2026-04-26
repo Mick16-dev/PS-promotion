@@ -187,7 +187,12 @@ export default function ShowDetailPage({ params }: any) {
             </div>
           </div>
           <div className="flex gap-3">
-            <button className="h-14 border border-white/10 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-black uppercase px-8 text-white transition-all" onClick={() => window.location.href = `/shows/${id}/edit`}>Edit Show</button>
+            <button 
+              className="h-14 border border-white/10 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-black uppercase px-8 text-white transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0)] hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]" 
+              onClick={() => window.location.href = `/shows/${id}/edit`}
+            >
+              Edit Show
+            </button>
           </div>
         </div>
       </div>
