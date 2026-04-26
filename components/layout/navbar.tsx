@@ -126,7 +126,7 @@ export function Navbar() {
           <span className="text-muted-foreground/40 hover:text-white transition-colors cursor-pointer" onClick={() => router.push('/overview')}>ShowReady</span>
           <span className="text-muted-foreground/20">/</span>
           {pathname && (
-            <span className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]">
+            <span className="text-primary drop-shadow-[0_0_8px_theme(colors.primary/30%)]">
               {pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'Dashboard'}
             </span>
           )}

@@ -110,12 +110,12 @@ export function Sidebar() {
             >
               {/* Active Glow Accent - More Prominent */}
               {isActive && (
-                <div className="absolute left-0 w-1.5 h-7 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.8)] transition-all" />
+                <div className="absolute left-0 w-1.5 h-7 bg-primary rounded-full shadow-[0_0_15px_theme(colors.primary/80%)] transition-all" />
               )}
               
               <item.icon className={cn(
                 "w-5 h-5 transition-all duration-300",
-                isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "text-muted-foreground group-hover:text-foreground"
+                isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_theme(colors.primary/50%)]" : "text-muted-foreground group-hover:text-foreground"
               )} />
               
               {!isCollapsed && (
