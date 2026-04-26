@@ -611,12 +611,14 @@ return (
                   + Add Tier
                 </Button>
               </div>
+              {ticketTiers.map((tier, idx) => (
                 <div key={idx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
                   <Input placeholder="Tier" value={tier.name} onChange={e => { const t = [...ticketTiers]; t[idx].name = e.target.value; setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 text-xs flex-1 min-w-[120px] font-bold shadow-inner" />
                   <Input type="number" placeholder="Price" value={tier.price || ''} onChange={e => { const t = [...ticketTiers]; t[idx].price = Number(e.target.value); setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 w-24 text-xs font-bold shadow-inner" />
                   <Input type="number" placeholder="Cap" value={tier.capacity || ''} onChange={e => { const t = [...ticketTiers]; t[idx].capacity = Number(e.target.value); setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 w-24 text-xs font-bold shadow-inner" />
                   <Button type="button" variant="ghost" onClick={() => setTicketTiers(ticketTiers.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-300 h-10 px-2 shrink-0"><X size={14} /></Button>
                 </div>
+              ))}
             </div>
 
             {/* Expenses */}
