@@ -187,7 +187,6 @@ export default function ShowDetailPage({ params }: any) {
           </div>
           <div className="flex gap-3">
             <button className="h-14 border border-white/10 bg-white/5 hover:bg-white/10 rounded-2xl text-xs font-black uppercase px-8 text-white transition-all" onClick={() => window.location.href = `/shows/${id}/edit`}>Edit Show</button>
-            <button className="h-14 bg-white hover:bg-zinc-200 text-black rounded-2xl text-xs font-black uppercase px-8 shadow-xl shadow-white/5 transition-all">Save Changes</button>
           </div>
         </div>
       </div>
@@ -260,16 +259,57 @@ export default function ShowDetailPage({ params }: any) {
 
         {activeTab === 'documents' && (
           <motion.div key="documents" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {documents.map((doc) => (
-              <div key={doc.id} className="bg-zinc-900/50 border border-white/5 p-8 rounded-[2.5rem] space-y-6 shadow-2xl group hover:border-primary/50 transition-all">
-                <div className="flex justify-between items-start">
-                   <div className={`p-4 rounded-xl ${doc.hasFile ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary/10 text-primary'}`}><FileSearch size={24} /></div>
-                   <div className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${doc.hasFile ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-white/5 text-muted-foreground border-white/5'}`}>{doc.hasFile ? 'Received' : 'Pending'}</div>
+            {documents.map((doc) => {
+              const isReceived = doc.status?.toLowerCase() === 'delivered' || doc.status?.toLowerCase() === 'submitted'
+              const deadline = doc.deadline ? new Date(doc.deadline) : null
+              const isOverdue = !isReceived && deadline && deadline < new Date()
+              
+              return (
+                <div key={doc.id} className={cn(
+                  "bg-zinc-900/50 border p-8 rounded-[2.5rem] space-y-6 shadow-2xl group transition-all",
+                  isReceived ? "border-emerald-500/20 hover:border-emerald-500/50" : 
+                  isOverdue ? "border-rose-500/20 hover:border-rose-500/50" : "border-white/5 hover:border-primary/50"
+                )}>
+                  <div className="flex justify-between items-start">
+                     <div className={cn(
+                       "p-4 rounded-xl",
+                       isReceived ? "bg-emerald-500/10 text-emerald-500" : 
+                       isOverdue ? "bg-rose-500/10 text-rose-500" : "bg-primary/10 text-primary"
+                     )}>
+                       <FileSearch size={24} />
+                     </div>
+                     <div className={cn(
+                       "text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border",
+                       isReceived ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : 
+                       isOverdue ? "bg-rose-500/10 text-rose-500 border-rose-500/20" : "bg-white/5 text-muted-foreground border-white/5"
+                     )}>
+                       {isReceived ? 'Received' : isOverdue ? 'Overdue' : 'Pending'}
+                     </div>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black italic text-white uppercase truncate">{doc.item_name || doc.name || 'Requirement'}</h4>
+                    <div className="flex items-center gap-2 mt-3">
+                       <Clock size={12} className={isOverdue ? "text-rose-500" : "text-zinc-600"} />
+                       <span className={cn(
+                         "text-[10px] font-black uppercase tracking-widest",
+                         isOverdue ? "text-rose-400" : "text-zinc-600"
+                       )}>
+                         Due: {doc.deadline ? new Date(doc.deadline).toLocaleDateString() : 'TBD'}
+                       </span>
+                    </div>
+                  </div>
+                  <button 
+                    className={cn(
+                      "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                      isReceived ? "bg-white text-black hover:bg-zinc-200" : "bg-white/5 text-zinc-500 cursor-not-allowed border border-white/5"
+                    )} 
+                    onClick={() => isReceived && handleViewDocument(doc)}
+                  >
+                    {isReceived ? 'View File' : 'Awaiting Upload'}
+                  </button>
                 </div>
-                <h4 className="text-xl font-black italic text-white uppercase truncate">{doc.name}</h4>
-                <button className="w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white text-black hover:bg-zinc-200 transition-all" onClick={() => doc.hasFile && handleViewDocument(doc)}>View File</button>
-              </div>
-            ))}
+              )
+            })}
           </motion.div>
         )}
 
@@ -282,11 +322,30 @@ export default function ShowDetailPage({ params }: any) {
               </div>
               <div className="grid grid-cols-1 gap-4">
                 {mapping.map((m) => (
-                  <div key={m.id} className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 group hover:border-white/20 transition-all">
-                    <div className="flex-1 w-full"><label className="text-[9px] uppercase text-muted-foreground/40 font-black ml-2">Internal Field</label><div className="bg-white/5 h-12 rounded-xl px-4 flex items-center text-xs font-bold text-white/40 border border-white/5 italic">{m.field === 'custom' ? 'Custom Static' : (m.field || '').replace(/_/g, ' ')}</div></div>
-                    <ArrowRight size={16} className="text-white/10 hidden md:block" />
-                    <div className="flex-1 w-full"><label className="text-[9px] uppercase text-primary font-black ml-2">Spreadsheet Header</label><input value={m.header} onChange={(e) => setMapping(mapping.map(item => item.id === m.id ? { ...item, header: e.target.value } : item))} className="bg-white/5 border border-white/10 h-12 rounded-xl text-xs font-black italic text-white w-full px-4" /></div>
-                    <button onClick={() => setMapping(mapping.filter(item => item.id !== m.id))} className="h-12 w-12 text-white/5 hover:text-red-500 rounded-xl flex items-center justify-center"><Trash2 size={18} /></button>
+                  <div key={m.id} className="bg-zinc-950 border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 group hover:border-primary/20 transition-all shadow-inner">
+                    <div className="flex-1 w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1 h-3 bg-zinc-700 rounded-full" />
+                        <label className="text-[10px] uppercase text-muted-foreground/60 font-black tracking-widest">Internal Field</label>
+                      </div>
+                      <div className="bg-white/5 h-12 rounded-xl px-4 flex items-center text-xs font-bold text-zinc-400 border border-white/5 italic">
+                        {m.field === 'custom' ? 'Custom Static' : (m.field || '').replace(/_/g, ' ')}
+                      </div>
+                    </div>
+                    <ArrowRight size={16} className="text-zinc-800 hidden md:block mt-4" />
+                    <div className="flex-1 w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1 h-3 bg-primary rounded-full" />
+                        <label className="text-[10px] uppercase text-primary font-black tracking-widest">Spreadsheet Header</label>
+                      </div>
+                      <input 
+                        value={m.header} 
+                        placeholder="Column Name"
+                        onChange={(e) => setMapping(mapping.map(item => item.id === m.id ? { ...item, header: e.target.value } : item))} 
+                        className="bg-black border border-white/10 h-12 rounded-xl text-xs font-black italic text-white w-full px-4 focus:border-primary/50 transition-all outline-none" 
+                      />
+                    </div>
+                    <button onClick={() => setMapping(mapping.filter(item => item.id !== m.id))} className="h-12 w-12 text-zinc-800 hover:text-red-500 rounded-xl flex items-center justify-center mt-4 transition-colors"><Trash2 size={20} /></button>
                   </div>
                 ))}
               </div>

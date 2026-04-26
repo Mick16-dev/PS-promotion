@@ -443,17 +443,20 @@ return (
       <form onSubmit={handleSubmit} className="px-8 py-6 space-y-8 relative z-10 bg-black/20">
         <div className="space-y-6">
           {/* Context Fields */}
-          <div className="space-y-3 pb-2">
-            <Label htmlFor="artist" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist</Label>
+          <div className="space-y-4 pb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-primary rounded-full" />
+              <Label htmlFor="artist" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80 bg-primary/5 px-2 py-0.5 rounded">Artist Selection</Label>
+            </div>
             <Select
               value={selectedArtistId}
               onValueChange={setSelectedArtistId}
               disabled={isLoadingArtists}
             >
-              <SelectTrigger className="bg-white/5 border-white/10 h-14 focus:ring-primary/50 text-foreground w-full rounded-2xl px-5 text-lg font-bold">
+              <SelectTrigger className="bg-zinc-950 border-white/10 h-14 focus:ring-primary/50 text-foreground w-full rounded-2xl px-5 text-lg font-bold shadow-inner">
                 <div className="flex items-center gap-3">
-                  <User size={18} className="text-primary" />
-                  <SelectValue placeholder={isLoadingArtists ? "Loading artists..." : "Select an artist"} />
+                  <User size={18} className="text-primary/60" />
+                  <SelectValue placeholder={isLoadingArtists ? "Select..." : "Select an artist"} />
                 </div>
               </SelectTrigger>
               <SelectContent className="bg-ebony-900 border-white/10 rounded-2xl">
@@ -469,9 +472,12 @@ return (
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <Label htmlFor="venue" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Venue & City</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <Label htmlFor="venue" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80 bg-primary/5 px-2 py-0.5 rounded">Venue & City</Label>
+              </div>
               <div className="relative group">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                 <div className="flex gap-2">
@@ -490,8 +496,8 @@ return (
                       }
                     }}
                     required
-                    placeholder="Venue Name"
-                    className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30"
+                    placeholder="Name"
+                    className="pl-12 bg-zinc-950 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-all hover:border-white/20 placeholder:text-zinc-700 shadow-inner"
                   />
                   <datalist id="venue-list">
                     {venuesList.map(v => (
@@ -504,15 +510,18 @@ return (
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="City"
-                    className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-colors group-hover:border-white/20 placeholder:font-normal placeholder:text-muted-foreground/30 w-32"
+                    className="bg-zinc-950 border-white/10 h-14 focus-visible:ring-primary/50 rounded-2xl font-bold text-lg transition-all hover:border-white/20 placeholder:text-zinc-700 w-32 shadow-inner"
                   />
                 </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <Label htmlFor="date" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Show Date</Label>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80 bg-primary/5 px-2 py-0.5 rounded">Show Date</Label>
+              </div>
               <div className="relative group">
-                <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+                <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/30 group-focus-within:text-primary transition-colors" />
                 <Input
                   id="date"
                   name="date"
@@ -520,12 +529,15 @@ return (
                   value={showDate}
                   onChange={(e) => setShowDate(e.target.value)}
                   required
-                  className="pl-12 bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20"
+                  className="pl-12 bg-zinc-950 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-all group-hover:border-white/20 shadow-inner"
                 />
               </div>
             </div>
-            <div className="space-y-3">
-              <Label htmlFor="time" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Show Time</Label>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <Label htmlFor="time" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80 bg-primary/5 px-2 py-0.5 rounded">Performance Time</Label>
+              </div>
               <div className="relative group">
                 <Input
                   id="time"
@@ -533,7 +545,7 @@ return (
                   type="time"
                   value={showTime}
                   onChange={(e) => setShowTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-colors group-hover:border-white/20 pl-5"
+                  className="bg-zinc-950 border-white/10 h-14 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-2xl font-bold text-lg tracking-widest transition-all group-hover:border-white/20 pl-5 shadow-inner"
                 />
               </div>
             </div>
@@ -542,17 +554,17 @@ return (
           {/* Financials & Deal Structure */}
           <div className="pt-6 border-t border-white/5 space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Music className="text-primary h-4 w-4" />
-                <Label className="text-sm font-black uppercase tracking-widest text-white italic">Financials & Deal</Label>
-              </div>
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-emerald-500 rounded-full" />
+              <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/80 bg-emerald-500/5 px-2 py-0.5 rounded italic">Financials & Revenue Model</Label>
+            </div>
             </div>
 
             {/* Deal Type */}
             <div className="space-y-4 bg-muted/10 p-5 rounded-3xl border border-white/5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Deal Type</Label>
+                  <Label className="text-xs font-bold uppercase tracking-widest text-zinc-300">Deal Type</Label>
                   <Select value={dealType} onValueChange={setDealType}>
                     <SelectTrigger className="bg-white/5 border-white/10 h-12 focus:ring-primary/50 text-foreground w-full rounded-xl px-4 font-bold">
                       <SelectValue />
@@ -567,24 +579,24 @@ return (
 
                 {(dealType === 'flat' || dealType === 'versus') && (
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Guarantee ($)</Label>
+                    <Label className="text-[9px] font-black uppercase tracking-widest text-emerald-500/60 ml-1">Guarantee ($)</Label>
                     <Input
                       type="number"
                       value={dealGuarantee || ''}
                       onChange={e => setDealGuarantee(Number(e.target.value))}
-                      className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold"
+                      className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-emerald-500/50 text-foreground rounded-xl font-bold shadow-inner"
                     />
                   </div>
                 )}
 
                 {(dealType === 'split' || dealType === 'versus') && (
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist Split (%)</Label>
+                    <Label className="text-[9px] font-black uppercase tracking-widest text-emerald-500/60 ml-1">Artist Split (%)</Label>
                     <Input
                       type="number"
                       value={dealPercentage || ''}
                       onChange={e => setDealPercentage(Number(e.target.value))}
-                      className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold"
+                      className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-emerald-500/50 text-foreground rounded-xl font-bold shadow-inner"
                     />
                   </div>
                 )}
@@ -599,14 +611,12 @@ return (
                   + Add Tier
                 </Button>
               </div>
-              {ticketTiers.map((tier, idx) => (
                 <div key={idx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
-                  <Input placeholder="Tier Name" value={tier.name} onChange={e => { const t = [...ticketTiers]; t[idx].name = e.target.value; setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 text-xs flex-1 min-w-[120px]" />
-                  <Input type="number" placeholder="Price" value={tier.price || ''} onChange={e => { const t = [...ticketTiers]; t[idx].price = Number(e.target.value); setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 w-24 text-xs" />
-                  <Input type="number" placeholder="Cap" value={tier.capacity || ''} onChange={e => { const t = [...ticketTiers]; t[idx].capacity = Number(e.target.value); setTicketTiers(t) }} className="bg-white/5 border-white/10 h-10 w-24 text-xs" />
+                  <Input placeholder="Tier" value={tier.name} onChange={e => { const t = [...ticketTiers]; t[idx].name = e.target.value; setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 text-xs flex-1 min-w-[120px] font-bold shadow-inner" />
+                  <Input type="number" placeholder="Price" value={tier.price || ''} onChange={e => { const t = [...ticketTiers]; t[idx].price = Number(e.target.value); setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 w-24 text-xs font-bold shadow-inner" />
+                  <Input type="number" placeholder="Cap" value={tier.capacity || ''} onChange={e => { const t = [...ticketTiers]; t[idx].capacity = Number(e.target.value); setTicketTiers(t) }} className="bg-zinc-950 border-white/10 h-10 w-24 text-xs font-bold shadow-inner" />
                   <Button type="button" variant="ghost" onClick={() => setTicketTiers(ticketTiers.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-300 h-10 px-2 shrink-0"><X size={14} /></Button>
                 </div>
-              ))}
             </div>
 
             {/* Expenses */}
@@ -630,69 +640,69 @@ return (
           {/* Logistics Section */}
           <div className="pt-6 border-t border-white/5 space-y-6">
             <div className="flex items-center gap-2">
-              <Clock className="text-primary h-4 w-4" />
-              <Label className="text-sm font-black uppercase tracking-widest text-white italic">Event Logistics</Label>
+              <div className="w-1 h-4 bg-primary rounded-full" />
+              <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80 bg-primary/5 px-2 py-0.5 rounded italic">Event Logistics & Timing</Label>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
-                <Label htmlFor="loadIn" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Load In</Label>
+                <Label htmlFor="loadIn" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Load In</Label>
                 <Input
                   id="loadIn"
                   type="time"
                   value={loadInTime}
                   onChange={(e) => setLoadInTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="soundcheck" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Soundcheck</Label>
+                <Label htmlFor="soundcheck" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Soundcheck</Label>
                 <Input
                   id="soundcheck"
                   type="time"
                   value={soundcheckTime}
                   onChange={(e) => setSoundcheckTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="doors" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Doors</Label>
+                <Label htmlFor="doors" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Doors</Label>
                 <Input
                   id="doors"
                   type="time"
                   value={doorsTime}
                   onChange={(e) => setDoorsTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-all shadow-inner"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <Label htmlFor="changeover" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Changeover</Label>
+                <Label htmlFor="changeover" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Changeover</Label>
                 <Input
                   id="changeover"
                   type="time"
                   value={changeoverTime}
                   onChange={(e) => setChangeoverTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-all shadow-inner"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="endTime" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Curfew / End Time</Label>
+                <Label htmlFor="endTime" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Curfew / End Time</Label>
                 <Input
                   id="endTime"
                   type="time"
                   value={showEndTime}
                   onChange={(e) => setShowEndTime(e.target.value)}
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground [color-scheme:dark] rounded-xl font-bold text-sm tracking-widest transition-all shadow-inner"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <Label htmlFor="musicians" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Musicians On Stage</Label>
+                <Label htmlFor="musicians" className="text-xs font-bold uppercase tracking-widest text-zinc-300">Musicians On Stage</Label>
                 <Input
                   id="musicians"
                   type="number"
@@ -703,7 +713,7 @@ return (
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="host" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Presenter / Host</Label>
+                <Label htmlFor="host" className="text-xs font-bold uppercase tracking-widest text-zinc-300">Presenter / Host</Label>
                 <Input
                   id="host"
                   value={hostName}
@@ -716,29 +726,29 @@ return (
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <Label htmlFor="epk" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Artist Website / URL</Label>
+                <Label htmlFor="epk" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Artist Website / URL</Label>
                 <Input
                   id="epk"
                   value={artistEpkUrl}
                   onChange={(e) => setArtistEpkUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-all shadow-inner placeholder:text-zinc-700"
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="stageplot" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Stageplot / Tech Link</Label>
+                <Label htmlFor="stageplot" className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Stageplot / Tech Link</Label>
                 <Input
                   id="stageplot"
                   value={stageplotUrl}
                   onChange={(e) => setStageplotUrl(e.target.value)}
                   placeholder="https://dropbox.com/..."
-                  className="bg-white/5 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-colors"
+                  className="bg-zinc-950 border-white/10 h-12 focus-visible:ring-primary/50 text-foreground rounded-xl font-bold transition-all shadow-inner placeholder:text-zinc-700"
                 />
               </div>
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="techNotes" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Technical / Stage Notes</Label>
+              <Label htmlFor="techNotes" className="text-xs font-bold uppercase tracking-widest text-zinc-300">Technical / Stage Notes</Label>
               <Textarea
                 id="techNotes"
                 value={technicalNotes}
@@ -749,7 +759,7 @@ return (
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="artistComment" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Internal Artist Comments</Label>
+              <Label htmlFor="artistComment" className="text-xs font-bold uppercase tracking-widest text-zinc-300">Internal Artist Comments</Label>
               <Textarea
                 id="artistComment"
                 value={artistComment}
@@ -760,7 +770,7 @@ return (
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="catering" className="text-[10px] font-pro-data uppercase tracking-[0.2em] text-muted-foreground font-bold">Catering & Hospitality Notes</Label>
+              <Label htmlFor="catering" className="text-xs font-bold uppercase tracking-widest text-zinc-300">Catering & Hospitality Notes</Label>
               <div className="relative group">
                 <Utensils className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                 <Textarea

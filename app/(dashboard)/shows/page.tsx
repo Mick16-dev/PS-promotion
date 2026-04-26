@@ -278,9 +278,6 @@ export default function ShowsPage() {
                           >
                              {isDeleting === show.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={18} />}
                           </Button>
-                          <Button variant="ghost" size="icon" className="text-zinc-700 hover:text-white group-hover:bg-zinc-800 transition-all rounded-lg h-10 w-10">
-                             <ArrowRight size={20} />
-                          </Button>
                        </div>
                     </div>
                  </div>

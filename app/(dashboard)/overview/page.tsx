@@ -193,9 +193,6 @@ export default function DashboardHome() {
                          <div className="bg-rose-500/5 px-3 py-1 rounded-md border border-rose-500/10">
                             <span className="text-[10px] font-bold text-rose-400 uppercase">Late: {item.deadline}</span>
                          </div>
-                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ArrowRight size={16} className="text-zinc-500" />
-                         </div>
                       </div>
                     </div>
                   </Link>

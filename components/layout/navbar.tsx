@@ -119,14 +119,25 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-white/5 bg-background/80 backdrop-blur-xl px-10">
-      <div className="flex flex-1 items-center space-x-6">
+      <div className="flex flex-1 items-center space-x-8">
+        {/* Dynamic Breadcrumbs */}
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]">
+          <span className="text-muted-foreground/40 hover:text-white transition-colors cursor-pointer" onClick={() => router.push('/overview')}>ShowReady</span>
+          <span className="text-muted-foreground/20">/</span>
+          {router && (
+            <span className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]">
+              {window.location.pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'Dashboard'}
+            </span>
+          )}
+        </div>
+
         {/* Search Bar */}
-        <div className="relative w-full max-w-lg">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
           <input
             type="text"
-            placeholder="Search by artist or venue..."
-            className="w-full bg-white/5 border border-white/5 rounded-2xl pl-12 pr-4 py-3 text-sm font-bold tracking-tight focus:border-primary/50 focus:bg-white/10 transition-all outline-none text-white placeholder:text-muted-foreground/40"
+            placeholder="Search roster..."
+            className="w-full bg-zinc-950 border border-white/10 rounded-2xl pl-12 pr-4 py-2.5 text-xs font-bold tracking-tight focus:border-primary/50 focus:bg-black transition-all outline-none text-white placeholder:text-muted-foreground/30"
           />
         </div>
       </div>
@@ -185,17 +196,9 @@ export function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <div className="flex items-center space-x-4 pl-6 border-l border-white/5">
-          {profileName && (
-            <span className="text-xs font-bold text-white/40 uppercase tracking-widest mr-2">{profileName}</span>
-          )}
-          <Button 
-            variant="ghost" 
-            className="text-muted-foreground hover:text-white hover:bg-white/5 gap-2 px-4 rounded-xl font-pro-data uppercase tracking-widest text-xs font-bold h-11"
-            onClick={handleSignOut}
-          >
-              <LogOut size={16} /> Sign Out
-          </Button>
+        {/* Profile Avatar Trigger (Cleaned up) */}
+        <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/20 flex items-center justify-center text-primary cursor-pointer hover:bg-primary/30 transition-all">
+          <User size={20} />
         </div>
       </div>
     </header>

@@ -102,24 +102,27 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                "group relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200",
+                "group relative flex items-center px-4 py-3 rounded-xl transition-all duration-300",
                 isActive 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  ? "bg-primary/15 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]" 
+                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               )}
             >
-              {/* Active Glow Accent */}
+              {/* Active Glow Accent - More Prominent */}
               {isActive && (
-                <div className="absolute left-0 w-1 h-6 bg-primary rounded-full blur-[2px] transition-all" />
+                <div className="absolute left-0 w-1.5 h-7 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.8)] transition-all" />
               )}
               
               <item.icon className={cn(
-                "w-5 h-5 transition-colors",
-                isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                "w-5 h-5 transition-all duration-300",
+                isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]" : "text-muted-foreground group-hover:text-foreground"
               )} />
               
               {!isCollapsed && (
-                <span className="ml-3 font-medium tracking-tight">
+                <span className={cn(
+                  "ml-3 font-bold tracking-tight transition-all",
+                  isActive ? "translate-x-1" : ""
+                )}>
                   {item.name}
                 </span>
               )}
