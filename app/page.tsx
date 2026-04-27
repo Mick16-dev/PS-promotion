@@ -59,31 +59,31 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-32 px-6 overflow-hidden">
+      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
         {/* Animated Glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-primary/20 blur-[120px] rounded-full opacity-30 -z-10" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[400px] bg-primary/20 blur-[100px] rounded-full opacity-30 -z-10" />
         
-        <div className="max-w-7xl mx-auto text-center space-y-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-primary animate-in fade-in slide-in-from-bottom-4">
+        <div className="max-w-7xl mx-auto text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-primary animate-in fade-in slide-in-from-bottom-4">
             <Zap size={12} /> The Future of Tour Management
           </div>
           
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter italic uppercase leading-[0.85] animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter italic uppercase leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-700">
             Precision <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/20">Performance</span>
           </h1>
           
-          <p className="max-w-2xl mx-auto text-xl md:text-2xl text-zinc-500 font-medium leading-relaxed italic animate-in fade-in slide-in-from-bottom-12 duration-1000">
+          <p className="max-w-xl mx-auto text-lg md:text-xl text-zinc-500 font-medium leading-relaxed italic animate-in fade-in slide-in-from-bottom-12 duration-1000">
             The high-fidelity dashboard for music promoters to manage advancements, technical riders, and artist logistics with surgical accuracy.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6 animate-in fade-in slide-in-from-bottom-16 duration-1000">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-16 duration-1000">
             <Link href="/register">
-              <Button className="h-16 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white text-sm font-black uppercase tracking-widest gap-3 shadow-2xl shadow-primary/20">
-                Launch Dashboard <ArrowRight size={18} />
+              <Button className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-widest gap-3 shadow-2xl shadow-primary/20">
+                Launch Dashboard <ArrowRight size={16} />
               </Button>
             </Link>
-            <Button variant="outline" className="h-16 px-10 rounded-2xl border-white/10 bg-white/5 text-white text-sm font-black uppercase tracking-widest">
+            <Button variant="outline" className="h-14 px-8 rounded-2xl border-white/10 bg-white/5 text-white text-xs font-black uppercase tracking-widest">
               Watch Demo
             </Button>
           </div>
