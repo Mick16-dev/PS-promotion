@@ -13,8 +13,10 @@ import {
   MoreVertical, 
   Filter,
   UserPlus,
-  Trash2
+  Trash2,
+  Loader2
 } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,7 +44,10 @@ interface UserProfile {
   subscription_status: 'paid' | 'unpaid' | 'trial'
   updated_at: string
 }
-
+export default function AdminPage() {
+  const [users, setUsers] = useState<UserProfile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
   
   // New Promoter Modal State
