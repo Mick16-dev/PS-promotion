@@ -119,7 +119,7 @@ export function Navbar() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-white/5 bg-background/80 backdrop-blur-xl px-10">
+    <header className="sticky top-0 z-30 flex h-20 w-full items-center border-b border-white/[0.05] bg-surface-base/80 backdrop-blur-xl px-10">
       <div className="flex flex-1 items-center space-x-8">
         {/* Dynamic Breadcrumbs */}
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]">

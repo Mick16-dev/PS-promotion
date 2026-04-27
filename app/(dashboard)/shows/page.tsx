@@ -4,23 +4,15 @@ import React, { useState, useEffect } from 'react'
 import { 
   Plus, 
   Search, 
-  ArrowUpRight,
-  MoreVertical,
-  CheckCircle2,
-  AlertCircle,
-  User,
-  ChevronRight,
-  Clock4,
-  Paperclip,
-  ArrowRight,
+  Trash2,
+  Loader2,
+  Filter,
   RefreshCw,
   Layers,
-  Filter,
-  Trash2,
-  Loader2
+  ChevronRight,
+  Calendar
 } from 'lucide-react'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { supabase } from '@/lib/supabase'
@@ -28,6 +20,12 @@ import { toast } from 'sonner'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
 import { UniversalSyncModal } from '@/components/dashboard/universal-sync-modal'
 import { Table as TableIcon } from 'lucide-react'
+import { 
+  BentoPanel, 
+  ArtistStatusAvatar, 
+  StatusPing 
+} from '@/components/ui/bento-grid'
+import { cn } from '@/lib/utils'
 
 interface Show {
   id: string;
@@ -69,13 +67,12 @@ export default function ShowsPage() {
       const processedShows = showsData.map((show: any) => {
         const showMats = materialsData?.filter((m: any) => m.show_id === show.id) || []
         const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
-        const total = showMats.length > 0 ? showMats.length : 5
-        const artistName = show.artist_name || 'Unnamed Artist'
+        const total = showMats.length > 0 ? showMats.length : 3
         
         return {
           id: show.id,
-          artist: artistName,
-          venue: show.venue || show.venue_name || 'Venue TBD',
+          artist: show.artist_name || 'Unnamed Artist',
+          venue: show.venue_name || show.venue || 'Venue TBD',
           city: show.city || '',
           date: show.show_date || '',
           progress: delivered,
@@ -96,39 +93,24 @@ export default function ShowsPage() {
   function handleSync() {
     setIsRefreshing(true)
     fetchShows()
-    toast.success('Syncing...', { description: 'Updating production metadata from backend.' })
+    toast.success('Syncing Data...')
   }
 
   async function handleDeleteShow(e: React.MouseEvent, id: string) {
     e.preventDefault()
     e.stopPropagation()
     
-    if (!confirm('Are you sure you want to delete this show? This will also remove all associated materials and cannot be undone.')) {
-      return
-    }
+    if (!confirm('Permanently remove this engagement?')) return
 
     setIsDeleting(id)
     try {
-      // First delete materials to ensure clean cascade if FK is not set to cascade
-      const { error: matErr } = await supabase
-        .from('materials')
-        .delete()
-        .eq('show_id', id)
-      
-      if (matErr) console.error('Error deleting materials:', matErr)
-
-      const { error } = await supabase
-        .from('shows')
-        .delete()
-        .eq('id', id)
-
+      await supabase.from('materials').delete().eq('show_id', id)
+      const { error } = await supabase.from('shows').delete().eq('id', id)
       if (error) throw error
-
       setShows(prev => prev.filter(s => s.id !== id))
-      toast.success('Show Deleted', { description: 'The engagement has been removed from the roster.' })
+      toast.success('Engagement Removed')
     } catch (err: any) {
-      console.error('DELETE_SHOW_ERROR:', err)
-      toast.error('Deletion Failed', { description: err.message || 'Could not remove the show.' })
+      toast.error('Deletion Failed')
     } finally {
       setIsDeleting(null)
     }
@@ -156,135 +138,153 @@ export default function ShowsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <div className="animate-spin h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="animate-spin text-primary" size={24} />
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Initializing Roster...</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto pt-10 pb-20 px-8 animate-in fade-in duration-700">
-      {/* Precision Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.04] pb-10 mb-12">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+      
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.03] pb-8">
         <div>
            <div className="flex items-center gap-2 mb-3">
-              <Layers size={14} className="text-zinc-600" />
-              <span className="text-zinc-300 text-xs font-bold">Manage Shows</span>
+              <Layers size={14} className="text-primary" />
+              <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">Roster Management</span>
            </div>
-           <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
-             Advancement <span className="text-zinc-600 font-medium">Pipeline</span>
+           <h1 className="text-5xl text-title-elegant text-white inline-flex items-center gap-3">
+             Advancement <span className="text-muted-foreground/40">/ Pipeline</span>
            </h1>
         </div>
-        <div className="flex items-center gap-3">
-           <div className="relative group mr-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-700" size={14} />
-              <input 
-                placeholder="Search engagements..." 
-                className="bg-zinc-900 border border-white/[0.05] rounded-xl h-10 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-white/20 transition-all w-[240px]"
-              />
-           </div>
-           <Button 
-            variant="outline" 
-            onClick={handleSync}
-            disabled={isRefreshing}
-            className="h-10 bg-zinc-900 border-white/10 hover:bg-zinc-800 text-zinc-300 font-bold text-xs px-4 rounded-lg gap-2"
-           >
-             <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> Sync
-           </Button>
+        <div className="flex items-center gap-4">
            <Button 
              onClick={() => setIsSyncModalOpen(true)}
-             className="h-10 bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-zinc-300 font-bold text-xs px-4 rounded-lg gap-2"
+             className="h-12 bg-surface-elevated border border-white/[0.05] hover:border-primary/50 text-white font-black uppercase text-[10px] px-6 rounded-xl transition-all flex items-center gap-2"
            >
              <TableIcon size={14} className="text-[#0F9D58]" /> Universal Export
            </Button>
            <Button 
              onClick={() => setIsCreateModalOpen(true)}
-             className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2 transition-all active:scale-95"
+             className="h-12 bg-primary hover:bg-primary/90 text-white font-black uppercase text-xs px-8 rounded-xl shadow-lg shadow-primary/20 gap-2 transition-all active:scale-95"
            >
              <Plus size={16} strokeWidth={3} /> Add Engagement
            </Button>
         </div>
       </div>
 
-      {/* Production Feed - High Density Row Pattern */}
-      <div className="bg-[#151618] border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl">
-         <div className="px-8 py-5 border-b border-white/[0.04] flex items-center justify-between bg-white/[0.01]">
-            <div className="flex items-center gap-4">
-              <Checkbox 
-                checked={shows.length > 0 && selectedShowIds.length === shows.length}
-                onCheckedChange={handleSelectAll}
-                className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-white"
-              />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Active Roster Advancements</h3>
-            </div>
-            <div className="flex items-center gap-4">
-               <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{shows.length} Total Engagements</span>
-               <Filter size={14} className="text-zinc-700" />
-            </div>
+      {/* FILTER & SEARCH */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+         <div className="relative w-full md:w-[320px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" size={14} />
+            <input 
+               placeholder="Search engagements..." 
+               className="bg-surface-elevated border-tactical rounded-xl h-11 pl-11 pr-4 text-[11px] font-bold text-white focus:outline-none focus:border-primary/30 transition-all w-full placeholder:text-muted-foreground/20"
+            />
          </div>
-
-         <div className="divide-y divide-white/[0.01]">
-            {shows.map((show) => (
-              <Link key={show.id} href={`/shows/${show.id}`}>
-                 <div className={`group flex flex-col md:flex-row md:items-center justify-between px-8 py-6 hover:bg-primary/10 hover:shadow-inner transition-all border-l-2 cursor-pointer ${selectedShowIds.includes(show.id) ? 'bg-primary/5 border-l-primary' : 'border-l-transparent hover:border-l-primary'}`}>
-                    <div className="flex items-center gap-8">
-                       <div onClick={(e) => handleSelectShow(e, show.id)}>
-                         <Checkbox 
-                           checked={selectedShowIds.includes(show.id)}
-                           className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-white"
-                         />
-                       </div>
-                       
-                       {/* High-Contrast Avatar Icon */}
-                       <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors relative overflow-hidden shadow-inner">
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent" />
-                          <span className="text-xl font-black italic relative z-10">{show.artist[0]}</span>
-                       </div>
-                       
-                       <div>
-                          <div className="flex items-center gap-3">
-                             <span className="text-lg font-bold text-white tracking-tight group-hover:text-primary transition-colors">{show.artist}</span>
-                             <Badge className="bg-emerald-500/10 text-emerald-500 border-none text-[9px] font-black uppercase px-2 py-0">ACTIVE</Badge>
-                          </div>
-                          <div className="flex items-center gap-3 mt-1 underline decoration-zinc-900 underline-offset-8">
-                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{show.venue}</span>
-                             <span className="h-1 w-1 rounded-full bg-zinc-800" />
-                             <span className="text-[11px] font-medium text-zinc-600 italic">{show.date} • {show.city}</span>
-                          </div>
-                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-12 mt-4 md:mt-0">
-                       <div className="flex flex-col items-end gap-2 pr-10 border-r border-white/5">
-                          <div className="flex items-center gap-3">
-                             <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Deliverables</span>
-                             <span className="text-sm font-bold text-white">{show.progress}/{show.totalItems}</span>
-                          </div>
-                          <div className="w-32 h-1 bg-zinc-900 rounded-full overflow-hidden">
-                             <div 
-                               className="h-full bg-primary transition-all duration-1000 shadow-[0_0_8px_rgba(var(--primary),0.5)]" 
-                               style={{ width: `${(show.progress / show.totalItems) * 100}%` }} 
-                             />
-                          </div>
-                       </div>
-                       
-                       <div className="flex items-center gap-3">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            disabled={isDeleting === show.id}
-                            onClick={(e) => handleDeleteShow(e, show.id)}
-                            className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-lg h-10 w-10"
-                          >
-                             {isDeleting === show.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={18} />}
-                          </Button>
-                       </div>
-                    </div>
-                 </div>
-              </Link>
-            ))}
+         <div className="flex items-center gap-2">
+            <button onClick={handleSync} className="h-11 w-11 flex items-center justify-center bg-surface-elevated border-tactical rounded-xl hover:bg-white/[0.02] transition-all">
+               <RefreshCw size={14} className={cn("text-muted-foreground", isRefreshing && "animate-spin")} />
+            </button>
+            <button className="h-11 w-11 flex items-center justify-center bg-surface-elevated border-tactical rounded-xl hover:bg-white/[0.02] transition-all">
+               <Filter size={14} className="text-muted-foreground" />
+            </button>
          </div>
       </div>
+
+      {/* ROSTER TABLE / GRID */}
+      <BentoPanel className="p-0" title="Active Roster Advancements" icon={Calendar}>
+         <div className="divide-y divide-white/[0.02]">
+            {/* Header Row */}
+            <div className="px-8 py-4 bg-white/[0.01] flex items-center gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+               <div className="flex items-center gap-4 w-10">
+                  <Checkbox 
+                     checked={shows.length > 0 && selectedShowIds.length === shows.length}
+                     onCheckedChange={handleSelectAll}
+                     className="border-white/10"
+                  />
+               </div>
+               <div className="flex-1">Artist / Engagement</div>
+               <div className="hidden md:block w-48 text-center">Status</div>
+               <div className="hidden md:block w-40 text-right">Progress</div>
+               <div className="w-12"></div>
+            </div>
+
+            {/* Data Rows */}
+            {shows.map((show) => (
+               <Link key={show.id} href={`/shows/${show.id}`}>
+                  <div className={cn(
+                     "group flex items-center gap-8 px-8 py-6 hover:bg-primary/[0.02] transition-all cursor-pointer relative overflow-hidden",
+                     selectedShowIds.includes(show.id) && "bg-primary/[0.05]"
+                  )}>
+                     {/* Selection */}
+                     <div className="flex items-center gap-4 w-10 relative z-10" onClick={(e) => handleSelectShow(e, show.id)}>
+                        <Checkbox 
+                           checked={selectedShowIds.includes(show.id)}
+                           className="border-white/10"
+                        />
+                     </div>
+
+                     {/* Artist Info */}
+                     <div className="flex-1 flex items-center gap-6 min-w-0 relative z-10">
+                        <ArtistStatusAvatar 
+                           size="sm"
+                           fallback={show.artist}
+                           status={{
+                              contract: show.progress > 0,
+                              rider: show.progress > 1,
+                              presskit: show.progress > 2
+                           }}
+                        />
+                        <div className="min-w-0">
+                           <h4 className="text-lg font-bold text-white tracking-tight group-hover:text-primary transition-colors truncate">{show.artist}</h4>
+                           <div className="flex items-center gap-3 mt-1 underline decoration-white/[0.03] underline-offset-8">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 truncate">{show.venue}</span>
+                              <span className="h-1 w-1 rounded-full bg-white/10" />
+                              <span className="text-[10px] font-bold text-muted-foreground/20 italic truncate">{show.date} • {show.city}</span>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Status Badge */}
+                     <div className="hidden md:flex w-48 justify-center relative z-10">
+                        <div className="flex items-center gap-3 bg-surface-base border border-white/[0.05] px-4 py-2 rounded-full">
+                           <StatusPing variant="teal" />
+                           <span className="text-[9px] font-black uppercase tracking-widest text-white">Production</span>
+                        </div>
+                     </div>
+
+                     {/* Progress */}
+                     <div className="hidden md:flex flex-col items-end gap-2 w-40 pr-4 relative z-10">
+                        <div className="flex items-center gap-3">
+                           <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Docs</span>
+                           <span className="text-xs font-black text-white italic">{show.progress}/{show.totalItems}</span>
+                        </div>
+                        <div className="w-24 h-0.5 bg-white/5 rounded-full overflow-hidden">
+                           <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(show.progress / show.totalItems) * 100}%` }}
+                              className="h-full bg-primary shadow-[0_0_8px_rgba(20,184,166,0.5)]" 
+                           />
+                        </div>
+                     </div>
+
+                     {/* Actions */}
+                     <div className="w-12 flex justify-end relative z-10">
+                        <button 
+                           onClick={(e) => handleDeleteShow(e, show.id)}
+                           className="h-10 w-10 flex items-center justify-center text-muted-foreground/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                        >
+                           {isDeleting === show.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                        </button>
+                     </div>
+                  </div>
+               </Link>
+            ))}
+         </div>
+      </BentoPanel>
 
       <CreateShowModal 
         isOpen={isCreateModalOpen} 

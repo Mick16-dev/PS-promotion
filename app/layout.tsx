@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono, Instrument_Serif, Syne } from 'next/font/google'
 import { LanguageProvider } from './context/language-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -14,6 +14,19 @@ const inter = Inter({
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const serif = Instrument_Serif({
+  weight: '400',
+  subsets: ["latin"],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: '--font-syne',
   display: 'swap',
 });
 
@@ -45,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable} scroll-smooth dark`}>
+    <html lang="en" className={`${inter.variable} ${mono.variable} ${serif.variable} ${syne.variable} scroll-smooth dark`}>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen selection:bg-primary/30 selection:text-white">
         {/* Ambient Lumina Effect Layer */}
         <div className="fixed inset-0 pointer-events-none lumina-glow opacity-50 z-0" />

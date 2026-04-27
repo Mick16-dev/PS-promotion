@@ -87,19 +87,19 @@ export function Sidebar() {
   return (
     <div 
       className={cn(
-        "relative flex flex-col h-screen border-r border-border bg-background transition-all duration-300 ease-in-out z-40",
+        "relative flex flex-col h-screen border-r border-white/[0.05] bg-canvas transition-all duration-300 ease-in-out z-40",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
       {/* Branding Header */}
-      <div className="flex items-center h-16 px-6 border-b border-border mb-4">
+      <div className="flex items-center h-20 px-6 border-b border-white/[0.05] mb-4">
         {!isCollapsed && (
           <span className="text-xl font-black uppercase italic tracking-tighter text-foreground">
-            Show<span className="text-primary">Ready</span>
+            Show<span className="text-primary drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]">Ready</span>
           </span>
         )}
         {isCollapsed && (
-          <span className="text-xl font-black italic tracking-tighter text-primary">SR</span>
+          <span className="text-xl font-black italic tracking-tighter text-primary drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]">SR</span>
         )}
       </div>
 
@@ -118,9 +118,9 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               )}
             >
-              {/* Active Glow Accent - More Prominent */}
+              {/* Active Glow Accent - Sharper */}
               {isActive && (
-                <div className="absolute left-0 w-1.5 h-7 bg-primary rounded-full shadow-[0_0_15px_theme(colors.primary/80%)] transition-all" />
+                <div className="absolute left-0 w-1 h-6 bg-primary rounded-full shadow-[0_0_15px_rgba(20,184,166,0.6)] transition-all" />
               )}
               
               <item.icon className={cn(

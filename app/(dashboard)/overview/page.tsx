@@ -7,22 +7,23 @@ import {
   Music,
   CheckCircle2,
   AlertCircle,
-  Search,
-  User,
   Calendar,
   Clock4,
   ChevronRight,
-  Filter,
-  Layers,
-  ArrowRight,
-  FileWarning
+  Activity,
+  FileWarning,
+  Database
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import { CreateShowModal } from '@/components/dashboard/create-show-modal'
+import { 
+  BentoPanel, 
+  TelemetryLine, 
+  StatusPing 
+} from '@/components/ui/bento-grid'
 
 export default function DashboardHome() {
   const [stats, setStats] = useState({
@@ -60,8 +61,7 @@ export default function DashboardHome() {
           const showMats = materials?.filter((m: any) => m.show_id === show.id) || []
           
           if (showMats.length === 0) {
-            // Logic for shows with no materials yet? 
-            // In a real agency, this might count as awaiting docs.
+            // Logic for shows with no materials yet?
           } else {
             showMats.forEach((mat: any) => {
               const deadline = mat.deadline ? new Date(mat.deadline) : null
@@ -71,7 +71,7 @@ export default function DashboardHome() {
                 overdueList.push({
                   id: mat.id,
                   artist: show.artist_name,
-                  venue: show.venue,
+                  venue: show.venue_name || show.venue,
                   document: mat.item_name || 'Requirement',
                   deadline: mat.deadline,
                   showId: show.id
@@ -104,114 +104,115 @@ export default function DashboardHome() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div className="animate-spin h-6 w-6 border-2 border-primary/20 border-t-primary rounded-full" />
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Syncing Data...</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto pt-10 pb-20 px-8 animate-in fade-in duration-700">
-      {/* Precision Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.04] pb-10 mb-12">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+      
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.03] pb-8">
         <div>
            <div className="flex items-center gap-2 mb-3">
-              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-bold px-2 py-0">LIVE</Badge>
-              <span className="text-zinc-500 text-xs font-medium tracking-tight">Active Roster Monitoring</span>
+              <StatusPing variant="healthy" />
+              <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">Live Data Sync Active</span>
            </div>
-           <h1 className="text-4xl font-bold tracking-tight text-white inline-flex items-center gap-3">
-             Production <span className="text-zinc-600 font-medium">/ Control</span>
+           <h1 className="text-5xl text-title-elegant text-white inline-flex items-center gap-3">
+             Production <span className="text-muted-foreground/40">/ Overview</span>
            </h1>
         </div>
-        <div className="flex items-center gap-3">
-           <Button 
-             onClick={() => setIsCreateModalOpen(true)}
-             className="h-10 bg-white hover:bg-zinc-200 text-[#0B0C0E] font-bold text-sm px-5 rounded-lg shadow-xl shadow-white/5 gap-2 transition-all active:scale-95"
-           >
-             <Plus size={16} strokeWidth={3} /> Add Engagement
-           </Button>
-        </div>
+        <Button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="h-12 bg-primary hover:bg-primary/90 text-white font-black uppercase text-xs px-8 rounded-xl shadow-lg shadow-primary/20 gap-2 transition-all active:scale-95"
+        >
+          <Plus size={16} strokeWidth={3} /> Add Engagement
+        </Button>
       </div>
 
-      {/* Senior Stats Grid - High Precision */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
+      {/* STATS BENTO GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Active Advancements', value: stats.totalShows, icon: Calendar, accent: 'text-white' },
-          { label: 'Materials Pipeline', value: stats.awaitingDocs, icon: Clock4, accent: 'text-amber-500' },
-          { label: 'Priority Overdue', value: stats.overdueDocs, icon: AlertCircle, accent: 'text-rose-500' }
+          { label: 'Active Advancements', value: stats.totalShows, icon: Calendar, color: 'text-white' },
+          { label: 'Materials Pipeline', value: stats.awaitingDocs, icon: Clock4, color: 'text-amber-500' },
+          { label: 'Priority Overdue', value: stats.overdueDocs, icon: AlertCircle, color: 'text-rose-500' }
         ].map((stat, i) => (
-          <div key={i} className="bg-[#151618] border border-white/[0.04] rounded-xl p-8 hover:border-white/[0.08] transition-colors group relative overflow-hidden">
+          <div key={i} className="bg-surface-elevated border-tactical rounded-2xl p-8 hover-cockpit-glow group">
              <div className="flex items-center justify-between mb-8">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">{stat.label}</span>
-                <stat.icon size={14} className="text-zinc-600 group-hover:text-zinc-300 transition-colors" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{stat.label}</span>
+                <stat.icon size={14} className="text-muted-foreground/30 group-hover:text-primary transition-colors" />
              </div>
              <div className="flex items-baseline gap-2">
-                <span className={`text-4xl font-bold tracking-tight ${stat.accent}`}>{stat.value}</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-700">Records</span>
+                <span className={`text-4xl text-raw-data font-black italic ${stat.color}`}>{stat.value}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Records</span>
              </div>
           </div>
         ))}
       </div>
 
-      {/* Main Content Area - Linear Pattern (Row-Based Feed) */}
-      <div className="space-y-10">
-        <div className="bg-[#151618] border border-white/[0.04] rounded-xl overflow-hidden shadow-2xl">
-           <div className="px-8 py-5 border-b border-white/[0.04] flex items-center justify-between bg-white/[0.01]">
-              <div>
-                 <h3 className="text-2xl font-bold text-white tracking-tight">Priority Advancements</h3>
-                 <p className="text-sm text-zinc-400 mt-1 font-medium italic">Unresolved deliverables requiring promoter review.</p>
-              </div>
-              <Link href="/shows">
-                <Button variant="ghost" className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">
-                  Full Roster Audit
-                </Button>
-              </Link>
-           </div>
+      {/* MAIN CONTENT BENTO */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         
+         {/* Priority Feed (2 cols) */}
+         <BentoPanel className="lg:col-span-2" title="Priority Advancements" icon={Activity}>
+            <div className="divide-y divide-white/[0.02] mt-4">
+               {overdueItems.length > 0 ? (
+                 overdueItems.map((item) => (
+                   <Link key={item.id} href={`/shows/${item.showId}`}>
+                     <div className="group flex items-center justify-between py-4 hover:bg-white/[0.02] transition-all px-4 rounded-xl">
+                       <div className="flex items-center gap-6 min-w-0">
+                          <div className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
+                             <FileWarning size={14} />
+                          </div>
+                          <div className="min-w-0">
+                             <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold text-white tracking-tight group-hover:text-primary transition-colors">{item.artist}</span>
+                                <span className="text-muted-foreground/20 text-xs font-black">•</span>
+                                <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{item.venue}</span>
+                             </div>
+                             <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wide mt-0.5">{item.document}</p>
+                          </div>
+                       </div>
+                       
+                       <div className="bg-rose-500/10 px-3 py-1 rounded-md border border-rose-500/20">
+                          <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest">Late: {item.deadline}</span>
+                       </div>
+                     </div>
+                   </Link>
+                 ))
+               ) : (
+                 <div className="py-20 text-center flex flex-col items-center justify-center">
+                    <CheckCircle2 size={32} className="mb-4 text-emerald-500 opacity-20" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Zero Unresolved Items</p>
+                 </div>
+               )}
+            </div>
+         </BentoPanel>
 
-           <div className="divide-y divide-white/[0.02]">
-              {overdueItems.length > 0 ? (
-                overdueItems.map((item) => (
-                  <Link key={item.id} href={`/shows/${item.showId}`}>
-                    <div className="group flex items-center justify-between px-8 py-4 hover:bg-white/[0.02] cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-rose-500">
-                      <div className="flex items-center gap-6 min-w-0">
-                         <div className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
-                            <FileWarning size={14} strokeWidth={2.5} />
-                         </div>
-                         <div className="min-w-0">
-                            <div className="flex items-center gap-3">
-                               <span className="text-sm font-bold text-white tracking-tight">{item.artist}</span>
-                               <span className="text-zinc-600 text-xs">•</span>
-                               <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest truncate">{item.venue}</span>
-                            </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                               <span className="text-[12px] font-medium text-zinc-400">{item.document}</span>
-                            </div>
-                         </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-8 shrink-0">
-                         <div className="bg-rose-500/5 px-3 py-1 rounded-md border border-rose-500/10">
-                            <span className="text-[10px] font-bold text-rose-400 uppercase">Late: {item.deadline}</span>
-                         </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="p-20 text-center flex flex-col items-center justify-center opacity-40">
-                   <CheckCircle2 size={32} className="mb-4 text-emerald-500" />
-                   <p className="text-sm font-bold text-zinc-100">Zero Unresolved Items</p>
-                   <p className="text-xs text-zinc-500 mt-1">Your shows are running perfectly according to schedule.</p>
-                </div>
-              )}
-           </div>
-           
-           <div className="px-8 py-4 bg-white/[0.01] border-t border-white/[0.04]">
-              <Link href="/shows" className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest hover:text-white transition-colors">
-                View Full Production Timeline
-              </Link>
-           </div>
-        </div>
+         {/* Quick Actions / Integration Status (1 col) */}
+         <BentoPanel title="Live Diagnostics" icon={Database}>
+            <div className="space-y-4 mt-4">
+               <TelemetryLine label="Database Status" value="Healthy" mono={false} />
+               <TelemetryLine label="Sync Latency" value="12ms" />
+               <TelemetryLine label="Total Storage" value="2.4 GB" />
+               
+               <div className="pt-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-4">Quick Navigation</p>
+                  <div className="grid grid-cols-2 gap-3">
+                     <Link href="/shows" className="bg-surface-base border border-white/[0.05] p-3 rounded-xl hover:border-primary/50 transition-all text-center">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white">Full Roster</span>
+                     </Link>
+                     <Link href="/calendar" className="bg-surface-base border border-white/[0.05] p-3 rounded-xl hover:border-primary/50 transition-all text-center">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white">Calendar</span>
+                     </Link>
+                  </div>
+               </div>
+            </div>
+         </BentoPanel>
+
       </div>
 
       <CreateShowModal 
@@ -222,3 +223,4 @@ export default function DashboardHome() {
     </div>
   )
 }
+

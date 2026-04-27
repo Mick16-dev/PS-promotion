@@ -4,37 +4,41 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* High-End Dark Base: Deep Ebony (#09090b equivalent) */
-  --background: oklch(0.12 0.015 250);
-  --foreground: oklch(0.92 0.01 250);
+  /* Production Office Palette: High-Depth Tinted Black */
+  --background: #07080F; /* Base Canvas */
+  --surface: #0F1118;    /* Lower Surface */
+  --elevated: #161B27;   /* Card / Elevated Surface */
+  --foreground: #F1F5F9; /* Off-white for high contrast */
   
-  /* Muted surfaces for professional layering */
-  --muted: oklch(0.18 0.02 250);
-  --muted-foreground: oklch(0.65 0.01 250);
+  --muted: #1E2435;
+  --muted-foreground: #94A3B8;
   
-  /* Indigo Accent: Highly refined, slightly desaturated for depth */
-  --primary: oklch(0.55 0.18 260);
-  --primary-foreground: oklch(0.98 0.01 260);
+  /* Primary Accent: Vibrant Teal */
+  --primary: #14b8a6;
+  --primary-foreground: #F1F5F9;
   
-  /* Lumina Glow & Borders */
-  --lumina-accent: oklch(0.60 0.20 260 / 0.15);
-  --border: oklch(0.25 0.02 250 / 0.8);
-  --input: oklch(0.20 0.02 250);
-  --ring: oklch(0.55 0.18 260 / 0.5);
+  /* Status Colors (Semantic) */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
   
-  /* Pro Chart Colors */
-  --chart-1: oklch(0.65 0.20 260);
-  --chart-2: oklch(0.75 0.15 180);
-  --chart-3: oklch(0.55 0.25 340);
+  /* Borders & Interactive */
+  --border: rgba(22, 27, 39, 0.8);
+  --input: #0F1118;
+  --ring: rgba(20, 184, 166, 0.3);
   
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 }
 
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+  --font-sans: var(--font-sans), 'Inter', system-ui, sans-serif;
+  --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
+  --font-serif: var(--font-serif), 'Instrument Serif', serif;
+  --font-syne: var(--font-syne), 'Syne', sans-serif;
   
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -69,34 +73,48 @@
 
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-white font-sans;
-    font-feature-settings: "ss01" 1, "ss03" 1, "cv01" 1;
+  }
+
+  h1, h2, h3 {
+    @apply font-syne font-semibold tracking-tight;
   }
 }
 
 @layer utilities {
-  /* Lumina Ambient Glow Effect */
-  .lumina-glow {
-    background: radial-gradient(
-      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      var(--lumina-accent),
-      transparent 70%
-    );
+  /* Tactical Border: 0.5px sharp border */
+  .border-tactical {
+    border-width: 0.5px;
+    @apply border-white/[0.08];
   }
 
-  /* Data-centric text formatting */
-  .text-pro-data {
+  /* Cockpit Glow: Subtle teal glow on hover */
+  .hover-cockpit-glow {
+    @apply transition-all duration-300;
+  }
+  .hover-cockpit-glow:hover {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.12);
+    @apply border-primary/20;
+  }
+
+  /* Raw Data Mono: For values only */
+  .text-raw-data {
     @apply font-mono tracking-tight;
   }
-  
-  /* Subtle pro layering */
-  .glass-card {
-    @apply bg-muted/20 border border-white/5 backdrop-blur-md;
+
+  /* Title Large: Elegant Serif */
+  .text-title-elegant {
+    @apply font-serif leading-tight;
   }
+  
+  /* Depth Layering Classes */
+  .bg-canvas { background-color: var(--background); }
+  .bg-surface-base { background-color: var(--surface); }
+  .bg-surface-elevated { background-color: var(--elevated); }
 }
 
 /* Custom Pro Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -104,6 +122,6 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  @apply bg-white/5 rounded-full hover:bg-white/10 transition-colors;
 }
 
