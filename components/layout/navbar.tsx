@@ -197,10 +197,41 @@ export function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
         
-        {/* Profile Avatar Trigger (Cleaned up) */}
-        <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/20 flex items-center justify-center text-primary cursor-pointer hover:bg-primary/30 transition-all">
-          <User size={20} />
-        </div>
+        {/* Profile Avatar Trigger (Purposeful) */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="h-10 w-10 rounded-full bg-primary/20 border border-primary/20 flex items-center justify-center text-primary cursor-pointer hover:bg-primary/30 transition-all active:scale-95 shadow-[0_0_15px_rgba(20,184,166,0.1)]">
+              <User size={20} />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64 bg-ebony-900/95 backdrop-blur-3xl border-white/10 p-2 rounded-3xl shadow-2xl">
+            <DropdownMenuLabel className="p-4">
+              <div className="flex flex-col space-y-1">
+                <p className="text-xs font-pro-data uppercase tracking-widest text-muted-foreground/60">Operator Account</p>
+                <p className="text-sm font-black text-white truncate leading-none">{profileName || 'Primary User'}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuItem 
+              onClick={() => router.push('/settings')}
+              className="p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex gap-3 items-center group transition-all"
+            >
+              <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                <User size={16} />
+              </div>
+              <span className="text-sm font-bold text-muted-foreground group-hover:text-white transition-colors">System Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleSignOut}
+              className="p-4 rounded-2xl hover:bg-rose-500/10 cursor-pointer flex gap-3 items-center group transition-all"
+            >
+              <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-muted-foreground group-hover:text-rose-500 transition-colors">
+                <LogOut size={16} />
+              </div>
+              <span className="text-sm font-bold text-muted-foreground group-hover:text-rose-500 transition-colors">Terminate Session</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )
