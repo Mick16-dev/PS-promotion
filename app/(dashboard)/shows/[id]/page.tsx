@@ -21,7 +21,8 @@ import {
   Settings,
   Send,
   Loader2,
-  Users
+  Users,
+  RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -44,6 +45,7 @@ export default function ShowDetailPage({ params }: any) {
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isGeneratingSheet, setIsGeneratingSheet] = useState(false)
   const [isResendingEmail, setIsResendingEmail] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   
   // Resolve ID with max compatibility
   useEffect(() => {
@@ -83,6 +85,45 @@ export default function ShowDetailPage({ params }: any) {
     }
     loadData()
   }, [id])
+
+  const handleSyncSpreadsheet = async () => {
+    setIsSyncing(true)
+    toast.info('Initiating sync...', { description: 'Creating Google Sheet in Drive.' })
+    try {
+      const payload = {
+        show_id: id,
+        show_name: `${showInfo?.artist_name || 'Show'} @ ${showInfo?.venue_name}`,
+        show_time: showInfo?.show_time || null,
+        status: showInfo?.status,
+        artist_name: showInfo?.artist_name || 'Unknown Artist',
+        artist_email: showInfo?.artist_email || '',
+        venue: showInfo?.venue_name,
+        venue_name: showInfo?.venue_name,
+        city: showInfo?.city,
+        date: showInfo?.show_date,
+        portal_url: showInfo?.portal_url,
+        required_documents: documents.map(d => ({
+          name: d.item_name,
+          deadline: d.deadline,
+          portal_token: d.portal_token
+        }))
+      }
+
+      const response = await fetch('/api/n8n/create-show', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) throw new Error('Sync failed')
+      
+      toast.success('Sync Complete', { description: 'Spreadsheet updated in Google Drive.' })
+    } catch (error) {
+      toast.error('Sync Failed', { description: 'Could not connect to Google Drive workflow.' })
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   const handleResendEmail = async () => {
     setIsResendingEmail(true)
@@ -188,6 +229,14 @@ export default function ShowDetailPage({ params }: any) {
              >
                 {isResendingEmail ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 Launch Artist Portal
+             </button>
+             <button 
+                onClick={handleSyncSpreadsheet}
+                disabled={isSyncing}
+                className="w-full mt-2 h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
+             >
+                {isSyncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                Sync to Google Sheets
              </button>
           </BentoPanel>
         </div>
