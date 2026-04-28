@@ -244,11 +244,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
-        artist_email: selectedArtist?.email || '',
+        artist_email: String(selectedArtist?.email || '').trim(),
       }
 
-      if (!payload.artist_email) {
-        toast.error('Missing Email', { description: 'Please ensure the selected artist has an email address.' })
+      if (!payload.artist_email || !payload.artist_email.includes('@')) {
+        toast.error('Invalid Email', { description: 'Please ensure the artist has a valid email address.' })
         setIsSubmitting(false)
         return
       }

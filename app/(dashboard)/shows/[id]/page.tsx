@@ -163,7 +163,7 @@ export default function ShowDetailPage({ params }: any) {
         showId: id,
         access_token,
         artist_name: showInfo?.artist_name,
-        artist_email: showInfo?.artist_email || showInfo?.email,
+        artist_email: String(showInfo?.artist_email || showInfo?.email || '').trim(),
         portal_url: showInfo?.portal_url || `${process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'}/?token=${showInfo?.portal_token || id}`,
         venue_name: showInfo?.venue_name,
         show_date: showInfo?.show_date
