@@ -118,7 +118,7 @@ export default function ShowDetailPage({ params }: any) {
         show_time: showInfo?.show_time || null,
         status: showInfo?.status,
         artist_name: showInfo?.artist_name || 'Unknown Artist',
-        artist_email: showInfo?.artist_email || '',
+        artist_email: showInfo?.artist_email || showInfo?.email || '',
         venue: showInfo?.venue_name,
         venue_name: showInfo?.venue_name,
         city: showInfo?.city,
