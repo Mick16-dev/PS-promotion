@@ -245,6 +245,16 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         artist_id: selectedArtistId,
         artist_name: artistName,
         artist_email: selectedArtist?.email || '',
+      }
+
+      if (!payload.artist_email) {
+        toast.error('Missing Email', { description: 'Please ensure the selected artist has an email address.' })
+        setIsSubmitting(false)
+        return
+      }
+
+      const payloadFinal = {
+        ...payload,
         venue,
         venue_name: venue,
         city,

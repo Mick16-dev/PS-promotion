@@ -63,6 +63,17 @@ export default function ShowDetailPage({ params }: any) {
       try {
         const { data: show } = await supabase.from('shows').select('*').eq('id', id).single()
         if (show) {
+          // If the show doesn't have the artist_email directly, fetch it from the artists table
+          if (!show.artist_email && show.artist_id) {
+            const { data: artist } = await supabase
+              .from('artists')
+              .select('email')
+              .eq('id', show.artist_id)
+              .maybeSingle()
+            if (artist?.email) {
+              show.artist_email = artist.email
+            }
+          }
           setShowInfo(show)
         }
 
@@ -152,21 +163,28 @@ export default function ShowDetailPage({ params }: any) {
         showId: id,
         access_token,
         artist_name: showInfo?.artist_name,
-        artist_email: showInfo?.artist_email,
+        artist_email: showInfo?.artist_email || showInfo?.email,
         portal_url: showInfo?.portal_url || `${process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'}/?token=${showInfo?.portal_token || id}`,
         venue_name: showInfo?.venue_name,
         show_date: showInfo?.show_date
       }
 
-      await fetch('/api/n8n/resend-email', { 
+      if (!payload.artist_email) {
+        toast.error('Missing Email', { description: 'Please update the artist with an email address.' })
+        setIsResendingEmail(false)
+        return
+      }
+
+      const response = await fetch('/api/n8n/resend-email', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload) 
       })
-      
+
+      if (!response.ok) throw new Error('Send failed')
       toast.success('Portal link sent to artist')
     } catch (err) { 
-      toast.error('Failed to send') 
+      toast.error('Failed to send', { description: 'Check your Google connection in Settings.' }) 
     } finally { 
       setIsResendingEmail(false) 
     }
