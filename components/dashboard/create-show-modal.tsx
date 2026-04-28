@@ -274,7 +274,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const response = await fetch('/api/n8n/create-show', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payloadFinal)
         })
 
       if(!response.ok) {
