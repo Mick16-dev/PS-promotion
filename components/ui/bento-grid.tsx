@@ -145,7 +145,7 @@ export function ArtistStatusAvatar({ src, fallback, status, size = 'md' }: Artis
           <img src={src} alt={fallback} className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold uppercase italic">
-            {fallback.substring(0, 2)}
+            {(fallback || '??').substring(0, 2)}
           </div>
         )}
       </div>
