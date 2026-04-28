@@ -111,12 +111,21 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       // Save global mapping to profile so it remembers the user's choices
       await supabase.from('profiles').update({ global_export_mapping: globalMapping }).eq('id', user?.id)
 
+      // Check Google Connection again to get token
+      const { data: integration } = await supabase
+        .from('user_integrations')
+        .select('access_token')
+        .eq('user_id', user?.id)
+        .eq('provider', 'google')
+        .maybeSingle()
+
       // 2. Trigger n8n
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user?.id,
+          access_token: integration?.access_token || null,
           mode: 'universal_bulk_export',
           mapping: globalMapping,
           shows: shows,

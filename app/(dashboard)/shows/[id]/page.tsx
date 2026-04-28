@@ -85,9 +85,32 @@ export default function ShowDetailPage({ params }: any) {
 
   const handleResendEmail = async () => {
     setIsResendingEmail(true)
-    // Non-blocking animation handled by UI state
     try {
-      await fetch('/api/n8n/resend-email', { method: 'POST', body: JSON.stringify({ showId: id }) })
+      // Fetch promoter's Google access token so n8n can send the email on their behalf
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: integration } = await supabase
+        .from('user_integrations')
+        .select('access_token')
+        .eq('user_id', user?.id)
+        .eq('provider', 'google')
+        .maybeSingle()
+
+      const payload = {
+        showId: id,
+        access_token: integration?.access_token || null,
+        artist_name: showInfo?.artist_name,
+        artist_email: showInfo?.artist_email,
+        portal_url: showInfo?.portal_url || `${process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'}/?token=${showInfo?.portal_token || id}`,
+        venue_name: showInfo?.venue_name,
+        show_date: showInfo?.show_date
+      }
+
+      await fetch('/api/n8n/resend-email', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload) 
+      })
+      
       toast.success('Portal link sent to artist')
     } catch (err) { 
       toast.error('Failed to send') 
