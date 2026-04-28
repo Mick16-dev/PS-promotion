@@ -20,7 +20,8 @@ import {
   ChevronRight,
   Settings,
   Send,
-  Loader2
+  Loader2,
+  Users
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
