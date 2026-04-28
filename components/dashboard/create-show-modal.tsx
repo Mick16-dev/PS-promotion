@@ -270,6 +270,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         expenses: expenses
       };
 
+      console.log('--- N8N PAYLOAD DEBUG ---', payloadFinal);
+
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
       const response = await fetch('/api/n8n/create-show', {
           method: 'POST',
