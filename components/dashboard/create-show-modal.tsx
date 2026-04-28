@@ -206,19 +206,26 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
-      // Fetch promoter's Google access token so n8n can create the calendar event on their behalf
+
+      // Fetch a FRESH Google access token via the refresh endpoint.
+      // This auto-refreshes the token if it has expired (tokens expire ~1 hour).
+      let access_token: string | null = null
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          access_token = refreshData.access_token ?? null
+        }
+      } catch {
+        // Non-fatal — calendar creation will be skipped in n8n if token is missing
+      }
+
       const userId = (await supabase.auth.getUser()).data.user?.id
-      const { data: integration } = await supabase
-        .from('user_integrations')
-        .select('access_token')
-        .eq('user_id', userId)
-        .eq('provider', 'google')
-        .maybeSingle()
 
       const payload = {
         show_id,
         user_id: userId,
-        access_token: integration?.access_token || null,
+        access_token: access_token,
         show_name: `${artistName} @ ${venue}`,
         show_time: showTime || null,
         show_end_time: showEndTime || null,

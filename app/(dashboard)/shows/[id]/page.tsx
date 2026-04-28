@@ -90,8 +90,19 @@ export default function ShowDetailPage({ params }: any) {
     setIsSyncing(true)
     toast.info('Initiating sync...', { description: 'Creating Google Sheet in Drive.' })
     try {
+      // Get a fresh Google access token (auto-refreshes if expired)
+      let access_token: string | null = null
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          access_token = refreshData.access_token ?? null
+        }
+      } catch { /* non-fatal */ }
+
       const payload = {
         show_id: id,
+        access_token,
         show_name: `${showInfo?.artist_name || 'Show'} @ ${showInfo?.venue_name}`,
         show_time: showInfo?.show_time || null,
         status: showInfo?.status,
@@ -116,7 +127,6 @@ export default function ShowDetailPage({ params }: any) {
       })
 
       if (!response.ok) throw new Error('Sync failed')
-      
       toast.success('Sync Complete', { description: 'Spreadsheet updated in Google Drive.' })
     } catch (error) {
       toast.error('Sync Failed', { description: 'Could not connect to Google Drive workflow.' })
@@ -128,18 +138,19 @@ export default function ShowDetailPage({ params }: any) {
   const handleResendEmail = async () => {
     setIsResendingEmail(true)
     try {
-      // Fetch promoter's Google access token so n8n can send the email on their behalf
-      const { data: { user } } = await supabase.auth.getUser()
-      const { data: integration } = await supabase
-        .from('user_integrations')
-        .select('access_token')
-        .eq('user_id', user?.id)
-        .eq('provider', 'google')
-        .maybeSingle()
+      // Get a fresh Google access token (auto-refreshes if expired)
+      let access_token: string | null = null
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          access_token = refreshData.access_token ?? null
+        }
+      } catch { /* non-fatal */ }
 
       const payload = {
         showId: id,
-        access_token: integration?.access_token || null,
+        access_token,
         artist_name: showInfo?.artist_name,
         artist_email: showInfo?.artist_email,
         portal_url: showInfo?.portal_url || `${process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'}/?token=${showInfo?.portal_token || id}`,
