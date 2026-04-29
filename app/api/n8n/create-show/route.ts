@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+const showSchema = z.object({
+  show_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  show_name: z.string().min(1),
+  artist_name: z.string().min(1),
+  artist_email: z.string().email(),
+  venue: z.string().min(1),
+  date: z.string().min(1),
+  deal_type: z.string(),
+  deal_guarantee: z.number().nonnegative(),
+}).passthrough()
 
 export async function POST(request: Request) {
   const webhookUrl =
@@ -15,12 +28,22 @@ export async function POST(request: Request) {
     )
   }
 
-  let payload: unknown
+  let body: unknown
   try {
-    payload = await request.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
   }
+
+  const result = showSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { error: 'Validation Error', details: result.error.format() },
+      { status: 400 }
+    )
+  }
+
+  const payload = result.data
 
   try {
     const res = await fetch(webhookUrl, {
