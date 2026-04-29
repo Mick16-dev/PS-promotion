@@ -10,13 +10,25 @@ import {
   DialogFooter 
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { 
-  Table, 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { 
+  Table as TableIcon, 
   Zap, 
   Loader2, 
   AlertCircle,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Plus,
+  Trash2,
+  GripVertical
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
@@ -27,35 +39,36 @@ interface UniversalSyncModalProps {
   selectedShowIds?: string[]
 }
 
-const AVAILABLE_COLUMNS = [
-  { id: 'c1', field: 'artist_name', header: 'Artist' },
-  { id: 'c2', field: 'show_date', header: 'Date' },
-  { id: 'c3', field: 'venue_name', header: 'Venue' },
-  { id: 'c4', field: 'city', header: 'City' },
-  { id: 'c5', field: 'deal_guarantee', header: 'Fee' },
-  { id: 'c6', field: 'deal_type', header: 'Deal Type' },
-  { id: 'c7', field: 'capacity', header: 'Capacity' },
-  { id: 'c8', field: 'ticket_price', header: 'Ticket Price' },
-  { id: 'c9', field: 'status', header: 'Status' },
-  { id: 'c10', field: 'notes', header: 'Notes' },
+const SOURCE_FIELDS = [
+  { value: 'artist_name', label: 'Artist Name' },
+  { value: 'venue_name', label: 'Venue / Location' },
+  { value: 'show_date', label: 'Show Date' },
+  { value: 'city', label: 'City' },
+  { value: 'show_time', label: 'Performance Time' },
+  { value: 'load_in_time', label: 'Load In' },
+  { value: 'soundcheck_time', label: 'Soundcheck' },
+  { value: 'deal_guarantee', label: 'Guarantee ($)' },
+  { value: 'deal_type', label: 'Deal Type' },
+  { value: 'portal_url', label: 'Artist Portal Link' },
+  { value: 'status', label: 'Engagement Status' },
+  { value: 'custom', label: 'Static / Custom Value' },
 ]
 
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [globalMapping, setGlobalMapping] = useState<any[]>(AVAILABLE_COLUMNS.slice(0, 5))
-
-  const toggleColumn = (col: any) => {
-    setGlobalMapping(prev => {
-      const exists = prev.find(p => p.field === col.field)
-      if (exists) {
-        return prev.filter(p => p.field !== col.field)
-      } else {
-        return [...prev, col]
-      }
-    })
-  }
+  
+  // New Customizable State
+  const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
+  const [sheetName, setSheetName] = useState('Active Shows')
+  const [mappings, setMappings] = useState<any[]>([
+    { id: '1', source: 'artist_name', header: 'Artist' },
+    { id: '2', source: 'show_date', header: 'Date' },
+    { id: '3', source: 'venue_name', header: 'Venue' },
+    { id: '4', source: 'deal_guarantee', header: 'Fee' },
+    { id: '5', source: 'portal_url', header: 'Portal Link' },
+  ])
 
   useEffect(() => {
     if (isOpen) {
@@ -75,15 +88,18 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           
           setIsGoogleConnected(!!integration)
 
-          // Load Global Mapping from User Profile or similar (fallback to defaults)
+          // Load Saved Mapping & Metadata
           const { data: profile } = await supabase
             .from('profiles')
-            .select('global_export_mapping')
+            .select('global_export_mapping, last_spreadsheet_name')
             .eq('id', user.id)
             .single()
           
           if (profile?.global_export_mapping) {
-            setGlobalMapping(profile.global_export_mapping)
+            setMappings(profile.global_export_mapping)
+          }
+          if (profile?.last_spreadsheet_name) {
+            setSpreadsheetName(profile.last_spreadsheet_name)
           }
         } catch (err) {
           console.error('Sync Modal Error:', err)
@@ -95,7 +111,25 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
     }
   }, [isOpen])
 
+  const addColumn = () => {
+    const newId = Math.random().toString(36).substring(2, 9)
+    setMappings([...mappings, { id: newId, source: 'artist_name', header: 'New Column' }])
+  }
+
+  const removeColumn = (id: string) => {
+    setMappings(mappings.filter(m => m.id !== id))
+  }
+
+  const updateMapping = (id: string, updates: any) => {
+    setMappings(mappings.map(m => m.id === id ? { ...m, ...updates } : m))
+  }
+
   const handleSync = async () => {
+    if (!spreadsheetName) {
+      toast.error('Please name your spreadsheet.')
+      return
+    }
+
     setIsSyncing(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -108,26 +142,22 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       const { data: shows, error: fetchErr } = await query
       if (fetchErr) throw fetchErr
 
-      // Save global mapping to profile so it remembers the user's choices
-      await supabase.from('profiles').update({ global_export_mapping: globalMapping }).eq('id', user?.id)
+      // Save global mapping and name preference
+      await supabase.from('profiles').update({ 
+        global_export_mapping: mappings,
+        last_spreadsheet_name: spreadsheetName
+      }).eq('id', user?.id)
 
-      // Check Google Connection again to get token
-      const { data: integration } = await supabase
-        .from('user_integrations')
-        .select('access_token')
-        .eq('user_id', user?.id)
-        .eq('provider', 'google')
-        .maybeSingle()
-
-      // 2. Trigger n8n
+      // 2. Trigger n8n with detailed mapping and custom metadata
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user?.id,
-          access_token: integration?.access_token || null,
-          mode: 'universal_bulk_export',
-          mapping: globalMapping,
+          spreadsheet_name: spreadsheetName,
+          sheet_name: sheetName,
+          mode: 'universal_custom_export',
+          mapping: mappings,
           shows: shows,
           timestamp: new Date().toISOString()
         })
@@ -136,11 +166,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       const result = await response.json().catch(() => ({}))
       
       if (!response.ok) {
-        throw new Error(result.details || result.error || result.message || 'Sync failed due to server error')
+        throw new Error(result.details || result.error || result.message || 'Sync failed')
       }
 
       toast.success('Universal Sync Successful!', {
-        description: `Exported ${shows.length} shows to your master sheet.`
+        description: `Exported to "${spreadsheetName}".`
       })
       onClose()
     } catch (err: any) {
@@ -152,89 +182,128 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] bg-[#0b0c0d] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
-        <div className="p-8 pb-6 border-b border-white/5">
+      <DialogContent className="sm:max-w-[700px] bg-ebony-950 border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="p-8 pb-6 border-b border-white/5 shrink-0 bg-white/[0.01]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
-              <Table className="text-primary" size={24} />
-              Universal Export
+            <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
+              <TableIcon className="text-primary" size={28} />
+              Flexible Export
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-2 font-medium">
-              Export your roster into your master production spreadsheet.
+              Configure your spreadsheet layout and field mapping for the production roster.
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        <div className="p-8 space-y-8">
+        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
           {!isGoogleConnected ? (
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 space-y-4">
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-[2rem] p-8 space-y-4">
                <div className="flex items-center gap-3 text-amber-500">
-                  <AlertCircle size={20} />
-                  <h4 className="font-bold uppercase tracking-tight text-sm">Google Offline</h4>
+                  <AlertCircle size={24} />
+                  <h4 className="font-black uppercase tracking-tight text-lg">Google Offline</h4>
                </div>
-               <p className="text-xs text-muted-foreground leading-relaxed">
-                 Please connect your Google account in Settings to enable this feature.
+               <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                 Your Google account is not connected. Connect it in Settings to enable direct spreadsheet sync.
                </p>
                <Button 
-                 variant="outline" 
                  onClick={() => { onClose(); window.location.href = '/settings' }}
-                 className="w-full border-amber-500/20 bg-amber-500/5 text-amber-500 font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl"
+                 className="bg-amber-500 text-black font-black text-xs uppercase tracking-widest h-12 px-8 rounded-xl hover:bg-amber-400"
                >
-                 Go to Integrations <ChevronRight size={14} />
+                 Connect Now <ChevronRight size={16} />
                </Button>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
-                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Master Sync Ready</span>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Selected Roster</span>
-                       <p className="text-sm font-black italic text-white truncate">
-                         {selectedShowIds?.length ? `${selectedShowIds.length} Shows` : 'All Active Shows'}
-                       </p>
-                    </div>
-                    <div className="space-y-1">
-                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Format</span>
-                       <p className="text-sm font-black italic text-white">Universal Layout</p>
-                    </div>
-                 </div>
+            <>
+              {/* FILE METADATA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-2">Spreadsheet Name</Label>
+                  <Input 
+                    value={spreadsheetName}
+                    onChange={(e) => setSpreadsheetName(e.target.value)}
+                    placeholder="e.g. Master Roster 2026"
+                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-2">Sheet / Tab Name</Label>
+                  <Input 
+                    value={sheetName}
+                    onChange={(e) => setSheetName(e.target.value)}
+                    placeholder="e.g. Main"
+                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50"
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-3 pt-2">
-                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Customize Columns</p>
-                 <div className="flex flex-wrap gap-2">
-                    {AVAILABLE_COLUMNS.map(col => {
-                      const isSelected = globalMapping.some(m => m.field === col.field)
-                      return (
-                        <button
-                          key={col.id}
-                          onClick={() => toggleColumn(col)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase italic transition-all ${isSelected ? 'bg-primary/20 border-primary text-primary border shadow-[0_0_10px_theme(colors.primary/30%)]' : 'bg-white/5 border border-white/10 text-zinc-500 hover:text-zinc-300'}`}
+
+              {/* MAPPING TABLE */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-white italic">Column Mapping</h4>
+                  <Button 
+                    onClick={addColumn}
+                    variant="outline" 
+                    className="h-8 px-4 rounded-full border-primary/30 text-primary text-[9px] font-black uppercase hover:bg-primary/10"
+                  >
+                    <Plus size={12} className="mr-1" /> Add Column
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {mappings.map((m) => (
+                    <div key={m.id} className="group flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.04] p-3 rounded-2xl border border-white/5 transition-all">
+                      <div className="text-zinc-700 group-hover:text-zinc-500 transition-colors">
+                        <GripVertical size={18} />
+                      </div>
+                      
+                      <div className="flex-1 grid grid-cols-2 gap-4">
+                        <Select 
+                          value={m.source} 
+                          onValueChange={(val) => updateMapping(m.id, { source: val })}
                         >
-                          {col.header}
-                        </button>
-                      )
-                    })}
-                 </div>
+                          <SelectTrigger className="bg-black/40 border-white/10 h-11 rounded-xl font-bold text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-ebony-950 border-white/10">
+                            {SOURCE_FIELDS.map(f => (
+                              <SelectItem key={f.value} value={f.value} className="font-bold text-xs">{f.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Input 
+                          value={m.header}
+                          onChange={(e) => updateMapping(m.id, { header: e.target.value })}
+                          placeholder="Header Name"
+                          className="bg-black/40 border-white/10 h-11 rounded-xl font-bold text-xs"
+                        />
+                      </div>
+
+                      <button 
+                        onClick={() => removeColumn(m.id)}
+                        className="h-10 w-10 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 
-        <DialogFooter className="p-8 bg-black/20 border-t border-white/5">
-          <Button variant="ghost" onClick={onClose} className="h-12 px-6 rounded-xl font-bold uppercase tracking-widest text-[10px] text-zinc-500" disabled={isSyncing}>
+        <DialogFooter className="p-8 bg-black/40 border-t border-white/5 shrink-0">
+          <Button variant="ghost" onClick={onClose} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] text-zinc-500" disabled={isSyncing}>
             Cancel
           </Button>
           <Button 
             onClick={handleSync}
             disabled={!isGoogleConnected || isSyncing || isLoading}
-            className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 h-14 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3"
+            className="bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/30 h-16 px-12 rounded-[2rem] font-black uppercase tracking-widest text-sm gap-3 active:scale-95 transition-all"
           >
-            {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
-            {isSyncing ? 'Exporting...' : 'Export to Master Sheet'}
+            {isSyncing ? <Loader2 size={20} className="animate-spin" /> : <Zap size={20} />}
+            {isSyncing ? 'Exporting...' : 'Initiate Universal Sync'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -34,6 +34,7 @@ import {
   StatusPing,
   DataStream
 } from '@/components/ui/bento-grid'
+import { UniversalSyncModal } from '@/components/dashboard/universal-sync-modal'
 
 export default function ShowDetailPage({ params }: any) {
   const router = useRouter()
@@ -43,9 +44,8 @@ export default function ShowDetailPage({ params }: any) {
   const [documents, setDocuments] = useState<any[]>([])
   const [allShows, setAllShows] = useState<any[]>([])
   const [isGoogleConnected, setIsGoogleConnected] = useState(false)
-  const [isGeneratingSheet, setIsGeneratingSheet] = useState(false)
   const [isResendingEmail, setIsResendingEmail] = useState(false)
-  const [isSyncing, setIsSyncing] = useState(false)
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   
   // Resolve ID with max compatibility
   useEffect(() => {
@@ -96,55 +96,6 @@ export default function ShowDetailPage({ params }: any) {
     }
     loadData()
   }, [id])
-
-  const handleSyncSpreadsheet = async () => {
-    setIsSyncing(true)
-    toast.info('Initiating sync...', { description: 'Creating Google Sheet in Drive.' })
-    try {
-      // Get a fresh Google access token (auto-refreshes if expired)
-      let access_token: string | null = null
-      try {
-        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
-        if (refreshRes.ok) {
-          const refreshData = await refreshRes.json()
-          access_token = refreshData.access_token ?? null
-        }
-      } catch { /* non-fatal */ }
-
-      const payload = {
-        show_id: id,
-        access_token,
-        show_name: `${showInfo?.artist_name || 'Show'} @ ${showInfo?.venue_name}`,
-        show_time: showInfo?.show_time || null,
-        status: showInfo?.status,
-        artist_name: showInfo?.artist_name || 'Unknown Artist',
-        artist_email: showInfo?.artist_email || showInfo?.email || '',
-        venue: showInfo?.venue_name,
-        venue_name: showInfo?.venue_name,
-        city: showInfo?.city,
-        date: showInfo?.show_date,
-        portal_url: showInfo?.portal_url,
-        required_documents: documents.map(d => ({
-          name: d.item_name,
-          deadline: d.deadline,
-          portal_token: d.portal_token
-        }))
-      }
-
-      const response = await fetch('/api/n8n/create-show', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) throw new Error('Sync failed')
-      toast.success('Sync Complete', { description: 'Spreadsheet updated in Google Drive.' })
-    } catch (error) {
-      toast.error('Sync Failed', { description: 'Could not connect to Google Drive workflow.' })
-    } finally {
-      setIsSyncing(false)
-    }
-  }
 
   const handleResendEmail = async () => {
     setIsResendingEmail(true)
@@ -260,11 +211,10 @@ export default function ShowDetailPage({ params }: any) {
                 Launch Artist Portal
              </button>
              <button 
-                onClick={handleSyncSpreadsheet}
-                disabled={isSyncing}
+                onClick={() => setIsSyncModalOpen(true)}
                 className="w-full mt-2 h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
              >
-                {isSyncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                <RefreshCw size={14} />
                 Sync to Google Sheets
              </button>
           </BentoPanel>
@@ -391,6 +341,11 @@ export default function ShowDetailPage({ params }: any) {
          </BentoPanel>
       </div>
 
+      <UniversalSyncModal 
+        isOpen={isSyncModalOpen} 
+        onClose={() => setIsSyncModalOpen(false)} 
+        selectedShowIds={id ? [id] : []}
+      />
     </div>
   )
 }

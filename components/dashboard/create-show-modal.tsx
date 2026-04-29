@@ -67,6 +67,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [artistComment, setArtistComment] = useState('')
   const [cateringNotes, setCateringNotes] = useState('')
   const [syncToCalendar, setSyncToCalendar] = useState(true)
+  const [syncToSpreadsheet, setSyncToSpreadsheet] = useState(false)
 
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -220,7 +221,15 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         // Non-fatal — calendar creation will be skipped in n8n if token is missing
       }
 
-      const userId = (await supabase.auth.getUser()).data.user?.id
+      const { data: { user } } = await supabase.auth.getUser()
+      const userId = user?.id
+
+      // Fetch promoter's mapping preferences
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('global_export_mapping, last_spreadsheet_name')
+        .eq('id', userId)
+        .single()
 
       const payload = {
         show_id,
@@ -241,6 +250,9 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         artist_comment: artistComment || null,
         catering_notes: cateringNotes || null,
         sync_to_calendar: syncToCalendar,
+        sync_to_spreadsheet: syncToSpreadsheet,
+        spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
+        mapping: profile?.global_export_mapping || null,
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
@@ -804,23 +816,45 @@ return (
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
-              <Checkbox
-                id="sync-calendar"
-                checked={syncToCalendar}
-                onCheckedChange={(checked) => setSyncToCalendar(checked as boolean)}
-                className="border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-5 w-5 rounded-md"
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="sync-calendar"
-                  className="text-xs font-bold text-white uppercase tracking-widest cursor-pointer flex items-center gap-2"
-                >
-                  Sync to Promoter Calendar
-                </label>
-                <p className="text-[10px] text-muted-foreground">
-                  Automatically create a booked event with this schedule and the artist portal link.
-                </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
+                <Checkbox
+                  id="sync-calendar"
+                  checked={syncToCalendar}
+                  onCheckedChange={(checked) => setSyncToCalendar(checked as boolean)}
+                  className="border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-5 w-5 rounded-md"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="sync-calendar"
+                    className="text-[10px] font-black text-white uppercase tracking-widest cursor-pointer"
+                  >
+                    Calendar Sync
+                  </label>
+                  <p className="text-[8px] text-muted-foreground">
+                    Add to G-Calendar
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 p-4 rounded-2xl bg-[#0F9D58]/5 border border-[#0F9D58]/20">
+                <Checkbox
+                  id="sync-spreadsheet"
+                  checked={syncToSpreadsheet}
+                  onCheckedChange={(checked) => setSyncToSpreadsheet(checked as boolean)}
+                  className="border-[#0F9D58]/40 data-[state=checked]:bg-[#0F9D58] data-[state=checked]:text-white h-5 w-5 rounded-md"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="sync-spreadsheet"
+                    className="text-[10px] font-black text-white uppercase tracking-widest cursor-pointer"
+                  >
+                    Spreadsheet Sync
+                  </label>
+                  <p className="text-[8px] text-muted-foreground">
+                    Sync to Master Sheet
+                  </p>
+                </div>
               </div>
             </div>
           </div>
