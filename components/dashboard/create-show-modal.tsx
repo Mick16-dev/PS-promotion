@@ -231,6 +231,9 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         .eq('id', userId)
         .single()
 
+      const headersArray = (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || []
+      const currentSpreadsheetName = profile?.last_spreadsheet_name || 'Master Production Roster'
+
       const payload = {
         show_id,
         user_id: userId,
@@ -251,9 +254,12 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         catering_notes: cateringNotes || null,
         sync_to_calendar: syncToCalendar,
         sync_to_spreadsheet: syncToSpreadsheet,
-        spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
-        headers: (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || [],
+        spreadsheet_name: currentSpreadsheetName,
+        spreadsheetName: currentSpreadsheetName,
+        headers: headersArray,
+        headerList: headersArray,
         mapping: profile?.global_export_mapping || null,
+        mappingList: profile?.global_export_mapping || null,
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,

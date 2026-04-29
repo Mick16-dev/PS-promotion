@@ -170,11 +170,16 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         body: JSON.stringify({
           user_id: user?.id,
           access_token: access_token,
+          // Send both naming conventions to ensure n8n catches it
           spreadsheet_name: spreadsheetName,
+          spreadsheetName: spreadsheetName, 
           sheet_name: sheetName,
+          sheetName: sheetName,
           mode: 'universal_custom_export',
           headers: headersArray,
+          headerList: headersArray,
           mapping: mappings,
+          mappingList: mappings,
           shows: shows,
           timestamp: new Date().toISOString()
         })
