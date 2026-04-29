@@ -116,7 +116,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   const addColumn = () => {
     const newId = Math.random().toString(36).substring(2, 9)
-    setMappings([...mappings, { id: newId, source: 'artist_name', header: 'New Column' }])
+    // Find a field that isn't already mapped, or default to custom
+    const usedFields = mappings.map(m => m.source)
+    const nextField = SOURCE_FIELDS.find(f => !usedFields.includes(f.value)) || { value: 'custom', label: 'New Column' }
+    
+    setMappings([...mappings, { 
+      id: newId, 
+      source: nextField.value, 
+      header: nextField.label === 'Static / Custom Value' ? '' : nextField.label 
+    }])
   }
 
   const removeColumn = (id: string) => {
@@ -124,7 +132,23 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   }
 
   const updateMapping = (id: string, updates: Partial<ExportMapping>) => {
-    setMappings(mappings.map(m => m.id === id ? { ...m, ...updates } : m))
+    setMappings(mappings.map(m => {
+      if (m.id !== id) return m
+      
+      const newMapping = { ...m, ...updates }
+      
+      // If the user changed the source and the header is still default/empty/matches old source, auto-update header
+      if (updates.source) {
+        const oldSourceLabel = SOURCE_FIELDS.find(f => f.value === m.source)?.label
+        const newSourceLabel = SOURCE_FIELDS.find(f => f.value === updates.source)?.label
+        
+        if (!m.header || m.header === 'New Column' || m.header === oldSourceLabel) {
+          newMapping.header = newSourceLabel === 'Static / Custom Value' ? '' : (newSourceLabel || '')
+        }
+      }
+      
+      return newMapping
+    }))
   }
 
   const resolveMappedValue = (show: ShowRow, source: string) => {
@@ -357,8 +381,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           <Input 
                             value={m.header}
                             onChange={(e) => updateMapping(m.id, { header: e.target.value })}
-                            placeholder="Column Title"
-                            className="w-full h-12 bg-black/60 border border-white/10 rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-primary/40 placeholder:text-zinc-800"
+                            placeholder="Type Column Title..."
+                            className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
                           />
                         </div>
 
