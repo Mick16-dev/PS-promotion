@@ -183,7 +183,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           sheet_name: sheetName,
           headers: headersArray,
           mapping: mappings,
-          shows: mappedShows, // Restored to April 28th format
+          rows: mappedShows, // Standard n8n key
+          shows: mappedShows, // Fallback
           timestamp: new Date().toISOString()
         })
       })

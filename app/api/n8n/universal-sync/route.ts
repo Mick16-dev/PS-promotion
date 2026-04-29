@@ -32,59 +32,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Invalid JSON body.' }, { status: 400 })
   }
 
-  // Validate but do NOT use the 'result.data' to avoid field stripping
-  const result = syncSchema.safeParse(body)
-  if (!result.success) {
-    return NextResponse.json(
-      { success: false, error: 'Security Validation Failed', details: result.error.format() },
-      { status: 400 }
-    )
-  }
-
-  const { user_id } = body
+  const { user_id, access_token: frontendToken } = body
+  let accessToken = frontendToken
 
   try {
-    // 1. Fetch the promoter's Google Integration
-    const { data: integration, error: intError } = await supabaseAdmin
-      .from('user_integrations')
-      .select('*')
-      .eq('user_id', user_id)
-      .eq('provider', 'google')
-      .maybeSingle()
-    
-    if (!integration) {
-      return NextResponse.json({ success: false, error: 'Google account not connected.' }, { status: 400 })
-    }
+    if (!accessToken) {
+      const { data: integration, error: intError } = await supabaseAdmin
+        .from('user_integrations')
+        .select('*')
+        .eq('user_id', user_id)
+        .eq('provider', 'google')
+        .maybeSingle()
+      
+      if (!integration) {
+        return NextResponse.json({ success: false, error: 'Google account not connected.' }, { status: 400 })
+      }
 
-    let accessToken = integration.access_token
+      accessToken = integration.access_token
 
-    // 2. Check if token needs refreshing
-    if (integration.refresh_token) {
-      try {
-        const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            client_id: process.env.GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            refresh_token: integration.refresh_token,
-            grant_type: 'refresh_token',
-          }),
-        })
+      // 2. Check if token needs refreshing
+      if (integration.refresh_token) {
+        try {
+          const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              client_id: process.env.GOOGLE_CLIENT_ID!,
+              client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+              refresh_token: integration.refresh_token,
+              grant_type: 'refresh_token',
+            }),
+          })
 
-        const refreshData = await refreshResponse.json()
-        if (refreshData.access_token) {
-          accessToken = refreshData.access_token
-          await supabaseAdmin
-            .from('user_integrations')
-            .update({ 
-              access_token: accessToken,
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', integration.id)
+          const refreshData = await refreshResponse.json()
+          if (refreshData.access_token) {
+            accessToken = refreshData.access_token
+            await supabaseAdmin
+              .from('user_integrations')
+              .update({ 
+                access_token: accessToken,
+                updated_at: new Date().toISOString() 
+              })
+              .eq('id', integration.id)
+          }
+        } catch (err) {
+          console.error('TOKEN_REFRESH_FAILED:', err)
         }
-      } catch (err) {
-        console.error('TOKEN_REFRESH_FAILED:', err)
       }
     }
 
