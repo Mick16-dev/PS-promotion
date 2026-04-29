@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: res.ok, ...data },
+      { success: res.ok, ...data, diagnostic_payload: body },
       { status: res.ok ? 200 : 502 }
     )
   } catch (e: any) {

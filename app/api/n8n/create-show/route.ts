@@ -53,6 +53,7 @@ export async function POST(request: Request) {
         ok: res.ok,
         status: res.status,
         body: text,
+        diagnostic_payload: body
       },
       { status: res.ok ? 200 : 502 },
     )
