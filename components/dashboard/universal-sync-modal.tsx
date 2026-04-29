@@ -73,10 +73,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   const [sheetName, setSheetName] = useState('Active Shows')
   const [exportMode, setExportMode] = useState<'standard' | 'transposed'>('standard')
   const [mappings, setMappings] = useState<ExportMapping[]>([
-    { id: '1', source: 'artist_name', header: '' },
-    { id: '2', source: 'show_date', header: '' },
-    { id: '3', source: 'venue_name', header: '' },
-    { id: '4', source: 'deal_guarantee', header: '' },
+    { id: '1', source: 'artist_name', override: '' },
+    { id: '2', source: 'show_date', override: '' },
+    { id: '3', source: 'venue_name', override: '' },
+    { id: '4', source: 'deal_guarantee', override: '' },
   ])
 
   useEffect(() => {
@@ -117,14 +117,13 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   const addColumn = () => {
     const newId = Math.random().toString(36).substring(2, 9)
-    // Find a field that isn't already mapped, or default to custom
     const usedFields = mappings.map(m => m.source)
     const nextField = SOURCE_FIELDS.find(f => !usedFields.includes(f.value)) || { value: 'custom', label: 'New Column' }
     
     setMappings([...mappings, { 
       id: newId, 
       source: nextField.value, 
-      header: nextField.label === 'Static / Custom Value' ? '' : nextField.label 
+      override: '' 
     }])
   }
 
@@ -237,7 +236,6 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       }
 
       const headersArray = sanitizedMappings.map((m) => {
-        // The Header is now the Label from the Dropdown (the "Left Section")
         return SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
       })
       
@@ -245,24 +243,20 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       let mappedData: any[] = []
 
       if (exportMode === 'transposed') {
-        // TRANSPOSED: Headers in Column A
         spreadsheet_values = sanitizedMappings.map(m => {
           const header = SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
           const row = [header]
           shows.forEach((show: any) => {
-            // If the user typed something in the "header" box, it's actually a static value
-            const value = m.header && m.header !== 'New Column' ? m.header : resolveMappedValue(show, m.source)
+            const value = m.override ? m.override : resolveMappedValue(show, m.source)
             row.push(value)
           })
           return row
         })
         mappedData = spreadsheet_values
       } else {
-        // STANDARD: Headers in Row 1
         const dataRows = (shows || []).map((show: ShowRow) => {
           return sanitizedMappings.map(m => {
-            // If the user typed something in the right box, use it as a static value
-            return m.header && m.header !== 'New Column' ? m.header : resolveMappedValue(show, m.source)
+            return m.override ? m.override : resolveMappedValue(show, m.source)
           })
         })
         spreadsheet_values = [headersArray, ...dataRows]
@@ -287,6 +281,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           export_layout: exportMode,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
+          mapping: sanitizedMappings.map(m => ({ 
+            ...m, 
+            header: SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source 
+          })),
           header_row: headersArray,
           spreadsheet_values: spreadsheet_values,
           mapped_data: mappedData,
@@ -426,11 +424,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           </Select>
 
                           <Input 
-                            value={m.header}
-                            onChange={(e) => updateMapping(m.id, { header: e.target.value })}
-                            placeholder="Optional: Static Value Override"
-                            className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
-                          />
+                          value={m.override || ''}
+                          onChange={(e) => updateMapping(m.id, { override: e.target.value })}
+                          placeholder="Optional: Static Value Override"
+                          className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
+                        />
                         </div>
 
                         <button 
