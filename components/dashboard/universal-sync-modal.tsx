@@ -228,6 +228,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       }))
 
       const headersArray = sanitizedMappings.map((m) => m.header)
+      const valueRows = mappedRows.map((row) => headersArray.map((header) => row[header] ?? ''))
 
       // 4. Trigger n8n with original short-key structure
       const response = await fetch('/api/n8n/universal-sync', {
@@ -239,9 +240,13 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           headers: headersArray,
+          header_row: headersArray,
+          columns: headersArray,
           mapping: sanitizedMappings,
           rows: mappedRows,
-          shows: mappedRows,
+          mapped_rows: mappedRows,
+          value_rows: valueRows,
+          shows: legacyRows,
           legacy_rows: legacyRows,
           timestamp: new Date().toISOString()
         })

@@ -260,6 +260,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         acc[mapping.header] = sourceValues[mapping.source] ?? ''
         return acc
       }, {})
+      const rowsMapped = Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy]
+      const valueRows = rowsMapped.map((row) => headersArray.map((header) => row[header] ?? ''))
 
       // Keep legacy short keys for backwards compatibility in n8n branches.
       const mappedShowLegacy = {
@@ -277,9 +279,13 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
         spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
         headers: headersArray,
+        header_row: headersArray,
+        columns: headersArray,
         mapping: sanitizedMappings,
-        rows: Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy],
-        shows: Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy],
+        rows: rowsMapped,
+        mapped_rows: rowsMapped,
+        value_rows: valueRows,
+        shows: [mappedShowLegacy],
         legacy_rows: [mappedShowLegacy],
         status: 'pending',
         artist_id: selectedArtistId,
