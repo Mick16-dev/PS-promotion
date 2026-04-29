@@ -231,28 +231,26 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       }
 
       const headersArray = sanitizedMappings.map((m) => {
-        return SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
+        // Use manual override as header if provided, otherwise use dropdown label
+        return (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
       })
       
       let spreadsheet_values: any[][] = []
       let mappedData: any[] = []
 
       if (exportMode === 'transposed') {
-        spreadsheet_values = sanitizedMappings.map(m => {
-          const header = SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
+        spreadsheet_values = sanitizedMappings.map((m, i) => {
+          const header = headersArray[i]
           const row = [header]
           shows.forEach((show: any) => {
-            const value = m.override ? m.override : resolveMappedValue(show, m.source)
-            row.push(value)
+            row.push(resolveMappedValue(show, m.source))
           })
           return row
         })
         mappedData = spreadsheet_values
       } else {
         const dataRows = (shows || []).map((show: ShowRow) => {
-          return sanitizedMappings.map(m => {
-            return m.override ? m.override : resolveMappedValue(show, m.source)
-          })
+          return sanitizedMappings.map(m => resolveMappedValue(show, m.source))
         })
         spreadsheet_values = [headersArray, ...dataRows]
         
@@ -423,7 +421,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           <Input 
                           value={m.override || ''}
                           onChange={(e) => updateMapping(m.id, { override: e.target.value })}
-                          placeholder="Optional: Static Value Override"
+                          placeholder="Rename Header (Optional)"
                           className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
                         />
                         </div>
