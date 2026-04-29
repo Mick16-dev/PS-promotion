@@ -182,8 +182,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[700px] bg-ebony-950 border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="p-8 pb-6 border-b border-white/5 shrink-0 bg-white/[0.01]">
+      <DialogContent className="sm:max-w-[700px] bg-[#07080F] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col backdrop-blur-xl">
+        <div className="p-8 pb-6 border-b border-white/5 shrink-0 bg-white/[0.02]">
           <DialogHeader>
             <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
               <TableIcon className="text-primary" size={28} />
@@ -195,7 +195,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar bg-[#07080F]">
           {!isGoogleConnected ? (
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-[2rem] p-8 space-y-4">
                <div className="flex items-center gap-3 text-amber-500">
@@ -222,7 +222,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                     value={spreadsheetName}
                     onChange={(e) => setSpreadsheetName(e.target.value)}
                     placeholder="e.g. Master Roster 2026"
-                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50"
+                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50 text-white"
                   />
                 </div>
                 <div className="space-y-3">
@@ -231,7 +231,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                     value={sheetName}
                     onChange={(e) => setSheetName(e.target.value)}
                     placeholder="e.g. Main"
-                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50"
+                    className="bg-white/5 border-white/10 h-14 rounded-2xl px-6 font-bold text-lg focus:ring-primary/50 text-white"
                   />
                 </div>
               </div>
@@ -251,8 +251,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
                 <div className="space-y-3">
                   {mappings.map((m) => (
-                    <div key={m.id} className="group flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.04] p-3 rounded-2xl border border-white/5 transition-all">
-                      <div className="text-zinc-700 group-hover:text-zinc-500 transition-colors">
+                    <div key={m.id} className="group flex items-center gap-3 bg-white/[0.04] hover:bg-white/[0.06] p-4 rounded-2xl border border-white/10 transition-all shadow-lg">
+                      <div className="text-zinc-500 group-hover:text-zinc-300 transition-colors">
                         <GripVertical size={18} />
                       </div>
                       
@@ -261,12 +261,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           value={m.source} 
                           onValueChange={(val) => updateMapping(m.id, { source: val })}
                         >
-                          <SelectTrigger className="bg-black/40 border-white/10 h-11 rounded-xl font-bold text-xs">
+                          <SelectTrigger className="bg-black/60 border-white/20 h-11 rounded-xl font-bold text-xs text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-ebony-950 border-white/10">
+                          <SelectContent className="bg-[#0F1118] border-white/10 text-white">
                             {SOURCE_FIELDS.map(f => (
-                              <SelectItem key={f.value} value={f.value} className="font-bold text-xs">{f.label}</SelectItem>
+                              <SelectItem key={f.value} value={f.value} className="font-bold text-xs hover:bg-primary/20">{f.label}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -275,13 +275,13 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           value={m.header}
                           onChange={(e) => updateMapping(m.id, { header: e.target.value })}
                           placeholder="Header Name"
-                          className="bg-black/40 border-white/10 h-11 rounded-xl font-bold text-xs"
+                          className="bg-black/60 border-white/20 h-11 rounded-xl font-bold text-xs text-white placeholder:text-zinc-600"
                         />
                       </div>
 
                       <button 
                         onClick={() => removeColumn(m.id)}
-                        className="h-10 w-10 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                        className="h-10 w-10 flex items-center justify-center text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -293,7 +293,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           )}
         </div>
 
-        <DialogFooter className="p-8 bg-black/40 border-t border-white/5 shrink-0">
+        <DialogFooter className="p-8 bg-black/60 border-t border-white/5 shrink-0">
           <Button variant="ghost" onClick={onClose} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] text-zinc-500" disabled={isSyncing}>
             Cancel
           </Button>
@@ -302,7 +302,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             disabled={!isGoogleConnected || isSyncing || isLoading}
             className="bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/30 h-16 px-12 rounded-[2rem] font-black uppercase tracking-widest text-sm gap-3 active:scale-95 transition-all"
           >
-            {isSyncing ? <Loader2 size={20} className="animate-spin" /> : <Zap size={20} />}
+            {isSyncing ? <Loader2 size={20} className="animate-spin" /> : <TableIcon size={20} />}
             {isSyncing ? 'Exporting...' : 'Initiate Universal Sync'}
           </Button>
         </DialogFooter>
