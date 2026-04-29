@@ -148,15 +148,32 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         last_spreadsheet_name: spreadsheetName
       }).eq('id', user?.id)
 
-      // 2. Trigger n8n with detailed mapping and custom metadata
+      // 2. Refresh Google Token (Crucial for n8n to access the right account/file)
+      let access_token: string | null = null
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          access_token = refreshData.access_token ?? null
+        }
+      } catch (err) {
+        console.error('TOKEN_REFRESH_FAILED:', err)
+      }
+
+      // 3. Prepare headers from mapping
+      const headersArray = mappings.map(m => m.header)
+
+      // 4. Trigger n8n with detailed mapping and custom metadata
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user?.id,
+          access_token: access_token,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           mode: 'universal_custom_export',
+          headers: headersArray,
           mapping: mappings,
           shows: shows,
           timestamp: new Date().toISOString()

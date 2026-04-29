@@ -252,6 +252,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         sync_to_calendar: syncToCalendar,
         sync_to_spreadsheet: syncToSpreadsheet,
         spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
+        headers: (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || [],
         mapping: profile?.global_export_mapping || null,
         status: 'pending',
         artist_id: selectedArtistId,
