@@ -9,16 +9,12 @@ const syncSchema = z.object({
   user_id: z.string().uuid(),
   spreadsheet_name: z.string().min(1).max(100),
   sheet_name: z.string().min(1).max(50),
-  mode: z.enum(['universal_custom_export']),
+  mode: z.string().optional(),
   headers: z.array(z.string()).optional(),
-  mapping: z.array(z.object({
-    id: z.string(),
-    source: z.string(),
-    header: z.string()
-  })),
+  mapping: z.any().optional(),
   shows: z.array(z.any()).min(1),
-  timestamp: z.string().datetime().optional()
-})
+  timestamp: z.string().optional()
+}).passthrough()
 
 export async function POST(request: Request) {
   // Create a service-role client to fetch integration tokens securely

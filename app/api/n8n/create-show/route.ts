@@ -9,10 +9,9 @@ const showSchema = z.object({
   show_name: z.string().min(1),
   artist_name: z.string().min(1),
   artist_email: z.string().email(),
-  venue: z.string().min(1),
-  date: z.string().min(1),
-  deal_type: z.string(),
-  deal_guarantee: z.number().nonnegative(),
+  spreadsheet_name: z.string().optional(),
+  headers: z.array(z.string()).optional(),
+  mapping: z.any().optional()
 }).passthrough()
 
 export async function POST(request: Request) {
