@@ -160,27 +160,37 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         console.error('TOKEN_REFRESH_FAILED:', err)
       }
 
-      // 3. Prepare headers from mapping
+      // 3. Transform shows to use custom headers as keys
+      const mappedShows = shows.map(show => {
+        const mappedShow: any = {}
+        mappings.forEach(m => {
+          if (m.source === 'custom') {
+            mappedShow[m.header] = m.customValue || ''
+          } else {
+            mappedShow[m.header] = show[m.source] || ''
+          }
+        })
+        return mappedShow
+      })
+
       const headersArray = mappings.map(m => m.header)
 
-      // 4. Trigger n8n with detailed mapping and custom metadata
+      // 4. Trigger n8n with transformed data
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user?.id,
           access_token: access_token,
-          // Send both naming conventions to ensure n8n catches it
           spreadsheet_name: spreadsheetName,
-          spreadsheetName: spreadsheetName, 
+          spreadsheetName: spreadsheetName,
           sheet_name: sheetName,
           sheetName: sheetName,
           mode: 'universal_custom_export',
           headers: headersArray,
           headerList: headersArray,
           mapping: mappings,
-          mappingList: mappings,
-          shows: shows,
+          shows: mappedShows, // Send transformed data
           timestamp: new Date().toISOString()
         })
       })

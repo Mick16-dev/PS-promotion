@@ -234,32 +234,40 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const headersArray = (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || []
       const currentSpreadsheetName = profile?.last_spreadsheet_name || 'Master Production Roster'
 
-      const payload = {
+      // Pre-map the current show data using the custom headers
+      const showData: any = {
         show_id,
         user_id: userId,
-        access_token: access_token,
-        show_name: `${artistName} @ ${venue}`,
-        show_time: showTime || null,
-        show_end_time: showEndTime || null,
-        load_in_time: loadInTime || null,
-        soundcheck_time: soundcheckTime || null,
-        changeover_time: changeoverTime || null,
-        doors_time: doorsTime || null,
-        musicians_count: musiciansCount || 0,
-        host_name: hostName || null,
-        artist_epk_url: artistEpkUrl || null,
-        stageplot_url: stageplotUrl || null,
-        technical_notes: technicalNotes || null,
-        artist_comment: artistComment || null,
-        catering_notes: cateringNotes || null,
-        sync_to_calendar: syncToCalendar,
-        sync_to_spreadsheet: syncToSpreadsheet,
+        artist_name: artistName,
+        venue_name: venue,
+        show_date: date,
+        // ... add other raw fields for safety
+      }
+
+      const mappedData: any = {}
+      if (profile?.global_export_mapping) {
+        (profile.global_export_mapping as any[]).forEach(m => {
+          if (m.source === 'custom') {
+            mappedData[m.header] = m.customValue || ''
+          } else {
+            // Map from the current show state
+            if (m.source === 'artist_name') mappedData[m.header] = artistName
+            else if (m.source === 'venue_name') mappedData[m.header] = venue
+            else if (m.source === 'show_date') mappedData[m.header] = date
+            else mappedData[m.header] = ''
+          }
+        })
+      }
+
+      const payload = {
+        ...showData,
         spreadsheet_name: currentSpreadsheetName,
         spreadsheetName: currentSpreadsheetName,
         headers: headersArray,
         headerList: headersArray,
         mapping: profile?.global_export_mapping || null,
-        mappingList: profile?.global_export_mapping || null,
+        mapped_data: mappedData, // Explicitly mapped data for n8n
+        shows: [mappedData], // Also send as a one-item array for consistency
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
