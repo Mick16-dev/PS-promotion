@@ -240,31 +240,23 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         })
       }
 
-      // THE FIX: Pre-map the single show to match the headers
-      const mappedShow: Record<string, any> = {}
-      if (profile?.global_export_mapping) {
-        (profile.global_export_mapping as any[]).forEach(m => {
-          let value = ''
-          if (m.source === 'custom') value = m.customValue
-          else if (m.source === 'artist_name') value = artistName
-          else if (m.source === 'venue_name') value = venue
-          else if (m.source === 'show_date') value = date
-          else if (m.source === 'city') value = city
-          
-          mappedShow[m.header] = value || ''
-        })
+      // RESTORE APRIL 28th LOGIC: Use short keys for single show
+      const mappedShow = {
+        artist: artistName,
+        venue: venue,
+        date: showDate,
+        city: city,
+        show_id: show_id
       }
 
       const payload = {
-        show_id,
+        ...mappedShow,
         user_id: userId,
         access_token: access_token,
         spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
-        spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
         headers: headersArray,
         mapping: profile?.global_export_mapping || null,
-        shows: [mappedShow], // Send as the primary data source
-        ...mappedShow,       // Also spread at top level for single-row nodes
+        shows: [mappedShow], 
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
