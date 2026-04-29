@@ -39,6 +39,14 @@ interface UniversalSyncModalProps {
   selectedShowIds?: string[]
 }
 
+type ExportMapping = {
+  id: string
+  source: string
+  header: string
+}
+
+type ShowRow = Record<string, unknown>
+
 const SOURCE_FIELDS = [
   { value: 'artist_name', label: 'Artist Name' },
   { value: 'venue_name', label: 'Venue / Location' },
@@ -62,7 +70,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   // New Customizable State
   const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
   const [sheetName, setSheetName] = useState('Active Shows')
-  const [mappings, setMappings] = useState<any[]>([
+  const [mappings, setMappings] = useState<ExportMapping[]>([
     { id: '1', source: 'artist_name', header: 'Artist' },
     { id: '2', source: 'show_date', header: 'Date' },
     { id: '3', source: 'venue_name', header: 'Venue' },
@@ -120,8 +128,39 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
     setMappings(mappings.filter(m => m.id !== id))
   }
 
-  const updateMapping = (id: string, updates: any) => {
+  const updateMapping = (id: string, updates: Partial<ExportMapping>) => {
     setMappings(mappings.map(m => m.id === id ? { ...m, ...updates } : m))
+  }
+
+  const resolveMappedValue = (show: ShowRow, source: string) => {
+    switch (source) {
+      case 'artist_name':
+        return String(show.artist_name ?? show.artist ?? '')
+      case 'venue_name':
+        return String(show.venue_name ?? show.venue ?? '')
+      case 'show_date':
+        return String(show.show_date ?? show.date ?? '')
+      case 'city':
+        return String(show.city ?? '')
+      case 'show_time':
+        return String(show.show_time ?? '')
+      case 'load_in_time':
+        return String(show.load_in_time ?? '')
+      case 'soundcheck_time':
+        return String(show.soundcheck_time ?? '')
+      case 'deal_guarantee':
+        return String(show.deal_guarantee ?? '')
+      case 'deal_type':
+        return String(show.deal_type ?? '')
+      case 'portal_url':
+        return String(show.portal_url ?? '')
+      case 'status':
+        return String(show.status ?? '')
+      case 'custom':
+        return ''
+      default:
+        return String(show[source] ?? '')
+    }
   }
 
   const handleSync = async () => {
@@ -160,17 +199,35 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         console.error('TOKEN_REFRESH_FAILED:', err)
       }
 
-      // 3. RESTORE APRIL 28th LOGIC: Map to short keys (artist, venue, date)
-      // This matches what the n8n workflow was originally built for
-      const mappedShows = shows.map(show => ({
-        artist: show.artist_name || show.artist || '',
-        venue: show.venue_name || show.venue || '',
-        date: show.show_date || show.date || '',
-        city: show.city || '',
-        id: show.id
+      const sanitizedMappings = mappings
+        .map((m) => ({
+          ...m,
+          header: String(m.header || '').trim(),
+        }))
+        .filter((m) => m.header.length > 0)
+
+      if (sanitizedMappings.length === 0) {
+        throw new Error('Add at least one mapped header before syncing.')
+      }
+
+      const mappedRows = (shows || []).map((show: ShowRow) => {
+        const row: Record<string, string> = {}
+        for (const mapping of sanitizedMappings) {
+          row[mapping.header] = resolveMappedValue(show, mapping.source)
+        }
+        return row
+      })
+
+      // Keep legacy short keys for backwards compatibility in n8n branches.
+      const legacyRows = (shows || []).map((show: ShowRow) => ({
+        artist: String(show.artist_name ?? show.artist ?? ''),
+        venue: String(show.venue_name ?? show.venue ?? ''),
+        date: String(show.show_date ?? show.date ?? ''),
+        city: String(show.city ?? ''),
+        id: String(show.id ?? ''),
       }))
 
-      const headersArray = mappings.map(m => m.header)
+      const headersArray = sanitizedMappings.map((m) => m.header)
 
       // 4. Trigger n8n with original short-key structure
       const response = await fetch('/api/n8n/universal-sync', {
@@ -182,9 +239,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           headers: headersArray,
-          mapping: mappings,
-          rows: mappedShows, // Standard n8n key
-          shows: mappedShows, // Fallback
+          mapping: sanitizedMappings,
+          rows: mappedRows,
+          shows: mappedRows,
+          legacy_rows: legacyRows,
           timestamp: new Date().toISOString()
         })
       })

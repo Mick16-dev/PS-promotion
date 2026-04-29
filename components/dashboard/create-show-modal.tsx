@@ -231,17 +231,38 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         .eq('id', userId)
         .single()
 
-      const headersArray = (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || []
-      
-      const legacyMapping: Record<string, string> = {}
-      if (profile?.global_export_mapping) {
-        (profile.global_export_mapping as any[]).forEach(m => {
-          legacyMapping[m.source] = m.header
-        })
+      const rawMappings = Array.isArray(profile?.global_export_mapping)
+        ? (profile.global_export_mapping as Array<{ source?: string; header?: string }>)
+        : []
+      const sanitizedMappings = rawMappings
+        .map((m) => ({
+          source: String(m?.source || '').trim(),
+          header: String(m?.header || '').trim(),
+        }))
+        .filter((m) => m.source.length > 0 && m.header.length > 0)
+      const headersArray = sanitizedMappings.map((m) => m.header)
+
+      const sourceValues: Record<string, string> = {
+        artist_name: artistName,
+        venue_name: venue,
+        show_date: showDate,
+        city,
+        show_time: showTime,
+        load_in_time: loadInTime,
+        soundcheck_time: soundcheckTime,
+        deal_guarantee: String(dealGuarantee ?? ''),
+        deal_type: dealType,
+        portal_url: primaryPortalUrl,
+        status: 'pending',
       }
 
-      // RESTORE APRIL 28th LOGIC: Use short keys for single show
-      const mappedShow = {
+      const mappedShowByHeaders = sanitizedMappings.reduce<Record<string, string>>((acc, mapping) => {
+        acc[mapping.header] = sourceValues[mapping.source] ?? ''
+        return acc
+      }, {})
+
+      // Keep legacy short keys for backwards compatibility in n8n branches.
+      const mappedShowLegacy = {
         artist: artistName,
         venue: venue,
         date: showDate,
@@ -250,15 +271,16 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       }
 
       const payload = {
-        ...mappedShow,
+        ...mappedShowLegacy,
         user_id: userId,
         access_token: access_token,
         spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
         spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
         headers: headersArray,
-        mapping: profile?.global_export_mapping || null,
-        rows: [mappedShow], 
-        shows: [mappedShow], 
+        mapping: sanitizedMappings,
+        rows: Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy],
+        shows: Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy],
+        legacy_rows: [mappedShowLegacy],
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
