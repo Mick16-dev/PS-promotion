@@ -1,18 +1,6 @@
 import { NextResponse } from 'next/server'
-import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
-
-const showSchema = z.object({
-  show_id: z.string().uuid(),
-  user_id: z.string().uuid(),
-  show_name: z.string().min(1),
-  artist_name: z.string().min(1),
-  artist_email: z.string().email(),
-  spreadsheet_name: z.string().optional(),
-  headers: z.array(z.string()).optional(),
-  mapping: z.any().optional()
-}).passthrough()
 
 export async function POST(request: Request) {
   const webhookUrl =
@@ -27,29 +15,18 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: unknown
+  let payload: any
   try {
-    body = await request.json()
+    payload = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
   }
-
-  const result = showSchema.safeParse(body)
-  if (!result.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: result.error.format() },
-      { status: 400 }
-    )
-  }
-
-  const payload = result.data
 
   try {
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      // Avoid caching webhook responses in edge/server environments.
       cache: 'no-store',
     })
 
@@ -70,4 +47,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

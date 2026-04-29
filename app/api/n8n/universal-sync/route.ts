@@ -1,20 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
-
-// Strict schema for the sync payload
-const syncSchema = z.object({
-  user_id: z.string().uuid(),
-  spreadsheet_name: z.string().min(1).max(100),
-  sheet_name: z.string().min(1).max(50),
-  mode: z.string().optional(),
-  headers: z.array(z.string()).optional(),
-  mapping: z.any().optional(),
-  shows: z.array(z.any()).min(1),
-  timestamp: z.string().optional()
-}).passthrough()
 
 export async function POST(request: Request) {
   // Create a service-role client to fetch integration tokens securely
@@ -31,23 +18,13 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: unknown
+  let payload: any
   try {
-    body = await request.json()
+    payload = await request.json()
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid JSON body.' }, { status: 400 })
   }
 
-  // Validate payload
-  const result = syncSchema.safeParse(body)
-  if (!result.success) {
-    return NextResponse.json(
-      { success: false, error: 'Invalid payload structure.', details: result.error.format() },
-      { status: 400 }
-    )
-  }
-
-  const payload = result.data
   const { user_id } = payload
 
   try {
@@ -65,8 +42,7 @@ export async function POST(request: Request) {
 
     let accessToken = integration.access_token
 
-    // 2. Check if token needs refreshing (Simplified check: if it fails, we'll try to refresh)
-    // In a real app, you'd check 'expires_at'. Here we'll ensure we have a fresh one if possible.
+    // 2. Check if token needs refreshing
     if (integration.refresh_token) {
       try {
         const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -83,7 +59,6 @@ export async function POST(request: Request) {
         const refreshData = await refreshResponse.json()
         if (refreshData.access_token) {
           accessToken = refreshData.access_token
-          // Update the database with the new token
           await supabaseAdmin
             .from('user_integrations')
             .update({ 
@@ -103,7 +78,7 @@ export async function POST(request: Request) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...payload,
-        access_token: accessToken // Send the fresh token to n8n
+        access_token: accessToken
       }),
       cache: 'no-store',
     })
