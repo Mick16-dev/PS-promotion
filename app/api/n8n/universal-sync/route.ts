@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+const syncSchema = z.object({
+  user_id: z.string().uuid(),
+  spreadsheet_name: z.string().min(1),
+  sheet_name: z.string().min(1),
+}).passthrough()
 
 export async function POST(request: Request) {
   // Create a service-role client to fetch integration tokens securely
@@ -18,14 +25,23 @@ export async function POST(request: Request) {
     )
   }
 
-  let payload: any
+  let body: any
   try {
-    payload = await request.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid JSON body.' }, { status: 400 })
   }
 
-  const { user_id } = payload
+  // Validate but do NOT use the 'result.data' to avoid field stripping
+  const result = syncSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { success: false, error: 'Security Validation Failed', details: result.error.format() },
+      { status: 400 }
+    )
+  }
+
+  const { user_id } = body
 
   try {
     // 1. Fetch the promoter's Google Integration
@@ -77,7 +93,7 @@ export async function POST(request: Request) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ...payload,
+        ...body,
         access_token: accessToken
       }),
       cache: 'no-store',
