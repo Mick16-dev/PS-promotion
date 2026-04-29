@@ -71,11 +71,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   
   const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
   const [sheetName, setSheetName] = useState('Active Shows')
+  const [exportMode, setExportMode] = useState<'standard' | 'transposed'>('standard')
   const [mappings, setMappings] = useState<ExportMapping[]>([
-    { id: '1', source: 'artist_name', header: 'Artist' },
-    { id: '2', source: 'show_date', header: 'Date' },
-    { id: '3', source: 'venue_name', header: 'Venue' },
-    { id: '4', source: 'deal_guarantee', header: 'Fee' },
+    { id: '1', source: 'artist_name', header: '' },
+    { id: '2', source: 'show_date', header: '' },
+    { id: '3', source: 'venue_name', header: '' },
+    { id: '4', source: 'deal_guarantee', header: '' },
   ])
 
   useEffect(() => {
@@ -235,12 +236,46 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         throw new Error('Add at least one mapped header before syncing.')
       }
 
-      const headersArray = sanitizedMappings.map((m) => m.header)
-      const dataRows = (shows || []).map((show: ShowRow) => {
-        return sanitizedMappings.map(m => resolveMappedValue(show, m.source))
+      const headersArray = sanitizedMappings.map((m) => {
+        // The Header is now the Label from the Dropdown (the "Left Section")
+        return SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
       })
       
-      const spreadsheet_values = [headersArray, ...dataRows]
+      let spreadsheet_values: any[][] = []
+      let mappedData: any[] = []
+
+      if (exportMode === 'transposed') {
+        // TRANSPOSED: Headers in Column A
+        spreadsheet_values = sanitizedMappings.map(m => {
+          const header = SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
+          const row = [header]
+          shows.forEach((show: any) => {
+            // If the user typed something in the "header" box, it's actually a static value
+            const value = m.header && m.header !== 'New Column' ? m.header : resolveMappedValue(show, m.source)
+            row.push(value)
+          })
+          return row
+        })
+        mappedData = spreadsheet_values
+      } else {
+        // STANDARD: Headers in Row 1
+        const dataRows = (shows || []).map((show: ShowRow) => {
+          return sanitizedMappings.map(m => {
+            // If the user typed something in the right box, use it as a static value
+            return m.header && m.header !== 'New Column' ? m.header : resolveMappedValue(show, m.source)
+          })
+        })
+        spreadsheet_values = [headersArray, ...dataRows]
+        
+        mappedData = (shows || []).map((show: ShowRow, idx: number) => {
+          const row: Record<string, any> = {}
+          sanitizedMappings.forEach((m, i) => {
+            const header = headersArray[i]
+            row[header] = dataRows[idx][i]
+          })
+          return row
+        })
+      }
 
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
@@ -249,12 +284,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           user_id: user?.id,
           access_token: integration?.access_token || null,
           mode: 'universal_bulk_export',
+          export_layout: exportMode,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mapping: sanitizedMappings,
           header_row: headersArray,
-          data_rows: dataRows,
           spreadsheet_values: spreadsheet_values,
+          mapped_data: mappedData,
           shows: shows,
           timestamp: new Date().toISOString()
         })
@@ -313,7 +348,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           ) : (
             <>
               {/* CONFIGURATION HEADER */}
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Spreadsheet Name</Label>
                   <Input 
@@ -331,6 +366,18 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                     className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all placeholder:text-zinc-700"
                     placeholder="e.g. Active Shows"
                   />
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Export Layout</Label>
+                  <Select value={exportMode} onValueChange={(val: any) => setExportMode(val)}>
+                    <SelectTrigger className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#050607] border-white/10 text-white">
+                      <SelectItem value="standard" className="font-bold">List (Rows)</SelectItem>
+                      <SelectItem value="transposed" className="font-bold">Production Sheet (Columns)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -381,7 +428,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           <Input 
                             value={m.header}
                             onChange={(e) => updateMapping(m.id, { header: e.target.value })}
-                            placeholder="Type Column Title..."
+                            placeholder="Optional: Static Value Override"
                             className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
                           />
                         </div>
