@@ -23,6 +23,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp'
+import { Loader2, ShieldCheck } from 'lucide-react'
 
 const settingsTabs = [
   { id: 'profile', name: 'Profile', icon: User },
@@ -100,7 +106,7 @@ export default function SettingsPage() {
   const handleConnectGoogle = async () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     const redirectUri = `${window.location.origin}/api/auth/google/callback`
-    const scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/calendar'
+    const scope = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/gmail.send'
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`
     window.location.href = authUrl
   }
@@ -202,13 +208,18 @@ export default function SettingsPage() {
               <div className="space-y-12 animate-in slide-in-from-right-4 fade-in duration-500">
                 <div className="flex items-center gap-5 border-b border-white/5 pb-8">
                   <div className="h-16 w-16 rounded-3xl bg-primary/10 flex items-center justify-center text-primary"><Settings size={32} /></div>
-                  <h3 className="text-3xl font-black uppercase tracking-tighter italic text-white">Account</h3>
+                  <h3 className="text-3xl font-black uppercase tracking-tighter italic text-white">Account Security</h3>
                 </div>
-                <div className="space-y-10 max-w-xl">
-                  <div className="space-y-6">
-                    <h4 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-3"><Lock size={16} className="text-primary" /> Security</h4>
+                
+                <div className="space-y-10 max-w-2xl">
+                  {/* Two-Factor Authentication Section */}
+                  <MfaManager />
+
+                  <div className="pt-10 border-t border-white/5 space-y-6">
+                    <h4 className="text-sm font-black uppercase tracking-widest text-white flex items-center gap-3"><Lock size={16} className="text-primary" /> Password</h4>
                     <Button variant="outline" className="h-12 px-8 rounded-xl text-xs font-bold" onClick={() => toast.info('Password reset email sent.')}>Reset Password</Button>
                   </div>
+
                   <div className="pt-10 border-t border-red-500/20 space-y-6">
                     <h4 className="text-sm font-black uppercase tracking-widest text-red-500 flex items-center gap-3"><ShieldAlert size={16} /> Danger Zone</h4>
                     <Button className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white h-14 px-8 rounded-2xl border border-red-500/20 font-bold" onClick={() => toast.error('Contact support to delete account.')}>Delete Account</Button>
@@ -219,6 +230,158 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function MfaManager() {
+  const [factors, setFactors] = useState<any[]>([])
+  const [isEnrolling, setIsEnrolling] = useState(false)
+  const [enrollData, setEnrollData] = useState<any>(null)
+  const [otp, setOtp] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+
+  const loadFactors = async () => {
+    const { data, error } = await supabase.auth.mfa.listFactors()
+    if (data) setFactors(data.totp || [])
+  }
+
+  useEffect(() => {
+    loadFactors()
+  }, [])
+
+  const startEnrollment = async () => {
+    setIsEnrolling(true)
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp'
+      })
+      if (error) throw error
+      setEnrollData(data)
+    } catch (err: any) {
+      toast.error('MFA Error', { description: err.message })
+      setIsEnrolling(false)
+    }
+  }
+
+  const verifyEnrollment = async () => {
+    if (!enrollData || otp.length < 6) return
+    setIsVerifying(true)
+    try {
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: enrollData.id
+      })
+      if (challengeError) throw challengeError
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: enrollData.id,
+        challengeId: challenge.id,
+        code: otp
+      })
+      if (verifyError) throw verifyError
+
+      toast.success('2FA Enabled', { description: 'Your account is now protected.' })
+      setEnrollData(null)
+      setIsEnrolling(false)
+      loadFactors()
+    } catch (err: any) {
+      toast.error('Verification Failed', { description: err.message })
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
+  const unenroll = async (factorId: string) => {
+    if (!confirm('Disable 2FA? This will make your account less secure.')) return
+    try {
+      const { error } = await supabase.auth.mfa.unenroll({ factorId })
+      if (error) throw error
+      toast.success('2FA Disabled')
+      loadFactors()
+    } catch (err: any) {
+      toast.error('Error', { description: err.message })
+    }
+  }
+
+  const isEnabled = factors.length > 0
+
+  return (
+    <div className="bg-black/20 border border-white/5 rounded-[2.5rem] p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${isEnabled ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary/10 text-primary'}`}>
+            <ShieldCheck size={24} />
+          </div>
+          <div>
+            <h4 className="text-xl font-bold text-white">Two-Factor Auth</h4>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest pt-1">
+              {isEnabled ? 'Active Protection' : 'Disabled'}
+            </p>
+          </div>
+        </div>
+        {isEnabled && (
+          <Button variant="ghost" onClick={() => unenroll(factors[0].id)} className="text-red-500 text-xs font-bold hover:bg-red-500/10 rounded-xl">
+            Disable
+          </Button>
+        )}
+      </div>
+
+      {!isEnabled && !isEnrolling && (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Secure your account by requiring a code from your authenticator app (like Google Authenticator) every time you sign in.
+          </p>
+          <Button onClick={startEnrollment} className="bg-primary text-white h-12 px-8 rounded-xl font-bold uppercase tracking-widest text-xs">
+            Enable 2FA
+          </Button>
+        </div>
+      )}
+
+      {isEnrolling && enrollData && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex flex-col md:flex-row gap-8 items-center bg-white/5 p-8 rounded-3xl border border-white/10">
+            <div className="bg-white p-4 rounded-2xl shadow-2xl shrink-0">
+              <img src={enrollData.totp.qr_code} alt="MFA QR Code" className="w-40 h-40" />
+            </div>
+            <div className="space-y-4 flex-1">
+              <h5 className="font-bold text-white text-lg">Scan this QR Code</h5>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Open your authenticator app and scan the code. If you can't scan, use this manual key:
+              </p>
+              <div className="bg-black/40 p-3 rounded-xl border border-white/10 font-mono text-xs text-primary break-all">
+                {enrollData.totp.secret}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <Label className="text-xs font-bold text-white uppercase tracking-widest ml-1 text-center block">Verify Setup</Label>
+            <div className="flex justify-center">
+              <InputOTP maxLength={6} value={otp} onChange={setOtp} onComplete={verifyEnrollment}>
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={1} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={2} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                </InputOTPGroup>
+                <div className="w-2" />
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={3} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={4} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={5} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={verifyEnrollment} disabled={isVerifying || otp.length < 6} className="flex-1 bg-primary text-white h-12 rounded-xl font-bold uppercase tracking-widest text-xs">
+                {isVerifying ? <Loader2 size={16} className="animate-spin" /> : 'Confirm & Activate'}
+              </Button>
+              <Button variant="ghost" onClick={() => { setIsEnrolling(false); setEnrollData(null); }} className="h-12 rounded-xl font-bold uppercase tracking-widest text-xs">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

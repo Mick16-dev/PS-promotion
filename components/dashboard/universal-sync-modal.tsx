@@ -6,20 +6,29 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogDescription,
+  DialogDescription, 
   DialogFooter 
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { 
-  Table, 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { 
+  Table as TableIcon, 
   Zap, 
   Loader2, 
   AlertCircle,
-  ChevronDown,
+  ChevronRight,
+  ArrowRight,
   Plus,
   Trash2,
   GripVertical,
-  ArrowRight,
   Layout
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -32,17 +41,27 @@ interface UniversalSyncModalProps {
   selectedShowIds?: string[]
 }
 
-const FIELD_OPTIONS = [
+type ExportMapping = {
+  id: string
+  source: string
+  header: string
+}
+
+type ShowRow = Record<string, unknown>
+
+const SOURCE_FIELDS = [
   { value: 'artist_name', label: 'Artist Name' },
-  { value: 'show_date', label: 'Show Date' },
   { value: 'venue_name', label: 'Venue / Location' },
+  { value: 'show_date', label: 'Show Date' },
   { value: 'city', label: 'City' },
+  { value: 'show_time', label: 'Performance Time' },
+  { value: 'load_in_time', label: 'Load In' },
+  { value: 'soundcheck_time', label: 'Soundcheck' },
   { value: 'deal_guarantee', label: 'Guarantee ($)' },
   { value: 'deal_type', label: 'Deal Type' },
-  { value: 'capacity', label: 'Capacity' },
-  { value: 'ticket_price', label: 'Ticket Price' },
-  { value: 'status', label: 'Status' },
-  { value: 'notes', label: 'Notes' },
+  { value: 'portal_url', label: 'Artist Portal Link' },
+  { value: 'status', label: 'Engagement Status' },
+  { value: 'custom', label: 'Static / Custom Value' },
 ]
 
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
@@ -52,11 +71,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   
   const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
   const [sheetName, setSheetName] = useState('Active Shows')
-  const [mappings, setMappings] = useState<any[]>([
-    { id: '1', field: 'artist_name', header: 'Artist' },
-    { id: '2', field: 'show_date', header: 'Date' },
-    { id: '3', field: 'venue_name', header: 'Venue' },
-    { id: '4', field: 'deal_guarantee', header: 'Fee' },
+  const [mappings, setMappings] = useState<ExportMapping[]>([
+    { id: '1', source: 'artist_name', header: 'Artist' },
+    { id: '2', source: 'show_date', header: 'Date' },
+    { id: '3', source: 'venue_name', header: 'Venue' },
+    { id: '4', source: 'deal_guarantee', header: 'Fee' },
   ])
 
   useEffect(() => {
@@ -96,19 +115,66 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   }, [isOpen])
 
   const addColumn = () => {
-    const newId = Math.random().toString(36).substr(2, 9)
-    setMappings([...mappings, { id: newId, field: 'artist_name', header: 'New Column' }])
+    const newId = Math.random().toString(36).substring(2, 9)
+    setMappings([...mappings, { id: newId, source: 'artist_name', header: 'New Column' }])
   }
 
   const removeColumn = (id: string) => {
     setMappings(mappings.filter(m => m.id !== id))
   }
 
-  const updateMapping = (id: string, updates: any) => {
+  const updateMapping = (id: string, updates: Partial<ExportMapping>) => {
     setMappings(mappings.map(m => m.id === id ? { ...m, ...updates } : m))
   }
 
+  const resolveMappedValue = (show: ShowRow, source: string) => {
+    const portalFallbackFromToken = (): string => {
+      const raw = show.portal_token
+      const token = typeof raw === 'string' || typeof raw === 'number' ? String(raw).trim() : ''
+      if (!token) return ''
+      const base = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '')
+      return `${base}/?token=${encodeURIComponent(token)}`
+    }
+
+    switch (source) {
+      case 'artist_name':
+        return String(show.artist_name ?? show.artist ?? '')
+      case 'venue_name':
+        return String(show.venue_name ?? show.venue ?? '')
+      case 'show_date':
+        const dateVal = show.show_date ?? show.date
+        return dateVal ? new Date(String(dateVal)).toLocaleDateString() : ''
+      case 'city':
+        return String(show.city ?? '')
+      case 'show_time':
+        return String(show.show_time ?? '')
+      case 'load_in_time':
+        return String(show.load_in_time ?? '')
+      case 'soundcheck_time':
+        return String(show.soundcheck_time ?? '')
+      case 'deal_guarantee':
+        return show.deal_guarantee ? `$${Number(show.deal_guarantee).toLocaleString()}` : ''
+      case 'deal_type':
+        return String(show.deal_type ?? '')
+      case 'portal_url': {
+        const direct = String(show.portal_url ?? '').trim()
+        return direct || portalFallbackFromToken()
+      }
+      case 'status':
+        return String(show.status ?? '')
+      case 'custom':
+        return ''
+      default:
+        return String(show[source] ?? '')
+    }
+  }
+
   const handleSync = async () => {
+    if (!spreadsheetName) {
+      toast.error('Please name your spreadsheet.')
+      return
+    }
+
     setIsSyncing(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -134,18 +200,23 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         .eq('provider', 'google')
         .maybeSingle()
 
-      // 3. Prepare explicit rows for n8n to avoid overwriting or mapping issues
-      const headerRow = mappings.map(m => m.header)
-      const dataRows = shows.map((show: any) => {
-        return mappings.map(m => {
-          const value = show[m.field]
-          // Format dates for better spreadsheet readability
-          if (m.field === 'show_date' && value) {
-            return new Date(value).toLocaleDateString()
-          }
-          return value || ''
-        })
+      const sanitizedMappings = mappings
+        .map((m) => ({
+          ...m,
+          header: String(m.header || '').trim(),
+        }))
+        .filter((m) => m.header.length > 0)
+
+      if (sanitizedMappings.length === 0) {
+        throw new Error('Add at least one mapped header before syncing.')
+      }
+
+      const headersArray = sanitizedMappings.map((m) => m.header)
+      const dataRows = (shows || []).map((show: ShowRow) => {
+        return sanitizedMappings.map(m => resolveMappedValue(show, m.source))
       })
+      
+      const spreadsheet_values = [headersArray, ...dataRows]
 
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
@@ -156,9 +227,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           mode: 'universal_bulk_export',
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mapping: mappings,
-          header_row: headerRow,
+          mapping: sanitizedMappings,
+          header_row: headersArray,
           data_rows: dataRows,
+          spreadsheet_values: spreadsheet_values,
           shows: shows,
           timestamp: new Date().toISOString()
         })
@@ -180,8 +252,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[700px] bg-[#050607] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
-        <div className="p-10 pb-6">
+      <DialogContent className="sm:max-w-[700px] bg-[#050607] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="p-10 pb-6 shrink-0">
           <DialogHeader>
             <div className="flex items-center gap-4 mb-4">
               <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(20,184,166,0.15)]">
@@ -197,94 +269,115 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           </DialogHeader>
         </div>
 
-        <div className="px-10 py-6 space-y-10 max-h-[60vh] overflow-y-auto no-scrollbar">
-          {/* CONFIGURATION HEADER */}
-          <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block">Spreadsheet Name</label>
-              <input 
-                value={spreadsheetName}
-                onChange={(e) => setSpreadsheetName(e.target.value)}
-                className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all placeholder:text-zinc-700"
-                placeholder="e.g. Master Production Roster"
-              />
+        <div className="flex-1 overflow-y-auto px-10 py-6 space-y-10 custom-scrollbar">
+          {!isGoogleConnected ? (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-[2rem] p-8 space-y-4">
+               <div className="flex items-center gap-3 text-amber-500">
+                  <AlertCircle size={24} />
+                  <h4 className="font-black uppercase tracking-tight text-lg">Google Offline</h4>
+               </div>
+               <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                 Your Google account is not connected. Connect it in Settings to enable direct spreadsheet sync.
+               </p>
+               <Button 
+                 onClick={() => { onClose(); window.location.href = '/settings' }}
+                 className="bg-amber-500 text-black font-black text-xs uppercase tracking-widest h-12 px-8 rounded-xl hover:bg-amber-400"
+               >
+                 Connect Now <ChevronRight size={16} />
+               </Button>
             </div>
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block">Sheet / Tab Name</label>
-              <input 
-                value={sheetName}
-                onChange={(e) => setSheetName(e.target.value)}
-                className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all placeholder:text-zinc-700"
-                placeholder="e.g. Active Shows"
-              />
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* CONFIGURATION HEADER */}
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Spreadsheet Name</Label>
+                  <Input 
+                    value={spreadsheetName}
+                    onChange={(e) => setSpreadsheetName(e.target.value)}
+                    className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all placeholder:text-zinc-700"
+                    placeholder="e.g. Master Production Roster"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Sheet / Tab Name</Label>
+                  <Input 
+                    value={sheetName}
+                    onChange={(e) => setSheetName(e.target.value)}
+                    className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all placeholder:text-zinc-700"
+                    placeholder="e.g. Active Shows"
+                  />
+                </div>
+              </div>
 
-          {/* MAPPING SECTION */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
-              <h3 className="text-lg font-black uppercase italic tracking-tighter text-white">Column Mapping</h3>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={addColumn}
-                className="h-9 px-4 border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary/10 transition-all gap-2"
-              >
-                <Plus size={14} /> Add Column
-              </Button>
-            </div>
-
-            <Reorder.Group axis="y" values={mappings} onReorder={setMappings} className="space-y-3">
-              <AnimatePresence mode="popLayout">
-                {mappings.map((m) => (
-                  <Reorder.Item 
-                    key={m.id} 
-                    value={m}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-2xl group hover:border-white/10 transition-all"
+              {/* MAPPING SECTION */}
+              <div className="space-y-6 pb-6">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <h3 className="text-lg font-black uppercase italic tracking-tighter text-white">Column Mapping</h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addColumn}
+                    className="h-9 px-4 border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary/10 transition-all gap-2"
                   >
-                    <div className="cursor-grab active:cursor-grabbing text-zinc-700 group-hover:text-zinc-500 transition-colors">
-                      <GripVertical size={20} />
-                    </div>
+                    <Plus size={14} /> Add Column
+                  </Button>
+                </div>
 
-                    <div className="flex-1 grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <select 
-                          value={m.field}
-                          onChange={(e) => updateMapping(m.id, { field: e.target.value })}
-                          className="w-full h-12 bg-black/40 border border-white/10 rounded-xl px-4 pr-10 text-xs font-bold text-white appearance-none focus:outline-none focus:border-primary/40"
+                <Reorder.Group axis="y" values={mappings} onReorder={setMappings} className="space-y-3">
+                  <AnimatePresence mode="popLayout">
+                    {mappings.map((m) => (
+                      <Reorder.Item 
+                        key={m.id} 
+                        value={m}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-2xl group hover:border-white/10 transition-all shadow-lg"
+                      >
+                        <div className="cursor-grab active:cursor-grabbing text-zinc-700 group-hover:text-zinc-500 transition-colors">
+                          <GripVertical size={20} />
+                        </div>
+
+                        <div className="flex-1 grid grid-cols-2 gap-4">
+                          <Select 
+                            value={m.source} 
+                            onValueChange={(val) => updateMapping(m.id, { source: val })}
+                          >
+                            <SelectTrigger className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-xs text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#0F1118] border-white/10 text-white">
+                              {SOURCE_FIELDS.map(f => (
+                                <SelectItem key={f.value} value={f.value} className="font-bold text-xs hover:bg-primary/20">{f.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          <Input 
+                            value={m.header}
+                            onChange={(e) => updateMapping(m.id, { header: e.target.value })}
+                            placeholder="Column Title"
+                            className="w-full h-12 bg-black/60 border border-white/10 rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-primary/40 placeholder:text-zinc-800"
+                          />
+                        </div>
+
+                        <button 
+                          onClick={() => removeColumn(m.id)}
+                          className="h-10 w-10 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                         >
-                          {FIELD_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
-                      </div>
-
-                      <input 
-                        value={m.header}
-                        onChange={(e) => updateMapping(m.id, { header: e.target.value })}
-                        placeholder="Column Title"
-                        className="w-full h-12 bg-black/40 border border-white/10 rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-primary/40 placeholder:text-zinc-800"
-                      />
-                    </div>
-
-                    <button 
-                      onClick={() => removeColumn(m.id)}
-                      className="h-10 w-10 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </Reorder.Item>
-                ))}
-              </AnimatePresence>
-            </Reorder.Group>
-          </div>
+                          <Trash2 size={18} />
+                        </button>
+                      </Reorder.Item>
+                    ))}
+                  </AnimatePresence>
+                </Reorder.Group>
+              </div>
+            </>
+          )}
         </div>
 
-        <DialogFooter className="p-10 bg-black/40 border-t border-white/5 flex items-center justify-between">
+        <DialogFooter className="p-10 bg-black/40 border-t border-white/5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
              <div className={`h-2 w-2 rounded-full ${isGoogleConnected ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`} />
              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
@@ -299,9 +392,9 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             <Button 
               onClick={handleSync}
               disabled={!isGoogleConnected || isSyncing || isLoading}
-              className="bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/20 h-16 px-12 rounded-2xl font-black uppercase tracking-[0.2em] text-xs gap-3 active:scale-95 transition-all"
+              className="bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/20 h-16 px-12 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs gap-3 active:scale-95 transition-all"
             >
-              {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
+              {isSyncing ? <Loader2 size={18} className="animate-spin" /> : <TableIcon size={18} />}
               {isSyncing ? 'Synchronizing...' : 'Trigger Universal Sync'}
             </Button>
           </div>
@@ -310,4 +403,3 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
     </Dialog>
   )
 }
-

@@ -67,6 +67,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [artistComment, setArtistComment] = useState('')
   const [cateringNotes, setCateringNotes] = useState('')
   const [syncToCalendar, setSyncToCalendar] = useState(true)
+  const [syncToSpreadsheet, setSyncToSpreadsheet] = useState(false)
 
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -206,38 +207,109 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
-      // Fetch promoter's Google access token so n8n can create the calendar event on their behalf
-      const userId = (await supabase.auth.getUser()).data.user?.id
-      const { data: integration } = await supabase
-        .from('user_integrations')
-        .select('access_token')
-        .eq('user_id', userId)
-        .eq('provider', 'google')
-        .maybeSingle()
+
+      // Fetch a FRESH Google access token via the refresh endpoint.
+      // This auto-refreshes the token if it has expired (tokens expire ~1 hour).
+      let access_token: string | null = null
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          access_token = refreshData.access_token ?? null
+        }
+      } catch {
+        // Non-fatal — calendar creation will be skipped in n8n if token is missing
+      }
+
+      const { data: { user } } = await supabase.auth.getUser()
+      const userId = user?.id
+
+      // Fetch promoter's mapping preferences
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('global_export_mapping, last_spreadsheet_name')
+        .eq('id', userId)
+        .single()
+
+      const rawMappings = Array.isArray(profile?.global_export_mapping)
+        ? (profile.global_export_mapping as Array<{ source?: string; header?: string }>)
+        : []
+      const sanitizedMappings = rawMappings
+        .map((m) => ({
+          source: String(m?.source || '').trim(),
+          header: String(m?.header || '').trim(),
+        }))
+        .filter((m) => m.source.length > 0 && m.header.length > 0)
+      const headersArray = sanitizedMappings.map((m) => m.header)
+
+      const sourceValues: Record<string, string> = {
+        artist_name: artistName,
+        venue_name: venue,
+        show_date: showDate,
+        city,
+        show_time: showTime,
+        load_in_time: loadInTime,
+        soundcheck_time: soundcheckTime,
+        deal_guarantee: String(dealGuarantee ?? ''),
+        deal_type: dealType,
+        portal_url: primaryPortalUrl,
+        status: 'pending',
+      }
+
+      // Keep legacy short keys for backwards compatibility in n8n branches.
+      const mappedShowLegacy = {
+        artist: artistName,
+        /** Alias expected by older n8n expressions (e.g. shows[0].artist_name). */
+        artist_name: artistName,
+        venue,
+        venue_name: venue,
+        date: showDate,
+        city: city,
+        show_id: show_id
+      }
+
+      const mappedShowByHeaders = sanitizedMappings.reduce<Record<string, string>>((acc, mapping) => {
+        acc[mapping.header] = sourceValues[mapping.source] ?? ''
+        return acc
+      }, {})
+      const rowsMapped = Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy]
+      const valueRows = rowsMapped.map((row) => headersArray.map((header) => row[header] ?? ''))
+      /** Google Sheets Append `values`: row 1 = headers, following rows = data (stable column order). */
+      const spreadsheet_values = headersArray.length ? [headersArray, ...valueRows] : []
 
       const payload = {
-        show_id,
+        ...mappedShowLegacy,
         user_id: userId,
-        access_token: integration?.access_token || null,
-        show_name: `${artistName} @ ${venue}`,
-        show_time: showTime || null,
-        show_end_time: showEndTime || null,
-        load_in_time: loadInTime || null,
-        soundcheck_time: soundcheckTime || null,
-        changeover_time: changeoverTime || null,
-        doors_time: doorsTime || null,
-        musicians_count: musiciansCount || 0,
-        host_name: hostName || null,
-        artist_epk_url: artistEpkUrl || null,
-        stageplot_url: stageplotUrl || null,
-        technical_notes: technicalNotes || null,
-        artist_comment: artistComment || null,
-        catering_notes: cateringNotes || null,
-        sync_to_calendar: syncToCalendar,
+        access_token: access_token,
+        spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
+        spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
+        headers: headersArray,
+        header_row: headersArray,
+        columns: headersArray,
+        column_order: headersArray,
+        mapping: sanitizedMappings,
+        rows: rowsMapped,
+        mapped_rows: rowsMapped,
+        value_rows: valueRows,
+        spreadsheet_values: spreadsheet_values,
+        spreadsheetValues: spreadsheet_values,
+        google_sheets_values: spreadsheet_values,
+        shows: [mappedShowLegacy],
+        legacy_rows: [mappedShowLegacy],
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,
-        artist_email: selectedArtist?.email || '',
+        artist_email: String(selectedArtist?.email || '').trim(),
+      }
+
+      if (!payload.artist_email || !payload.artist_email.includes('@')) {
+        toast.error('Invalid Email', { description: 'Please ensure the artist has a valid email address.' })
+        setIsSubmitting(false)
+        return
+      }
+
+      const payloadFinal = {
+        ...payload,
         venue,
         venue_name: venue,
         city,
@@ -253,11 +325,13 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         expenses: expenses
       };
 
+      console.log('--- N8N PAYLOAD DEBUG ---', payloadFinal);
+
       // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
       const response = await fetch('/api/n8n/create-show', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payloadFinal)
         })
 
       if(!response.ok) {
@@ -785,23 +859,45 @@ return (
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
-              <Checkbox
-                id="sync-calendar"
-                checked={syncToCalendar}
-                onCheckedChange={(checked) => setSyncToCalendar(checked as boolean)}
-                className="border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-5 w-5 rounded-md"
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="sync-calendar"
-                  className="text-xs font-bold text-white uppercase tracking-widest cursor-pointer flex items-center gap-2"
-                >
-                  Sync to Promoter Calendar
-                </label>
-                <p className="text-[10px] text-muted-foreground">
-                  Automatically create a booked event with this schedule and the artist portal link.
-                </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
+                <Checkbox
+                  id="sync-calendar"
+                  checked={syncToCalendar}
+                  onCheckedChange={(checked) => setSyncToCalendar(checked as boolean)}
+                  className="border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground h-5 w-5 rounded-md"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="sync-calendar"
+                    className="text-[10px] font-black text-white uppercase tracking-widest cursor-pointer"
+                  >
+                    Calendar Sync
+                  </label>
+                  <p className="text-[8px] text-muted-foreground">
+                    Add to G-Calendar
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 p-4 rounded-2xl bg-[#0F9D58]/5 border border-[#0F9D58]/20">
+                <Checkbox
+                  id="sync-spreadsheet"
+                  checked={syncToSpreadsheet}
+                  onCheckedChange={(checked) => setSyncToSpreadsheet(checked as boolean)}
+                  className="border-[#0F9D58]/40 data-[state=checked]:bg-[#0F9D58] data-[state=checked]:text-white h-5 w-5 rounded-md"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="sync-spreadsheet"
+                    className="text-[10px] font-black text-white uppercase tracking-widest cursor-pointer"
+                  >
+                    Spreadsheet Sync
+                  </label>
+                  <p className="text-[8px] text-muted-foreground">
+                    Sync to Master Sheet
+                  </p>
+                </div>
               </div>
             </div>
           </div>

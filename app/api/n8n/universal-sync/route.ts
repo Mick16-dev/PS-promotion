@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+const syncSchema = z.object({
+  user_id: z.string().uuid(),
+  spreadsheet_name: z.string().min(1),
+  sheet_name: z.string().min(1),
+}).passthrough()
 
 export async function POST(request: Request) {
   // Create a service-role client to fetch integration tokens securely
@@ -18,59 +25,59 @@ export async function POST(request: Request) {
     )
   }
 
-  let payload: any
+  let body: any
   try {
-    payload = await request.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid JSON body.' }, { status: 400 })
   }
 
-  const { user_id } = payload
+  const { user_id, access_token: frontendToken } = body
+  let accessToken = frontendToken
 
   try {
-    // 1. Fetch the promoter's Google Integration
-    const { data: integration, error: intError } = await supabaseAdmin
-      .from('user_integrations')
-      .select('*')
-      .eq('user_id', user_id)
-      .eq('provider', 'google')
-      .maybeSingle()
-    
-    if (!integration) {
-      return NextResponse.json({ success: false, error: 'Google account not connected.' }, { status: 400 })
-    }
+    if (!accessToken) {
+      const { data: integration, error: intError } = await supabaseAdmin
+        .from('user_integrations')
+        .select('*')
+        .eq('user_id', user_id)
+        .eq('provider', 'google')
+        .maybeSingle()
+      
+      if (!integration) {
+        return NextResponse.json({ success: false, error: 'Google account not connected.' }, { status: 400 })
+      }
 
-    let accessToken = integration.access_token
+      accessToken = integration.access_token
 
-    // 2. Check if token needs refreshing (Simplified check: if it fails, we'll try to refresh)
-    // In a real app, you'd check 'expires_at'. Here we'll ensure we have a fresh one if possible.
-    if (integration.refresh_token) {
-      try {
-        const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            client_id: process.env.GOOGLE_CLIENT_ID!,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-            refresh_token: integration.refresh_token,
-            grant_type: 'refresh_token',
-          }),
-        })
+      // 2. Check if token needs refreshing
+      if (integration.refresh_token) {
+        try {
+          const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              client_id: process.env.GOOGLE_CLIENT_ID!,
+              client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+              refresh_token: integration.refresh_token,
+              grant_type: 'refresh_token',
+            }),
+          })
 
-        const refreshData = await refreshResponse.json()
-        if (refreshData.access_token) {
-          accessToken = refreshData.access_token
-          // Update the database with the new token
-          await supabaseAdmin
-            .from('user_integrations')
-            .update({ 
-              access_token: accessToken,
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', integration.id)
+          const refreshData = await refreshResponse.json()
+          if (refreshData.access_token) {
+            accessToken = refreshData.access_token
+            await supabaseAdmin
+              .from('user_integrations')
+              .update({ 
+                access_token: accessToken,
+                updated_at: new Date().toISOString() 
+              })
+              .eq('id', integration.id)
+          }
+        } catch (err) {
+          console.error('TOKEN_REFRESH_FAILED:', err)
         }
-      } catch (err) {
-        console.error('TOKEN_REFRESH_FAILED:', err)
       }
     }
 
@@ -79,8 +86,8 @@ export async function POST(request: Request) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ...payload,
-        access_token: accessToken // Send the fresh token to n8n
+        ...body,
+        access_token: accessToken
       }),
       cache: 'no-store',
     })
@@ -94,7 +101,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: res.ok, ...data },
+      { success: res.ok, ...data, diagnostic_payload: body },
       { status: res.ok ? 200 : 502 }
     )
   } catch (e: any) {
