@@ -231,29 +231,40 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         .eq('id', userId)
         .single()
 
+      const headersArray = (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || []
+      
+      const legacyMapping: Record<string, string> = {}
+      if (profile?.global_export_mapping) {
+        (profile.global_export_mapping as any[]).forEach(m => {
+          legacyMapping[m.source] = m.header
+        })
+      }
+
+      // THE FIX: Pre-map the single show to match the headers
+      const mappedShow: Record<string, any> = {}
+      if (profile?.global_export_mapping) {
+        (profile.global_export_mapping as any[]).forEach(m => {
+          let value = ''
+          if (m.source === 'custom') value = m.customValue
+          else if (m.source === 'artist_name') value = artistName
+          else if (m.source === 'venue_name') value = venue
+          else if (m.source === 'show_date') value = date
+          else if (m.source === 'city') value = city
+          
+          mappedShow[m.header] = value || ''
+        })
+      }
+
       const payload = {
         show_id,
         user_id: userId,
         access_token: access_token,
-        show_name: `${artistName} @ ${venue}`,
-        show_time: showTime || null,
-        show_end_time: showEndTime || null,
-        load_in_time: loadInTime || null,
-        soundcheck_time: soundcheckTime || null,
-        changeover_time: changeoverTime || null,
-        doors_time: doorsTime || null,
-        musicians_count: musiciansCount || 0,
-        host_name: hostName || null,
-        artist_epk_url: artistEpkUrl || null,
-        stageplot_url: stageplotUrl || null,
-        technical_notes: technicalNotes || null,
-        artist_comment: artistComment || null,
-        catering_notes: cateringNotes || null,
-        sync_to_calendar: syncToCalendar,
-        sync_to_spreadsheet: syncToSpreadsheet,
         spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
-        headers: (profile?.global_export_mapping as any[])?.map((m: any) => m.header) || [],
+        spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
+        headers: headersArray,
         mapping: profile?.global_export_mapping || null,
+        shows: [mappedShow], // Send as the primary data source
+        ...mappedShow,       // Also spread at top level for single-row nodes
         status: 'pending',
         artist_id: selectedArtistId,
         artist_name: artistName,

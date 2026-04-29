@@ -160,9 +160,20 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         console.error('TOKEN_REFRESH_FAILED:', err)
       }
 
+      // 3. THE FIX: Transform the data keys to MATCH the header names
+      // This is what n8n needs to recognize the columns
+      const mappedShows = shows.map(show => {
+        const row: Record<string, any> = {}
+        mappings.forEach(m => {
+          const value = m.source === 'custom' ? m.customValue : show[m.source]
+          row[m.header] = value || ''
+        })
+        return row
+      })
+
       const headersArray = mappings.map(m => m.header)
 
-      // 4. Trigger n8n with original data structure
+      // 4. Trigger n8n with the transformed "Header-as-Key" structure
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -170,10 +181,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           user_id: user?.id,
           access_token: access_token,
           spreadsheet_name: spreadsheetName,
+          spreadsheetName: spreadsheetName,
           sheet_name: sheetName,
           headers: headersArray,
           mapping: mappings,
-          shows: shows, // Back to raw shows
+          shows: mappedShows, // Now the keys ARE the headers
           timestamp: new Date().toISOString()
         })
       })
