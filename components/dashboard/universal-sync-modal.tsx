@@ -224,15 +224,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         .eq('provider', 'google')
         .maybeSingle()
 
-      const sanitizedMappings = mappings
-        .map((m) => ({
-          ...m,
-          header: String(m.header || '').trim(),
-        }))
-        .filter((m) => m.header.length > 0)
+      const sanitizedMappings = mappings.filter((m) => m.source && m.source !== 'custom')
 
       if (sanitizedMappings.length === 0) {
-        throw new Error('Add at least one mapped header before syncing.')
+        throw new Error('Please select at least one field to export.')
       }
 
       const headersArray = sanitizedMappings.map((m) => {
