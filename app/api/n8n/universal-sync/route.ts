@@ -1,7 +1,24 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+// Strict schema for the sync payload
+const syncSchema = z.object({
+  user_id: z.string().uuid(),
+  spreadsheet_name: z.string().min(1).max(100),
+  sheet_name: z.string().min(1).max(50),
+  mode: z.enum(['universal_custom_export']),
+  headers: z.array(z.string()).optional(),
+  mapping: z.array(z.object({
+    id: z.string(),
+    source: z.string(),
+    header: z.string()
+  })),
+  shows: z.array(z.any()).min(1),
+  timestamp: z.string().datetime().optional()
+})
 
 export async function POST(request: Request) {
   // Create a service-role client to fetch integration tokens securely
@@ -18,13 +35,23 @@ export async function POST(request: Request) {
     )
   }
 
-  let payload: any
+  let body: unknown
   try {
-    payload = await request.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ success: false, error: 'Invalid JSON body.' }, { status: 400 })
   }
 
+  // Validate payload
+  const result = syncSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid payload structure.', details: result.error.format() },
+      { status: 400 }
+    )
+  }
+
+  const payload = result.data
   const { user_id } = payload
 
   try {
