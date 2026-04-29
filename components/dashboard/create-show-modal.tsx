@@ -256,13 +256,6 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         status: 'pending',
       }
 
-      const mappedShowByHeaders = sanitizedMappings.reduce<Record<string, string>>((acc, mapping) => {
-        acc[mapping.header] = sourceValues[mapping.source] ?? ''
-        return acc
-      }, {})
-      const rowsMapped = Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy]
-      const valueRows = rowsMapped.map((row) => headersArray.map((header) => row[header] ?? ''))
-
       // Keep legacy short keys for backwards compatibility in n8n branches.
       const mappedShowLegacy = {
         artist: artistName,
@@ -271,6 +264,15 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         city: city,
         show_id: show_id
       }
+
+      const mappedShowByHeaders = sanitizedMappings.reduce<Record<string, string>>((acc, mapping) => {
+        acc[mapping.header] = sourceValues[mapping.source] ?? ''
+        return acc
+      }, {})
+      const rowsMapped = Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy]
+      const valueRows = rowsMapped.map((row) => headersArray.map((header) => row[header] ?? ''))
+      /** Google Sheets Append `values`: row 1 = headers, following rows = data (stable column order). */
+      const spreadsheet_values = headersArray.length ? [headersArray, ...valueRows] : []
 
       const payload = {
         ...mappedShowLegacy,
@@ -281,10 +283,14 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         headers: headersArray,
         header_row: headersArray,
         columns: headersArray,
+        column_order: headersArray,
         mapping: sanitizedMappings,
         rows: rowsMapped,
         mapped_rows: rowsMapped,
         value_rows: valueRows,
+        spreadsheet_values: spreadsheet_values,
+        spreadsheetValues: spreadsheet_values,
+        google_sheets_values: spreadsheet_values,
         shows: [mappedShowLegacy],
         legacy_rows: [mappedShowLegacy],
         status: 'pending',

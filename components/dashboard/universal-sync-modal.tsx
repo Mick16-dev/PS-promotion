@@ -133,6 +133,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   }
 
   const resolveMappedValue = (show: ShowRow, source: string) => {
+    const portalFallbackFromToken = (): string => {
+      const raw = show.portal_token
+      const token = typeof raw === 'string' || typeof raw === 'number' ? String(raw).trim() : ''
+      if (!token) return ''
+      const base = (process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app').replace(/\/$/, '')
+      return `${base}/?token=${encodeURIComponent(token)}`
+    }
+
     switch (source) {
       case 'artist_name':
         return String(show.artist_name ?? show.artist ?? '')
@@ -152,8 +160,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         return String(show.deal_guarantee ?? '')
       case 'deal_type':
         return String(show.deal_type ?? '')
-      case 'portal_url':
-        return String(show.portal_url ?? '')
+      case 'portal_url': {
+        const direct = String(show.portal_url ?? '').trim()
+        return direct || portalFallbackFromToken()
+      }
       case 'status':
         return String(show.status ?? '')
       case 'custom':
@@ -229,6 +239,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
       const headersArray = sanitizedMappings.map((m) => m.header)
       const valueRows = mappedRows.map((row) => headersArray.map((header) => row[header] ?? ''))
+      /** Google Sheets Append `values`: row 1 = headers, following rows = data (stable column order). */
+      const spreadsheet_values = [headersArray, ...valueRows]
 
       // 4. Trigger n8n with original short-key structure
       const response = await fetch('/api/n8n/universal-sync', {
@@ -242,10 +254,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           headers: headersArray,
           header_row: headersArray,
           columns: headersArray,
+          column_order: headersArray,
           mapping: sanitizedMappings,
           rows: mappedRows,
           mapped_rows: mappedRows,
           value_rows: valueRows,
+          spreadsheet_values,
+          spreadsheetValues: spreadsheet_values,
+          google_sheets_values: spreadsheet_values,
           shows: legacyRows,
           legacy_rows: legacyRows,
           timestamp: new Date().toISOString()
