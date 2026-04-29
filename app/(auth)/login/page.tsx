@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [error, setError] = React.useState<string | null>(null)
   const [showMFA, setShowMFA] = React.useState(false)
   const [mfaFactorId, setMfaFactorId] = React.useState<string | null>(null)
+  const [mfaChallengeId, setMfaChallengeId] = React.useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = React.useState<number | null>(null)
   const [redirectedFrom, setRedirectedFrom] = React.useState<string>('/')
   const failedAttemptsRef = React.useRef(0)
@@ -100,6 +101,7 @@ export default function LoginPage() {
         
         if (challengeError) throw challengeError
         
+        setMfaChallengeId(challenge.id)
         setShowMFA(true)
         setIsLoading(false)
         return
@@ -126,11 +128,9 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // Find the active challenge or create a new one if needed
-      // Note: In Supabase, usually you just verify the code for the factor.
       const { data, error } = await supabase.auth.mfa.verify({
         factorId: mfaFactorId,
-        challengeId: (await supabase.auth.mfa.getAuthenticatorAssuranceLevel()).data?.nextLevelChallengeId || '',
+        challengeId: mfaChallengeId || '',
         code: otp
       })
 
