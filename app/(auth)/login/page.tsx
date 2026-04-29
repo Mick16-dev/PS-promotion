@@ -7,10 +7,10 @@ import { Music, ArrowRight, Github, ShieldCheck, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import {
-  OTPInput,
-  OTPGroup,
-  OTPSlot,
-  OTPSeparator,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  InputOTPSeparator,
 } from '@/components/ui/input-otp'
 
 export default function LoginPage() {
@@ -188,25 +188,25 @@ export default function LoginPage() {
                 Please enter the 6-digit code from your authenticator app to continue.
               </p>
               
-              <OTPInput
+              <InputOTP
                 maxLength={6}
                 value={otp}
                 onChange={setOtp}
                 onComplete={() => handleMFAVerify()}
                 containerClassName="group flex items-center justify-center"
               >
-                <OTPGroup className="gap-2">
-                  <OTPSlot index={0} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                  <OTPSlot index={1} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                  <OTPSlot index={2} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                </OTPGroup>
-                <OTPSeparator className="text-white/20 mx-1" />
-                <OTPGroup className="gap-2">
-                  <OTPSlot index={3} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                  <OTPSlot index={4} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                  <OTPSlot index={5} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
-                </OTPGroup>
-              </OTPInput>
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={1} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={2} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                </InputOTPGroup>
+                <InputOTPSeparator className="text-white/20 mx-1" />
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={3} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={4} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                  <InputOTPSlot index={5} className="w-12 h-14 text-xl border-white/10 bg-white/5 rounded-xl font-black text-primary" />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
 
             <div className="space-y-4">
