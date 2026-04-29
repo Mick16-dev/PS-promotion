@@ -229,13 +229,20 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       })
 
       // Keep legacy short keys for backwards compatibility in n8n branches.
-      const legacyRows = (shows || []).map((show: ShowRow) => ({
-        artist: String(show.artist_name ?? show.artist ?? ''),
-        venue: String(show.venue_name ?? show.venue ?? ''),
-        date: String(show.show_date ?? show.date ?? ''),
-        city: String(show.city ?? ''),
-        id: String(show.id ?? ''),
-      }))
+      const legacyRows = (shows || []).map((show: ShowRow) => {
+        const artist = String(show.artist_name ?? show.artist ?? '')
+        const venueStr = String(show.venue_name ?? show.venue ?? '')
+        return {
+          artist,
+          /** Alias expected by older n8n expressions (e.g. shows[0].artist_name). */
+          artist_name: artist,
+          venue: venueStr,
+          venue_name: venueStr,
+          date: String(show.show_date ?? show.date ?? ''),
+          city: String(show.city ?? ''),
+          id: String(show.id ?? ''),
+        }
+      })
 
       const headersArray = sanitizedMappings.map((m) => m.header)
       const valueRows = mappedRows.map((row) => headersArray.map((header) => row[header] ?? ''))
