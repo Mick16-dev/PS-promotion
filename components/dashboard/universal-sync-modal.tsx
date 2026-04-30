@@ -164,22 +164,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
     switch (source) {
       case 'artist_name':
-        return String(show.artist_name ?? show.artist ?? '')
+        return String(show.artist_name || show.artist || show.name || '')
       case 'venue_name':
-        return String(show.venue_name ?? show.venue ?? '')
+        return String(show.venue_name || show.venue || show.location || '')
       case 'show_date':
-        const dateVal = show.show_date ?? show.date
-        return dateVal ? new Date(String(dateVal)).toLocaleDateString() : ''
-      case 'city':
-        return String(show.city ?? '')
-      case 'show_time':
-        return String(show.show_time ?? '')
-      case 'load_in_time':
-        return String(show.load_in_time ?? '')
-      case 'soundcheck_time':
-        return String(show.soundcheck_time ?? '')
+        const d = show.show_date || show.date || show.start_time
+        return d ? new Date(String(d)).toLocaleDateString() : ''
       case 'deal_guarantee':
-        return show.deal_guarantee ? `$${Number(show.deal_guarantee).toLocaleString()}` : ''
+        const fee = show.deal_guarantee || show.guarantee || show.fee
+        return fee ? `$${Number(fee).toLocaleString()}` : ''
       case 'deal_type':
         return String(show.deal_type ?? '')
       case 'portal_url': {
@@ -283,13 +276,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             header: SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source 
           })),
           header_row: headersArray,
-          data_rows: dataRows, // Just the show data
-          rows: dataRows, // Alias
-          spreadsheet_values: spreadsheet_values, // Header + Data
-          spreadsheetValues: spreadsheet_values, // Alias
-          google_sheets_values: spreadsheet_values, // Alias
-          mapped_data: mappedData, // Array of objects
-          shows: shows,
+          data_rows: dataRows,
+          rows: dataRows,
+          spreadsheet_values: spreadsheet_values,
+          mapped_data: mappedData,
+          show_count: shows?.length || 0,
+          raw_shows: shows, // Debugging
           timestamp: new Date().toISOString()
         })
       })
