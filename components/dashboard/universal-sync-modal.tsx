@@ -204,15 +204,20 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           export_layout: exportMode,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mapping: sanitizedMappings.map(m => ({ ...m, field: m.source })), // Match n8n's m.field
+          mapping: sanitizedMappings.map(m => ({ 
+            ...m, 
+            field: m.source,
+            header: (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
+          })),
           header_row: headersArray,
-          data_rows: dataRows,
           spreadsheet_values: spreadsheet_values,
-          spreadsheetValues: spreadsheet_values,
-          google_sheets_values: spreadsheet_values,
-          mapped_data: mappedData,
-          shows: shows, // Match n8n's body.shows
-          show_count: shows.length,
+          shows: (shows || []).map(s => {
+            const resolved: Record<string, any> = {}
+            sanitizedMappings.forEach(m => {
+              resolved[m.source] = resolveMappedValue(s, m.source)
+            })
+            return resolved
+          }),
           timestamp: new Date().toISOString()
         })
       })
