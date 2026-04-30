@@ -244,6 +244,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
       const sourceValues: Record<string, string> = {
         artist_name: artistName,
+        venue: venue,
         venue_name: venue,
         show_date: showDate,
         city,
@@ -264,6 +265,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         venue,
         venue_name: venue,
         date: showDate,
+        show_date: showDate,
+        show_time: showTime,
         city: city,
         show_id: show_id
       }
@@ -310,10 +313,13 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
 
       const payloadFinal = {
         ...payload,
+        show_name: `${artistName} at ${venue}`,
         venue,
         venue_name: venue,
         city,
         date: showDate,
+        show_date: showDate,
+        show_time: showTime,
         required_documents: docs,
         timestamp: new Date().toISOString(),
         portal_token: showPortalToken,
