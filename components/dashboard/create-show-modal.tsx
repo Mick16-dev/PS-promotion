@@ -258,7 +258,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       }
 
       // Keep legacy short keys for backwards compatibility in n8n branches.
-      const mappedShowLegacy = {
+      const mappedShowLegacy: Record<string, string> = {
         artist: artistName,
         /** Alias expected by older n8n expressions (e.g. shows[0].artist_name). */
         artist_name: artistName,
