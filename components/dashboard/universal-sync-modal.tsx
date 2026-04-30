@@ -200,14 +200,27 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       const { data: { user } } = await supabase.auth.getUser()
       
       let query = supabase.from('shows').select('*')
+      
       if (exportType === 'selected' && selectedShowIds && selectedShowIds.length > 0) {
         query = query.in('id', selectedShowIds)
-      } else if (exportType === 'all') {
-        // Fetch all active/upcoming shows for this user/org
+      } else {
+        // Fetch ALL shows for the user's organization to ensure nothing is missed
+        const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user?.id).single()
+        if (profile?.organization_id) {
+          query = query.eq('organization_id', profile.organization_id)
+        }
         query = query.order('show_date', { ascending: true })
       }
+      
       const { data: shows, error: fetchErr } = await query
-      if (fetchErr) throw fetchErr
+      if (fetchErr) {
+        console.error('Fetch Error:', fetchErr)
+        throw new Error(`Database Error: ${fetchErr.message}`)
+      }
+
+      if (!shows || shows.length === 0) {
+        throw new Error('No shows found to export. Please check your filters.')
+      }
 
       // Save preferences
       await supabase.from('profiles').update({ 
