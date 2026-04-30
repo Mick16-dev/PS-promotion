@@ -72,6 +72,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
   const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
   const [sheetName, setSheetName] = useState('Active Shows')
   const [exportMode, setExportMode] = useState<'standard' | 'transposed'>('standard')
+  const [exportType, setExportType] = useState<'selected' | 'all'>('all')
   const [mappings, setMappings] = useState<ExportMapping[]>([
     { id: '1', source: 'artist_name', override: '' },
     { id: '2', source: 'show_date', override: '' },
@@ -199,8 +200,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       const { data: { user } } = await supabase.auth.getUser()
       
       let query = supabase.from('shows').select('*')
-      if (selectedShowIds && selectedShowIds.length > 0) {
+      if (exportType === 'selected' && selectedShowIds && selectedShowIds.length > 0) {
         query = query.in('id', selectedShowIds)
+      } else if (exportType === 'all') {
+        // Fetch all active/upcoming shows for this user/org
+        query = query.order('show_date', { ascending: true })
       }
       const { data: shows, error: fetchErr } = await query
       if (fetchErr) throw fetchErr
@@ -340,7 +344,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           ) : (
             <>
               {/* CONFIGURATION HEADER */}
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-3">
                   <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Spreadsheet Name</Label>
                   <Input 
@@ -351,7 +355,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Sheet / Tab Name</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Sheet Name</Label>
                   <Input 
                     value={sheetName}
                     onChange={(e) => setSheetName(e.target.value)}
@@ -360,14 +364,26 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Export Layout</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Export Range</Label>
+                  <Select value={exportType} onValueChange={(val: any) => setExportType(val)}>
+                    <SelectTrigger className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#050607] border-white/10 text-white">
+                      <SelectItem value="all" className="font-bold">All Shows</SelectItem>
+                      <SelectItem value="selected" className="font-bold">Selected Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-primary block ml-2">Layout</Label>
                   <Select value={exportMode} onValueChange={(val: any) => setExportMode(val)}>
                     <SelectTrigger className="w-full h-14 bg-white/[0.03] border border-white/10 rounded-2xl px-6 text-sm font-bold text-white focus:outline-none focus:border-primary/40 transition-all">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#050607] border-white/10 text-white">
                       <SelectItem value="standard" className="font-bold">List (Rows)</SelectItem>
-                      <SelectItem value="transposed" className="font-bold">Production Sheet (Columns)</SelectItem>
+                      <SelectItem value="transposed" className="font-bold">Transposed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -418,11 +434,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                           </Select>
 
                           <Input 
-                          value={m.override || ''}
-                          onChange={(e) => updateMapping(m.id, { override: e.target.value })}
-                          placeholder="Rename Header (Optional)"
-                          className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
-                        />
+                            value={m.override || ''}
+                            onChange={(e) => updateMapping(m.id, { override: e.target.value })}
+                            placeholder="Custom Column Title"
+                            className="bg-black/60 border-white/20 h-12 rounded-xl font-bold text-sm text-white placeholder:text-zinc-600 focus:border-primary/50 transition-all shadow-inner"
+                          />
                         </div>
 
                         <button 
