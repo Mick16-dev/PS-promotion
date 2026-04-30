@@ -202,14 +202,7 @@ export default function ShowDetailPage({ params }: any) {
                    <StatusPing variant={isGoogleConnected ? 'healthy' : 'critical'} />
                 </div>
              </div>
-             <button 
-                onClick={handleResendEmail}
-                disabled={isResendingEmail}
-                className="w-full mt-6 h-12 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
-             >
-                {isResendingEmail ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                Launch Artist Portal
-             </button>
+
              <button 
                 onClick={() => setIsSyncModalOpen(true)}
                 className="w-full mt-2 h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
@@ -254,9 +247,9 @@ export default function ShowDetailPage({ params }: any) {
              </div>
           </BentoPanel>
 
-          {/* Live Activity Feed */}
-          <BentoPanel title="Live Activity" icon={Activity}>
-             <div className="space-y-4 max-h-[220px] overflow-y-auto no-scrollbar pr-2">
+          {/* Documents & Portal */}
+          <BentoPanel title="Documents & Portal" icon={FileText}>
+             <div className="space-y-4 max-h-[160px] overflow-y-auto no-scrollbar pr-2">
                 {documents.length > 0 ? documents.slice(0, 5).map((doc, idx) => (
                    <div key={idx} className="flex gap-4 items-start pb-4 border-b border-white/[0.03] last:border-0">
                       <div className="h-8 w-8 shrink-0 rounded-lg bg-white/5 flex items-center justify-center">
@@ -271,12 +264,20 @@ export default function ShowDetailPage({ params }: any) {
                       </div>
                    </div>
                 )) : (
-                   <div className="flex flex-col items-center justify-center py-10 text-muted-foreground/20">
+                   <div className="flex flex-col items-center justify-center py-6 text-muted-foreground/20">
                       <Database size={32} />
-                      <p className="text-[10px] font-bold uppercase tracking-widest mt-4">No recent pings</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest mt-4">No documents yet</p>
                    </div>
                 )}
              </div>
+             <button 
+                onClick={handleResendEmail}
+                disabled={isResendingEmail}
+                className="w-full mt-4 h-12 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
+             >
+                {isResendingEmail ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                Send Reminder to Artist
+             </button>
           </BentoPanel>
         </div>
 
