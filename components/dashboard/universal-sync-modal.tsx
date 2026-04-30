@@ -26,7 +26,7 @@ import {
   AlertCircle, 
   ChevronRight 
 } from 'lucide-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
 import { toast } from "sonner"
 import { Reorder, AnimatePresence } from 'framer-motion'
 
@@ -54,8 +54,7 @@ const SOURCE_FIELDS = [
   { value: 'custom', label: 'Static / Custom Value' }
 ]
 
-export default function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
-  const supabase = createClientComponentClient()
+export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
   const [isSyncing, setIsSyncing] = useState(false)
   const [isGoogleConnected, setIsGoogleConnected] = useState(true)
   
@@ -90,7 +89,7 @@ export default function UniversalSyncModal({ isOpen, onClose, selectedShowIds }:
       }
     }
     if (isOpen) loadPrefs()
-  }, [isOpen, supabase])
+  }, [isOpen])
 
   const addColumn = () => {
     const newId = Math.random().toString(36).substring(2, 9)
