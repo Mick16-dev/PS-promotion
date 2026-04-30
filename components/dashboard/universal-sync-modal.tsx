@@ -77,7 +77,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        if (profile?.global_export_mapping) setGlobalMapping(profile.global_export_mapping)
+        if (profile?.global_export_mapping) {
+          // Sanitize old schema ('source'/'override') into new schema ('field'/'header')
+          const sanitized = profile.global_export_mapping.map((m: any) => ({
+            id: m.id || Math.random().toString(),
+            field: m.field || m.source || 'custom',
+            header: m.header || m.override || m.label || 'New Column'
+          }))
+          setGlobalMapping(sanitized)
+        }
         if (profile?.last_spreadsheet_name) setSpreadsheetName(profile.last_spreadsheet_name)
         if (profile?.last_sheet_name) setSheetName(profile.last_sheet_name)
         
