@@ -151,7 +151,9 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
     }))
   }
 
-  const resolveMappedValue = (show: ShowRow, source: string) => {
+  const resolveMappedValue = (show: ShowRow, source: string): string => {
+    if (!show) return ''
+
     const portalFallbackFromToken = (): string => {
       const raw = show.portal_token
       const token = typeof raw === 'string' || typeof raw === 'number' ? String(raw).trim() : ''
@@ -279,10 +281,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
             header: SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source 
           })),
           header_row: headersArray,
-          spreadsheet_values: spreadsheet_values,
+          data_rows: dataRows, // Just the show data
+          rows: dataRows, // Alias
+          spreadsheet_values: spreadsheet_values, // Header + Data
           spreadsheetValues: spreadsheet_values, // Alias
           google_sheets_values: spreadsheet_values, // Alias
-          mapped_data: mappedData,
+          mapped_data: mappedData, // Array of objects
           shows: shows,
           timestamp: new Date().toISOString()
         })
