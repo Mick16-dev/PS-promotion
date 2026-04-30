@@ -171,15 +171,22 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
 
     switch (source) {
       case 'artist_name':
-        return String(show.artist_name || show.artist || show.name || findByKeyword(['artist', 'performer', 'title', 'act']) || '')
+        return String(show.artist_name || show.artist || show.name || '')
       case 'venue_name':
-        return String(show.venue_name || show.venue || findByKeyword(['venue', 'location', 'place', 'club']) || '')
+        return String(show.venue_name || show.venue || show.location || '')
       case 'show_date':
-        const d = show.show_date || show.date || show.start_time || findByKeyword(['date', 'time', 'start'])
+        const d = show.show_date || show.date || show.start_time
         return d ? new Date(String(d)).toLocaleDateString() : ''
       case 'deal_guarantee':
-        const fee = show.deal_guarantee || show.guarantee || show.fee || findByKeyword(['fee', 'guarantee', 'price', 'deal', 'money'])
+        const fee = show.deal_guarantee || show.guarantee || show.fee
         return fee ? `$${Number(fee).toLocaleString()}` : ''
+      case 'city':
+        return String(show.city || show.venue_city || '')
+      case 'status':
+        return String(show.status || show.show_status || '')
+      default:
+        return String(show[source] || '')
+    }
       case 'deal_type':
         return String(show.deal_type ?? '')
       case 'portal_url': {
@@ -314,7 +321,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       if (!response.ok) throw new Error(result.details || result.error || 'Sync failed')
 
       toast.success('Flexible Export Successful!', {
-        description: `Exported ${shows.length} rows to "${spreadsheetName}".`
+        description: `Exported ${shows.length} shows (First: ${shows[0]?.artist_name || 'Unknown'}).`
       })
       onClose()
     } catch (err: any) {
