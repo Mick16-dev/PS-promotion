@@ -45,14 +45,16 @@ interface ExportMapping {
   header: string // Changed back to 'header' for legacy compatibility
 }
 
-const AVAILABLE_COLUMNS = [
-  { id: '1', field: 'artist_name', header: 'Artist Name' },
-  { id: '2', field: 'show_date', header: 'Show Date' },
-  { id: '3', field: 'venue_name', header: 'Venue' },
-  { id: '4', field: 'city', header: 'City' },
-  { id: '5', field: 'deal_guarantee', header: 'Guarantee' },
-  { id: '6', field: 'show_status', header: 'Status' },
-  { id: '7', field: 'portal_url', header: 'Portal Link' },
+const SOURCE_FIELDS = [
+  { value: 'artist_name', label: 'Artist Name' },
+  { value: 'venue_name', label: 'Venue / Location' },
+  { value: 'show_date', label: 'Show Date' },
+  { value: 'city', label: 'City' },
+  { value: 'deal_guarantee', label: 'Guarantee ($)' },
+  { value: 'show_status', label: 'Show Status' },
+  { value: 'portal_url', label: 'Artist Portal Link' },
+  { value: 'notes', label: 'Production Notes' },
+  { value: 'custom', label: 'Static / Custom Value' }
 ]
 
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: UniversalSyncModalProps) {
@@ -92,15 +94,19 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
     if (isOpen) loadPrefs()
   }, [isOpen])
 
-  const toggleColumn = (col: any) => {
-    setGlobalMapping(prev => {
-      const exists = prev.find(p => p.field === col.field)
-      if (exists) {
-        return prev.filter(p => p.field !== col.field)
-      } else {
-        return [...prev, col]
-      }
-    })
+  const addColumn = () => {
+    const newId = Math.random().toString(36).substring(2, 9)
+    const usedFields = globalMapping.map(m => m.field)
+    const nextField = SOURCE_FIELDS.find(f => !usedFields.includes(f.value)) || { value: 'custom', label: 'New Column' }
+    setGlobalMapping([...globalMapping, { id: newId, field: nextField.value, header: nextField.label }])
+  }
+
+  const removeColumn = (id: string) => {
+    setGlobalMapping(globalMapping.filter(m => m.id !== id))
+  }
+
+  const updateMapping = (id: string, updates: Partial<ExportMapping>) => {
+    setGlobalMapping(globalMapping.map(m => m.id === id ? { ...m, ...updates } : m))
   }
 
   const handleSync = async () => {
@@ -223,22 +229,34 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
                  </Select>
               </div>
 
-              <div className="space-y-3 pt-2">
-                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest ml-2">Customize Columns</p>
-                 <div className="flex flex-wrap gap-2">
-                    {AVAILABLE_COLUMNS.map(col => {
-                      const isSelected = globalMapping.some(m => m.field === col.field)
-                      return (
-                        <button
-                          key={col.id}
-                          onClick={() => toggleColumn(col)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase italic transition-all ${isSelected ? 'bg-primary/20 border-primary text-primary border shadow-[0_0_10px_theme(colors.primary/30%)]' : 'bg-white/5 border border-white/10 text-zinc-500 hover:text-zinc-300'}`}
-                        >
-                          {col.header}
-                        </button>
-                      )
-                    })}
-                 </div>
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4 px-2">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Customize Columns</h3>
+                  <Button variant="outline" size="sm" onClick={addColumn} className="h-8 px-3 border-primary/20 bg-primary/5 text-primary text-[9px] font-black uppercase rounded-lg gap-2"><Plus size={12} /> Add Column</Button>
+                </div>
+
+                <Reorder.Group axis="y" values={globalMapping} onReorder={setGlobalMapping} className="space-y-3">
+                  <AnimatePresence mode="popLayout">
+                    {globalMapping.map((m) => (
+                      <Reorder.Item key={m.id} value={m} className="flex items-center gap-4 p-3 bg-white/[0.02] border border-white/5 rounded-2xl group">
+                        <GripVertical size={16} className="text-zinc-600 cursor-grab" />
+                        <div className="flex-1 grid grid-cols-2 gap-4">
+                          <Select value={m.field} onValueChange={(val) => {
+                            const sf = SOURCE_FIELDS.find(f => f.value === val)
+                            updateMapping(m.id, { field: val, header: sf ? sf.label : m.header })
+                          }}>
+                            <SelectTrigger className="bg-black/60 border-white/10 h-10 rounded-xl text-white font-bold text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent className="bg-[#0b0c0d] border-white/10 text-white">
+                              {SOURCE_FIELDS.map(f => <SelectItem key={f.value} value={f.value} className="text-xs">{f.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Input value={m.header} onChange={(e) => updateMapping(m.id, { header: e.target.value })} placeholder="Custom Title" className="bg-black/60 border-white/10 h-10 rounded-xl text-white font-bold text-xs" />
+                        </div>
+                        <button onClick={() => removeColumn(m.id)} className="text-zinc-600 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                      </Reorder.Item>
+                    ))}
+                  </AnimatePresence>
+                </Reorder.Group>
               </div>
             </>
           )}
