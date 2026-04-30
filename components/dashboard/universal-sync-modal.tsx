@@ -204,13 +204,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           export_layout: exportMode,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mapping: sanitizedMappings,
+          mapping: sanitizedMappings.map(m => ({ ...m, field: m.source })), // Match n8n's m.field
           header_row: headersArray,
           data_rows: dataRows,
           spreadsheet_values: spreadsheet_values,
-          spreadsheetValues: spreadsheet_values, // Alias for n8n compatibility
-          google_sheets_values: spreadsheet_values, // Alias for n8n compatibility
+          spreadsheetValues: spreadsheet_values,
+          google_sheets_values: spreadsheet_values,
           mapped_data: mappedData,
+          shows: shows, // Match n8n's body.shows
           show_count: shows.length,
           timestamp: new Date().toISOString()
         })
