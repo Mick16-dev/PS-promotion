@@ -97,7 +97,7 @@ export default function ShowDetailPage({ params }: any) {
     loadData()
   }, [id])
 
-  const handleResendEmail = async () => {
+  const handleResendEmail = async (documentName?: string) => {
     setIsResendingEmail(true)
     try {
       // Get a fresh Google access token (auto-refreshes if expired)
@@ -117,7 +117,8 @@ export default function ShowDetailPage({ params }: any) {
         artist_email: String(showInfo?.artist_email || showInfo?.email || '').trim(),
         portal_url: showInfo?.portal_url || `${process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'}/?token=${showInfo?.portal_token || id}`,
         venue_name: showInfo?.venue_name,
-        show_date: showInfo?.show_date
+        show_date: showInfo?.show_date,
+        remind_document: documentName
       }
 
       if (!payload.artist_email) {
@@ -133,7 +134,7 @@ export default function ShowDetailPage({ params }: any) {
       })
 
       if (!response.ok) throw new Error('Send failed')
-      toast.success('Portal link sent to artist')
+      toast.success(documentName ? `Reminder for ${documentName} sent` : 'Portal link sent to artist')
     } catch (err) { 
       toast.error('Failed to send', { description: 'Check your Google connection in Settings.' }) 
     } finally { 
@@ -249,34 +250,62 @@ export default function ShowDetailPage({ params }: any) {
 
           {/* Documents & Portal */}
           <BentoPanel title="Documents & Portal" icon={FileText}>
-             <div className="space-y-4 max-h-[160px] overflow-y-auto no-scrollbar pr-2">
-                {documents.length > 0 ? documents.slice(0, 5).map((doc, idx) => (
-                   <div key={idx} className="flex gap-4 items-start pb-4 border-b border-white/[0.03] last:border-0">
-                      <div className="h-8 w-8 shrink-0 rounded-lg bg-white/5 flex items-center justify-center">
-                         <FileText size={14} className="text-muted-foreground" />
-                      </div>
-                      <div>
-                         <p className="text-xs font-bold text-white leading-snug">{doc.item_name || 'Document Uploaded'}</p>
-                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[8px] font-black uppercase tracking-widest text-emerald-500">Delivered</span>
-                            <span className="text-[8px] font-bold text-muted-foreground/40">2 HOURS AGO</span>
-                         </div>
-                      </div>
-                   </div>
-                )) : (
-                   <div className="flex flex-col items-center justify-center py-6 text-muted-foreground/20">
-                      <Database size={32} />
-                      <p className="text-[10px] font-bold uppercase tracking-widest mt-4">No documents yet</p>
-                   </div>
-                )}
+             <div className="space-y-4 max-h-[200px] overflow-y-auto no-scrollbar pr-2">
+                {(() => {
+                  const ALL_DOCS = [
+                    { id: 'epk', label: 'EPK' },
+                    { id: 'bio', label: 'Biography' },
+                    { id: 'photos', label: 'Hi-Res Photos' },
+                    { id: 'rider', label: 'Tech Rider' },
+                    { id: 'contract', label: 'Contract' },
+                  ]
+                  const requiredDocIds = showInfo?.required_documents ? Object.keys(showInfo.required_documents) : ALL_DOCS.map(d => d.id)
+                  const displayDocs = ALL_DOCS.filter(d => requiredDocIds.includes(d.id))
+
+                  return displayDocs.map((doc) => {
+                    const isUploaded = documents.some(d => 
+                      d.item_name?.toLowerCase().includes(doc.id) || 
+                      d.item_name?.toLowerCase().includes(doc.label.toLowerCase()) ||
+                      d.item_type?.toLowerCase().includes(doc.id)
+                    )
+
+                    return (
+                       <div key={doc.id} className="flex gap-4 items-center justify-between pb-4 border-b border-white/[0.03] last:border-0">
+                          <div className="flex items-center gap-4">
+                             <div className={cn("h-8 w-8 shrink-0 rounded-lg flex items-center justify-center", isUploaded ? "bg-emerald-500/10" : "bg-white/5")}>
+                                <FileText size={14} className={isUploaded ? "text-emerald-500" : "text-muted-foreground"} />
+                             </div>
+                             <div>
+                                <p className="text-xs font-bold text-white leading-snug">{doc.label}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                   <span className={cn("text-[8px] font-black uppercase tracking-widest", isUploaded ? "text-emerald-500" : "text-amber-500")}>
+                                      {isUploaded ? 'Delivered' : 'Pending'}
+                                   </span>
+                                </div>
+                             </div>
+                          </div>
+                          
+                          {!isUploaded && (
+                             <button 
+                                onClick={(e) => { e.preventDefault(); handleResendEmail(doc.label); }}
+                                disabled={isResendingEmail}
+                                className="h-8 px-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all flex items-center gap-1.5"
+                             >
+                                <Send size={10} /> Remind
+                             </button>
+                          )}
+                       </div>
+                    )
+                  })
+                })()}
              </div>
              <button 
-                onClick={handleResendEmail}
+                onClick={(e) => { e.preventDefault(); handleResendEmail(); }}
                 disabled={isResendingEmail}
                 className="w-full mt-4 h-12 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
              >
                 {isResendingEmail ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                Send Reminder to Artist
+                Resend Portal Link
              </button>
           </BentoPanel>
         </div>
