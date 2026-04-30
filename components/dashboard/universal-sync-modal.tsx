@@ -277,11 +277,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           })),
           header_row: headersArray,
           data_rows: dataRows,
+          data_rows: dataRows,
           rows: dataRows,
           spreadsheet_values: spreadsheet_values,
           mapped_data: mappedData,
           show_count: shows?.length || 0,
-          raw_shows: shows, // Debugging
+          raw_shows: shows,
           timestamp: new Date().toISOString()
         })
       })
