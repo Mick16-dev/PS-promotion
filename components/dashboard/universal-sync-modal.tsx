@@ -124,8 +124,6 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
         return String(show.city || show.venue_city || '')
       case 'show_status':
         return String(show.status || show.show_status || '')
-      case 'portal_url':
-        return String(show.portal_url || '')
       default:
         return String(show[source] || '')
     }
@@ -157,34 +155,30 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       if (!shows || shows.length === 0) throw new Error('No shows found.')
 
       const sanitizedMappings = mappings.filter((m) => m.source && m.source !== 'custom')
-      const headersArray = sanitizedMappings.map((m) => {
-        return (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
+      const finalMapping = sanitizedMappings.length > 0 ? sanitizedMappings.map(m => ({ 
+        ...m, 
+        field: m.source,
+        header: (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
+      })) : mappings.map(m => ({
+        ...m,
+        field: m.source,
+        header: SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
+      }))
+
+      const headersArray = finalMapping.map(m => m.header)
+      const dataRows = (shows || []).map((show: any) => {
+        return finalMapping.map(m => resolveMappedValue(show, m.source))
       })
-      
+
       let spreadsheet_values: any[][] = []
-      let dataRows: any[][] = []
-      let mappedData: any[] = []
-
-      dataRows = (shows || []).map((show: any) => {
-        return sanitizedMappings.map(m => resolveMappedValue(show, m.source))
-      })
-
       if (exportMode === 'transposed') {
-        spreadsheet_values = sanitizedMappings.map((m, i) => {
+        spreadsheet_values = finalMapping.map((m, i) => {
           const row = [headersArray[i]]
           shows.forEach((show: any) => row.push(resolveMappedValue(show, m.source)))
           return row
         })
-        mappedData = spreadsheet_values
       } else {
         spreadsheet_values = [headersArray, ...dataRows]
-        mappedData = (shows || []).map((show: any, idx: number) => {
-          const row: Record<string, any> = {}
-          sanitizedMappings.forEach((m, i) => {
-            row[headersArray[i]] = dataRows[idx][i]
-          })
-          return row
-        })
       }
 
       const { data: integration } = await supabase
@@ -204,17 +198,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           export_layout: exportMode,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mapping: sanitizedMappings.map(m => ({ 
-            ...m, 
-            field: m.source,
-            header: (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
-          })),
+          mapping: finalMapping,
           header_row: headersArray,
           spreadsheet_values: spreadsheet_values,
+          spreadsheetValues: spreadsheet_values,
+          google_sheets_values: spreadsheet_values,
           shows: (shows || []).map(s => {
             const resolved: Record<string, any> = {}
-            sanitizedMappings.forEach(m => {
-              resolved[m.source] = resolveMappedValue(s, m.source)
+            finalMapping.forEach(m => {
+              resolved[m.field] = resolveMappedValue(s, m.source)
             })
             return resolved
           }),
