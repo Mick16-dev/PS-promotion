@@ -238,6 +238,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       })
       
       let spreadsheet_values: any[][] = []
+      let dataRows: any[][] = []
       let mappedData: any[] = []
 
       if (exportMode === 'transposed') {
@@ -249,9 +250,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           })
           return row
         })
+        dataRows = spreadsheet_values
         mappedData = spreadsheet_values
       } else {
-        const dataRows = (shows || []).map((show: ShowRow) => {
+        dataRows = (shows || []).map((show: ShowRow) => {
           return sanitizedMappings.map(m => resolveMappedValue(show, m.source))
         })
         spreadsheet_values = [headersArray, ...dataRows]
