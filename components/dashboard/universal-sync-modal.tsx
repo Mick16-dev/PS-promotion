@@ -154,15 +154,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       if (fetchErr) throw fetchErr
       if (!shows || shows.length === 0) throw new Error('No shows found.')
 
-      const sanitizedMappings = mappings.filter((m) => m.source && m.source !== 'custom')
-      const finalMapping = sanitizedMappings.length > 0 ? sanitizedMappings.map(m => ({ 
+      const sanitizedMappings = mappings.filter((m) => m.source)
+      const finalMapping = sanitizedMappings.map(m => ({ 
         ...m, 
         field: m.source,
-        header: (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source)
-      })) : mappings.map(m => ({
-        ...m,
-        field: m.source,
-        header: SOURCE_FIELDS.find(f => f.value === m.source)?.label || m.source
+        header: (m.override && m.override.trim()) ? m.override.trim() : (SOURCE_FIELDS.find(f => f.value === m.source)?.label || 'New Column')
       }))
 
       const headersArray = finalMapping.map(m => m.header)
