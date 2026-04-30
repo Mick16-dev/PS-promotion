@@ -67,7 +67,6 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
   const [artistComment, setArtistComment] = useState('')
   const [cateringNotes, setCateringNotes] = useState('')
   const [syncToCalendar, setSyncToCalendar] = useState(true)
-  const [syncToSpreadsheet, setSyncToSpreadsheet] = useState(false)
 
   // Track selected documents and their deadlines
   const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({
@@ -320,6 +319,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         show_date: showDate,
         show_time: showTime,
+        sync_to_calendar: syncToCalendar,
         required_documents: docs,
         timestamp: new Date().toISOString(),
         portal_token: showPortalToken,
@@ -865,7 +865,7 @@ return (
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center space-x-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
                 <Checkbox
                   id="sync-calendar"
@@ -882,26 +882,6 @@ return (
                   </label>
                   <p className="text-[8px] text-muted-foreground">
                     Add to G-Calendar
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-4 rounded-2xl bg-[#0F9D58]/5 border border-[#0F9D58]/20">
-                <Checkbox
-                  id="sync-spreadsheet"
-                  checked={syncToSpreadsheet}
-                  onCheckedChange={(checked) => setSyncToSpreadsheet(checked as boolean)}
-                  className="border-[#0F9D58]/40 data-[state=checked]:bg-[#0F9D58] data-[state=checked]:text-white h-5 w-5 rounded-md"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <label
-                    htmlFor="sync-spreadsheet"
-                    className="text-[10px] font-black text-white uppercase tracking-widest cursor-pointer"
-                  >
-                    Spreadsheet Sync
-                  </label>
-                  <p className="text-[8px] text-muted-foreground">
-                    Sync to Master Sheet
                   </p>
                 </div>
               </div>
