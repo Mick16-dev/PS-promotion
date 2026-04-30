@@ -208,6 +208,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
           header_row: headersArray,
           data_rows: dataRows,
           spreadsheet_values: spreadsheet_values,
+          spreadsheetValues: spreadsheet_values, // Alias for n8n compatibility
+          google_sheets_values: spreadsheet_values, // Alias for n8n compatibility
           mapped_data: mappedData,
           show_count: shows.length,
           timestamp: new Date().toISOString()
