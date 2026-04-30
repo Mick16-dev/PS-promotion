@@ -163,16 +163,22 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds }: Univers
       return `${base}/?token=${encodeURIComponent(token)}`
     }
 
+    const findByKeyword = (keywords: string[]) => {
+      const keys = Object.keys(show)
+      const match = keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw.toLowerCase())))
+      return match ? show[match] : null
+    }
+
     switch (source) {
       case 'artist_name':
-        return String(show.artist_name || show.artist || show.name || '')
+        return String(show.artist_name || show.artist || show.name || findByKeyword(['artist', 'performer', 'title', 'act']) || '')
       case 'venue_name':
-        return String(show.venue_name || show.venue || show.location || '')
+        return String(show.venue_name || show.venue || findByKeyword(['venue', 'location', 'place', 'club']) || '')
       case 'show_date':
-        const d = show.show_date || show.date || show.start_time
+        const d = show.show_date || show.date || show.start_time || findByKeyword(['date', 'time', 'start'])
         return d ? new Date(String(d)).toLocaleDateString() : ''
       case 'deal_guarantee':
-        const fee = show.deal_guarantee || show.guarantee || show.fee
+        const fee = show.deal_guarantee || show.guarantee || show.fee || findByKeyword(['fee', 'guarantee', 'price', 'deal', 'money'])
         return fee ? `$${Number(fee).toLocaleString()}` : ''
       case 'deal_type':
         return String(show.deal_type ?? '')
