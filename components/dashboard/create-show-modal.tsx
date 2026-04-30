@@ -266,6 +266,8 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         date: showDate,
         show_date: showDate,
         show_time: showTime,
+        sync_to_calendar: syncToCalendar,
+        syncToCalendar: syncToCalendar,
         city: city,
         show_id: show_id
       }
@@ -320,6 +322,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         show_date: showDate,
         show_time: showTime,
         sync_to_calendar: syncToCalendar,
+        syncToCalendar: syncToCalendar,
         required_documents: docs,
         timestamp: new Date().toISOString(),
         portal_token: showPortalToken,
