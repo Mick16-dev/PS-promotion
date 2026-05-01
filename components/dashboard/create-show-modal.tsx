@@ -194,13 +194,11 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
       // 1. DIRECT SUPABASE INSERT (The Source of Truth)
-      // We create the show row FIRST so we know it exists.
       const { data: newShow, error: insertError } = await supabase
         .from('shows')
         .insert({
-          id: show_id, // Use our stable UUID
+          id: show_id,
           user_id: userId,
-          artist_id: selectedArtistId,
           artist_name: artistName,
           venue_name: venue,
           venue: venue,
@@ -219,7 +217,6 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           technical_notes: technicalNotes || null,
           artist_comment: artistComment || null,
           portal_token: showPortalToken,
-          portal_url: primaryPortalUrl,
           deal_type: dealType,
           deal_guarantee: dealGuarantee || 0,
           deal_percentage: dealPercentage || 0,
