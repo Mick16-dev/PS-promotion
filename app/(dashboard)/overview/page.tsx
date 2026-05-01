@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { 
   Plus, 
   ArrowUpRight,
@@ -26,81 +27,46 @@ import {
 } from '@/components/ui/bento-grid'
 
 export default function DashboardHome() {
-  const [stats, setStats] = useState({
-    totalShows: 0,
-    awaitingDocs: 0,
-    overdueDocs: 0
-  })
-  
-  const [overdueItems, setOverdueItems] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const { data, error: fetchError, mutate } = useSWR('dashboard-data', async () => {
+    const { data: shows, error: showsErr } = await supabase
+      .from('shows')
+      .select('id, show_date, artist_name, venue_name, venue')
+      .order('show_date')
+    
+    const { data: materials, error: matsErr } = await supabase
+      .from('materials')
+      .select('id, status, show_id, deadline, item_name')
+      .not('status', 'eq', 'delivered')
+      .not('status', 'eq', 'submitted')
 
-  async function fetchDashboardData() {
-    try {
-      setIsLoading(true)
-      const { data: shows, error: showsErr } = await supabase
-        .from('shows')
-        .select('*')
-        .order('show_date')
-      
-      const { data: materials, error: matsErr } = await supabase
-        .from('materials')
-        .select('*')
-        .not('status', 'eq', 'delivered')
-        .not('status', 'eq', 'submitted')
+    if (showsErr || matsErr) throw showsErr || matsErr
 
-      if (showsErr || matsErr) throw showsErr || matsErr
+    let awaitingCount = 0
+    const overdueList: any[] = []
+    const now = new Date()
 
-      if (shows) {
-        let awaitingCount = 0
-        const overdueList: any[] = []
-        const now = new Date()
+    shows?.forEach((show: any) => {
+      const showMats = materials?.filter((m: any) => m.show_id === show.id) || []
+      showMats.forEach((mat: any) => {
+        const deadline = mat.deadline ? new Date(mat.deadline) : null
+        if (deadline && deadline < now) {
+          overdueList.push({
+            id: mat.id, artist: show.artist_name, venue: show.venue_name || show.venue,
+            document: mat.item_name || 'Requirement', deadline: mat.deadline, showId: show.id
+          })
+        } else { awaitingCount++ }
+      })
+    })
 
-        shows?.forEach((show: any) => {
-          const showMats = materials?.filter((m: any) => m.show_id === show.id) || []
-          
-          if (showMats.length === 0) {
-            // Logic for shows with no materials yet?
-          } else {
-            showMats.forEach((mat: any) => {
-              const deadline = mat.deadline ? new Date(mat.deadline) : null
-              const isLate = deadline && deadline < now
-              
-              if (isLate) {
-                overdueList.push({
-                  id: mat.id,
-                  artist: show.artist_name,
-                  venue: show.venue_name || show.venue,
-                  document: mat.item_name || 'Requirement',
-                  deadline: mat.deadline,
-                  showId: show.id
-                })
-              } else {
-                awaitingCount++
-              }
-            })
-          }
-        })
-
-        setStats({
-          totalShows: shows.length,
-          awaitingDocs: awaitingCount,
-          overdueDocs: overdueList.length
-        })
-        setOverdueItems(overdueList.slice(0, 8))
-      }
-    } catch (err: any) {
-      console.error('Data Fetch Failure:', err)
-      toast.error('Sync Error', { description: 'Could not connect to database.' })
-    } finally {
-      setIsLoading(false)
+    return {
+      stats: { totalShows: shows?.length || 0, awaitingDocs: awaitingCount, overdueDocs: overdueList.length },
+      overdueItems: overdueList.slice(0, 8)
     }
-  }
+  }, { revalidateOnFocus: true, refreshInterval: 30000 })
 
-  useEffect(() => {
-    fetchDashboardData()
-  }, [])
+  const stats = data?.stats || { totalShows: 0, awaitingDocs: 0, overdueDocs: 0 }
+  const overdueItems = data?.overdueItems || []
+  const isLoading = !data && !fetchError
 
   if (isLoading) {
     return (

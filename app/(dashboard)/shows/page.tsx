@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { 
   Plus, 
   Search, 
@@ -40,56 +41,50 @@ interface Show {
 }
 
 export default function ShowsPage() {
-  const [shows, setShows] = useState<Show[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const { data: showsDataRaw, error: fetchError, mutate } = useSWR('shows-roster', async () => {
+    const { data, error } = await supabase
+      .from('shows')
+      .select(`
+        id, 
+        artist_name, 
+        venue_name, 
+        venue, 
+        city, 
+        show_date, 
+        materials (status)
+      `)
+      .order('show_date', { ascending: true })
+    
+    if (error) throw error
+    return data
+  }, { revalidateOnFocus: true, refreshInterval: 60000 })
+
+  const shows = React.useMemo(() => {
+    if (!showsDataRaw) return []
+    return showsDataRaw.map((show: any) => {
+      const showMats = show.materials || []
+      const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
+      const total = showMats.length > 0 ? showMats.length : 3
+      
+      return {
+        id: show.id,
+        artist: show.artist_name || 'Unnamed Artist',
+        venue: show.venue_name || show.venue || 'Venue TBD',
+        city: show.city || '',
+        date: show.show_date || '',
+        progress: delivered,
+        totalItems: total,
+        status: 'active'
+      }
+    })
+  }, [showsDataRaw])
+
+  const isLoading = !showsDataRaw && !fetchError
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   const [selectedShowIds, setSelectedShowIds] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
-
-  async function fetchShows() {
-    try {
-      if (!isRefreshing) setIsLoading(true)
-      
-      const { data: showsData, error: showsErr } = await supabase
-        .from('shows')
-        .select('*')
-        .order('show_date', { ascending: true })
-
-      if (showsErr) throw showsErr
-
-      const { data: materialsData, error: matsErr } = await supabase
-        .from('materials')
-        .select('show_id, status')
-
-      if (matsErr) throw matsErr
-
-      const processedShows = showsData.map((show: any) => {
-        const showMats = materialsData?.filter((m: any) => m.show_id === show.id) || []
-        const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
-        const total = showMats.length > 0 ? showMats.length : 3
-        
-        return {
-          id: show.id,
-          artist: show.artist_name || 'Unnamed Artist',
-          venue: show.venue_name || show.venue || 'Venue TBD',
-          city: show.city || '',
-          date: show.show_date || '',
-          progress: delivered,
-          totalItems: total,
-          status: 'active'
-        }
-      })
-
-      setShows(processedShows)
-    } catch (err: any) {
-      toast.error('Sync Failure', { description: 'Could not fetch the production roster.' })
-    } finally {
-      setIsLoading(false)
-      setIsRefreshing(false)
-    }
-  }
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   function handleSync() {
     setIsRefreshing(true)

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { Search, Plus, User, Mail, Star, ChevronRight, MoreVertical, X, Loader2, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -9,25 +10,23 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
 export default function ArtistsPage() {
-  const [artists, setArtists] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: artistsRaw, error: fetchError, mutate } = useSWR('artists-roster', async () => {
+    const { data, error } = await supabase
+      .from('artists')
+      .select('id, name, email, reliability_score, shows_completed')
+      .order('name', { ascending: true })
+    if (error) throw error
+    return data || []
+  }, { revalidateOnFocus: true, refreshInterval: 60000 })
+
+  const artists = artistsRaw || []
+  const isLoading = !artistsRaw && !fetchError
   const [searchQuery, setSearchQuery] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
-
-  async function fetchArtists() {
-    try {
-      setIsLoading(true)
-      const { data, error } = await supabase.from('artists').select('*').order('name', { ascending: true })
-      if (error) throw error
-      setArtists(data || [])
-    } catch (err: any) { console.error(err) } finally { setIsLoading(false) }
-  }
-
-  useEffect(() => { fetchArtists() }, [])
 
   const handleAddArtist = async () => {
     if (!newName.trim() || !newEmail.trim()) { toast.error('Please enter both name and email.'); return }
