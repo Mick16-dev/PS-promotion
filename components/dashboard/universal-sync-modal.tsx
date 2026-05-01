@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   Dialog, 
   DialogContent, 
@@ -13,13 +13,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select"
-import { Table, Plus, Trash2, AlertCircle, ArrowRight, Loader2 } from 'lucide-react'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Table, Plus, X, AlertCircle, ArrowRight, Loader2, Pencil, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner"
 import { AnimatePresence, motion } from 'framer-motion'
@@ -33,11 +32,11 @@ interface UniversalSyncModalProps {
 
 interface ExportColumn {
   id: string
-  field: string
-  header: string
+  field: string   // database field key — never changes, always used as JSON key
+  header: string  // display name in Google Sheet — user can rename freely
 }
 
-// All available database fields the user can pick from
+// All database fields users can pick from when adding a column
 const AVAILABLE_FIELDS = [
   { field: 'artist_name',    label: 'Artist Name' },
   { field: 'show_date',      label: 'Show Date' },
@@ -68,6 +67,71 @@ const DEFAULT_COLUMNS: ExportColumn[] = [
   { id: 'c9', field: 'notes',          header: 'Notes' },
 ]
 
+// Inline editable column chip
+function ColumnChip({ col, onRename, onRemove }: {
+  col: ExportColumn
+  onRename: (id: string, newHeader: string) => void
+  onRemove: (id: string) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(col.header)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus()
+  }, [editing])
+
+  const commit = () => {
+    const trimmed = draft.trim()
+    if (trimmed) onRename(col.id, trimmed)
+    else setDraft(col.header)
+    setEditing(false)
+  }
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="group flex items-center gap-2 bg-white/[0.04] border border-white/10 hover:border-primary/30 rounded-2xl px-4 py-3 transition-all"
+    >
+      {editing ? (
+        <div className="flex items-center gap-2 flex-1">
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setDraft(col.header); setEditing(false) } }}
+            onBlur={commit}
+            className="bg-transparent border-none outline-none text-sm font-black uppercase italic text-primary w-full tracking-tight"
+          />
+          <button onClick={commit} className="text-primary shrink-0">
+            <Check size={13} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className="text-sm font-black uppercase italic text-white tracking-tight truncate">{col.header}</span>
+          <span className="text-[8px] font-bold text-zinc-600 shrink-0 hidden group-hover:inline">({col.field})</span>
+          <button
+            onClick={() => { setDraft(col.header); setEditing(true) }}
+            className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 hover:text-primary shrink-0"
+          >
+            <Pencil size={11} />
+          </button>
+        </div>
+      )}
+      <button
+        onClick={() => onRemove(col.id)}
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-600 hover:text-red-500 shrink-0"
+      >
+        <X size={13} />
+      </button>
+    </motion.div>
+  )
+}
+
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSelectedIds }: UniversalSyncModalProps) {
   const [isSyncing, setIsSyncing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -91,7 +155,6 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        // Load saved prefs
         const { data: profile } = await supabase
           .from('profiles')
           .select('last_spreadsheet_name, last_sheet_name, global_export_mapping')
@@ -101,14 +164,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         if (profile?.last_sheet_name) setSheetName(profile.last_sheet_name)
         if (profile?.global_export_mapping?.length) setColumns(profile.global_export_mapping)
 
-        // Load shows for selection
         const { data: shows } = await supabase
           .from('shows')
           .select('id, artist_name, show_date, venue_name')
           .order('show_date', { ascending: true })
         if (shows) setAvailableShows(shows)
 
-        // Check Google integration
         const { data: integration } = await supabase
           .from('user_integrations')
           .select('id')
@@ -125,17 +186,23 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
     if (isOpen) load()
   }, [isOpen])
 
-  const addColumn = () => {
+  const addColumn = (field: string) => {
+    const alreadyAdded = columns.some(c => c.field === field)
+    if (alreadyAdded) {
+      toast.info('Column already added')
+      return
+    }
+    const defaultLabel = AVAILABLE_FIELDS.find(f => f.field === field)?.label || field
     const newId = Math.random().toString(36).substring(2, 9)
-    setColumns(prev => [...prev, { id: newId, field: 'artist_name', header: 'New Column' }])
+    setColumns(prev => [...prev, { id: newId, field, header: defaultLabel }])
+  }
+
+  const renameColumn = (id: string, newHeader: string) => {
+    setColumns(prev => prev.map(c => c.id === id ? { ...c, header: newHeader } : c))
   }
 
   const removeColumn = (id: string) => {
     setColumns(prev => prev.filter(c => c.id !== id))
-  }
-
-  const updateColumn = (id: string, updates: Partial<ExportColumn>) => {
-    setColumns(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
   }
 
   const toggleShow = (id: string) => {
@@ -161,7 +228,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
       if (fetchErr) throw fetchErr
       if (!shows || shows.length === 0) throw new Error('No shows found.')
 
-      // Save prefs for next time
+      // Save preferences
       await supabase.from('profiles').update({
         last_spreadsheet_name: spreadsheetName,
         last_sheet_name: sheetName,
@@ -175,10 +242,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
-      // CRITICAL: always use m.field as JSON key so n8n can extract values correctly.
-      // The mapping array tells n8n what custom header name to use for each field.
-      // This prevents column shifts (empty fields are padded with '') and lets n8n
-      // write the custom header row using mapping[].header.
+      // Pad shows using m.field as key — n8n reads values by field key,
+      // and uses mapping[].header to write the column title row in the sheet
       const paddedShows = shows.map(show => {
         const row: any = {}
         columns.forEach(col => {
@@ -198,8 +263,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           mode: 'universal_bulk_export',
-          mapping: columns,  // n8n uses mapping[].header to write the header row
-          shows: paddedShows, // n8n uses mapping[].field to read values from each row
+          mapping: columns,    // n8n uses .header to write the title row
+          shows: paddedShows,  // n8n uses .field keys to read values
           timestamp: new Date().toISOString()
         })
       })
@@ -216,9 +281,12 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
     }
   }
 
+  // Fields not yet added
+  const remainingFields = AVAILABLE_FIELDS.filter(f => !columns.some(c => c.field === f.field))
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[680px] bg-[#0b0c0d] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[640px] bg-[#0b0c0d] border-white/10 p-0 overflow-hidden rounded-[2.5rem] shadow-2xl max-h-[90vh] flex flex-col">
         <div className="p-8 pb-6 border-b border-white/5 shrink-0">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
@@ -226,7 +294,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
               Freedom Export Console
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-2 font-medium">
-              Customize your columns, select shows, and export to Google Sheets.
+              Rename any column, add new ones, then export. All data is auto-fetched from your shows.
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -266,58 +334,42 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Column Editor</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Columns</h3>
+                    <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Hover to rename or remove</span>
                   </div>
-                  <Button onClick={addColumn} variant="ghost" className="h-7 px-3 text-[9px] font-black uppercase text-primary bg-primary/10 hover:bg-primary/20 rounded-lg">
-                    <Plus size={12} className="mr-1" /> Add Column
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-7 px-3 text-[9px] font-black uppercase text-primary bg-primary/10 hover:bg-primary/20 rounded-lg">
+                        <Plus size={12} className="mr-1" /> Add Column
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-[#0f0f10] border-white/10 rounded-2xl p-2 w-52" align="end">
+                      {remainingFields.length === 0 ? (
+                        <div className="px-3 py-2 text-[10px] text-zinc-600 font-bold uppercase">All fields added</div>
+                      ) : (
+                        remainingFields.map(f => (
+                          <DropdownMenuItem
+                            key={f.field}
+                            onClick={() => addColumn(f.field)}
+                            className="text-xs font-bold text-white hover:text-primary cursor-pointer rounded-xl px-3 py-2"
+                          >
+                            {f.label}
+                          </DropdownMenuItem>
+                        ))
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
-                {/* Header labels */}
-                <div className="grid grid-cols-2 gap-3 px-3 mb-1">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Data Field</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Header Title in Sheet</span>
-                </div>
-
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
                   <AnimatePresence mode="popLayout">
-                    {columns.map((col, idx) => (
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
+                    {columns.map(col => (
+                      <ColumnChip
                         key={col.id}
-                        className="flex items-center gap-3 bg-white/[0.03] border border-white/5 p-3 rounded-2xl group hover:border-primary/20 transition-all"
-                      >
-                        <div className="w-5 h-5 flex items-center justify-center text-zinc-700 font-black text-[9px] italic shrink-0">{idx + 1}</div>
-                        <div className="flex-1 grid grid-cols-2 gap-3">
-                          {/* Field selector */}
-                          <Select value={col.field} onValueChange={(v) => {
-                            const label = AVAILABLE_FIELDS.find(f => f.field === v)?.label || v
-                            updateColumn(col.id, { field: v, header: label })
-                          }}>
-                            <SelectTrigger className="bg-transparent border-none h-9 text-xs font-bold text-white focus:ring-0 px-2">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#0b0c0d] border-white/10 text-white">
-                              {AVAILABLE_FIELDS.map(f => (
-                                <SelectItem key={f.field} value={f.field}>{f.label}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {/* Custom header name */}
-                          <Input
-                            value={col.header}
-                            onChange={(e) => updateColumn(col.id, { header: e.target.value })}
-                            placeholder="Column title..."
-                            className="bg-white/5 border-none h-9 rounded-lg px-3 text-xs font-black uppercase italic text-primary placeholder:text-zinc-700"
-                          />
-                        </div>
-                        <button onClick={() => removeColumn(col.id)} className="w-8 h-8 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 shrink-0">
-                          <Trash2 size={13} />
-                        </button>
-                      </motion.div>
+                        col={col}
+                        onRename={renameColumn}
+                        onRemove={removeColumn}
+                      />
                     ))}
                   </AnimatePresence>
                 </div>
