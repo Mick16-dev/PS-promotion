@@ -184,6 +184,33 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
+      // PAD SHOWS: ensure all keys exist and use raw m.field so n8n maps correctly
+      const paddedShows = shows.map(show => {
+        const paddedShow: any = {}
+        globalMapping.forEach(m => {
+          let val = show[m.field] || ''
+          if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
+          paddedShow[m.field] = val 
+        })
+        return paddedShow
+      })
+
+      // DETECT CUSTOMIZATION: if they typed new headers or changed the sheet name
+      const hasCustomHeaders = globalMapping.some(m => {
+        const defaultCol = AVAILABLE_COLUMNS.find(c => c.field === m.field)
+        return defaultCol && defaultCol.header !== m.header
+      })
+      const isNewTarget = spreadsheetName !== initialSpreadsheetName || sheetName !== initialSheetName
+
+      // PREPEND TITLES: force n8n to print custom headers in Row 1
+      if (hasCustomHeaders || isNewTarget) {
+        const headerShow: any = {}
+        globalMapping.forEach(m => {
+          headerShow[m.field] = m.header // Map title to raw field key
+        })
+        paddedShows.unshift(headerShow)
+      }
+
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -194,7 +221,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           sheet_name: sheetName,
           mode: 'universal_bulk_export',
           mapping: globalMapping,
-          shows: shows,
+          shows: paddedShows,
           timestamp: new Date().toISOString()
         })
       })
