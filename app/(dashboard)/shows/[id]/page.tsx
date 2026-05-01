@@ -80,8 +80,24 @@ export default function ShowDetailPage({ params }: any) {
         const { data: materials } = await supabase.from('materials').select('*').eq('show_id', id)
         setDocuments(materials || [])
 
-        const { data: shows } = await supabase.from('shows').select('id, artist_name, show_date, status').order('show_date', { ascending: true }).limit(8)
-        setAllShows(shows || [])
+        const { data: shows } = await supabase
+          .from('shows')
+          .select('id, artist_name, show_date, date, status')
+          .limit(50)
+
+        const normalizedShows = (shows || [])
+          .map((s: any) => ({
+            ...s,
+            show_date: s.show_date ?? s.date ?? null,
+          }))
+          .sort((a: any, b: any) => {
+            const aTime = Date.parse(a.show_date) || Number.POSITIVE_INFINITY
+            const bTime = Date.parse(b.show_date) || Number.POSITIVE_INFINITY
+            return aTime - bTime
+          })
+          .slice(0, 8)
+
+        setAllShows(normalizedShows)
 
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {

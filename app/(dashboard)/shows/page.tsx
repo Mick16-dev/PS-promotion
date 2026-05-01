@@ -80,7 +80,62 @@ export default function ShowsPage() {
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false)
   const [selectedShowIds, setSelectedShowIds] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+<<<<<<< HEAD
   const [isRefreshing, setIsRefreshing] = useState(false)
+=======
+
+  async function fetchShows() {
+    try {
+      if (!isRefreshing) setIsLoading(true)
+      
+      const { data: showsData, error: showsErr } = await supabase
+        .from('shows')
+        .select('*')
+
+      if (showsErr) throw showsErr
+
+      const { data: materialsData, error: matsErr } = await supabase
+        .from('materials')
+        .select('show_id, status')
+
+      if (matsErr) throw matsErr
+
+      const processedShows = (showsData || []).map((show: any) => {
+        const showMats = materialsData?.filter((m: any) => m.show_id === show.id) || []
+        const delivered = showMats.filter((m: any) => m.status === 'delivered' || m.status === 'submitted').length
+        const total = showMats.length > 0 ? showMats.length : 3
+
+        const dateValue = show.show_date ?? show.date ?? ''
+        const venueValue = show.venue_name ?? show.venue ?? ''
+        
+        return {
+          id: show.id,
+          artist: show.artist_name || 'Unnamed Artist',
+          venue: venueValue || 'Venue TBD',
+          city: show.city || '',
+          date: dateValue,
+          progress: delivered,
+          totalItems: total,
+          status: 'active'
+        }
+      })
+
+      processedShows.sort((a, b) => {
+        // Put undated rows last, otherwise sort ascending by date.
+        const aTime = Date.parse(a.date) || Number.POSITIVE_INFINITY
+        const bTime = Date.parse(b.date) || Number.POSITIVE_INFINITY
+        return aTime - bTime
+      })
+
+      setShows(processedShows)
+    } catch (err: any) {
+      toast.error('Sync Failure', { description: 'Could not fetch the production roster.' })
+    } finally {
+      setIsLoading(false)
+      setIsRefreshing(false)
+    }
+  }
+>>>>>>> cff695f (fix: show roster for legacy show rows)
 
   function handleSync() {
     setIsRefreshing(true)
