@@ -47,13 +47,17 @@ interface ExportMapping {
 }
 
 const AVAILABLE_COLUMNS = [
-  { id: '1', field: 'artist_name', header: 'Artist Name' },
-  { id: '2', field: 'show_date', header: 'Show Date' },
-  { id: '3', field: 'venue_name', header: 'Venue' },
-  { id: '4', field: 'city', header: 'City' },
-  { id: '5', field: 'deal_guarantee', header: 'Guarantee' },
-  { id: '6', field: 'show_status', header: 'Status' },
-  { id: '7', field: 'portal_url', header: 'Portal Link' },
+  { id: 'c1', field: 'artist_name', header: 'Artist' },
+  { id: 'c2', field: 'show_date', header: 'Date' },
+  { id: 'c3', field: 'venue_name', header: 'Venue' },
+  { id: 'c4', field: 'city', header: 'City' },
+  { id: 'c5', field: 'deal_guarantee', header: 'Fee' },
+  { id: 'c6', field: 'notes', header: 'Notes' },
+  { id: 'c7', field: 'ticket_price', header: 'Ticket Price' },
+  { id: 'c8', field: 'capacity', header: 'Capacity' },
+  { id: 'c9', field: 'deal_type', header: 'Deal Type' },
+  { id: 'c10', field: 'show_status', header: 'Status' },
+  { id: 'c11', field: 'portal_url', header: 'Portal Link' },
 ]
 
 export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSelectedIds }: UniversalSyncModalProps) {
@@ -68,10 +72,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
   const [availableShows, setAvailableShows] = useState<any[]>([])
 
   const [globalMapping, setGlobalMapping] = useState<ExportMapping[]>([
-    { id: '1', field: 'artist_name', header: 'Artist Name' },
-    { id: '2', field: 'show_date', header: 'Show Date' },
-    { id: '3', field: 'venue_name', header: 'Venue' },
-    { id: '4', field: 'city', header: 'City' },
+    { id: 'c1', field: 'artist_name', header: 'Artist' },
+    { id: 'c2', field: 'show_date', header: 'Date' },
+    { id: 'c3', field: 'venue_name', header: 'Venue' },
+    { id: 'c4', field: 'city', header: 'City' },
+    { id: 'c5', field: 'deal_guarantee', header: 'Fee' },
+    { id: 'c6', field: 'notes', header: 'Notes' },
+    { id: 'c7', field: 'ticket_price', header: 'Ticket Price' },
+    { id: 'c8', field: 'capacity', header: 'Capacity' },
+    { id: 'c9', field: 'deal_type', header: 'Deal Type' },
   ])
 
   useEffect(() => {
