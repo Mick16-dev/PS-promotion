@@ -31,7 +31,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner"
-import { Reorder, AnimatePresence } from 'framer-motion'
+import { Reorder, AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface UniversalSyncModalProps {
@@ -80,14 +80,18 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
 
   useEffect(() => {
     const loadPrefs = async () => {
-      setIsLoading(true)
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      try {
+        setIsLoading(true)
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
         // Load Profile Prefs
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        if (profile?.global_export_mapping) setGlobalMapping(profile.global_export_mapping)
-        if (profile?.last_spreadsheet_name) setSpreadsheetName(profile.last_spreadsheet_name)
-        if (profile?.last_sheet_name) setSheetName(profile.last_sheet_name)
+        if (profile) {
+          if (profile.global_export_mapping) setGlobalMapping(profile.global_export_mapping)
+          if (profile.last_spreadsheet_name) setSpreadsheetName(profile.last_spreadsheet_name)
+          if (profile.last_sheet_name) setSheetName(profile.last_sheet_name)
+        }
         
         // Load All Shows for Selection
         const { data: shows } = await supabase.from('shows').select('id, artist_name, show_date, venue_name').order('show_date', { ascending: true })
@@ -102,8 +106,11 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           .maybeSingle()
         
         setIsGoogleConnected(!!integration)
+      } catch (err) {
+        console.error("Error loading prefs:", err)
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
     if (isOpen) loadPrefs()
   }, [isOpen])
@@ -137,9 +144,9 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         if (selectedShowIds.length === 0) throw new Error('Please select at least one show.')
         query = query.in('id', selectedShowIds)
       } else {
-        const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user?.id).single()
-        if (profile?.organization_id) query = query.eq('organization_id', profile.organization_id)
-        query = query.order('show_date', { ascending: true })
+      const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user?.id).maybeSingle()
+      if (profile?.organization_id) query = query.eq('organization_id', profile.organization_id)
+      query = query.order('show_date', { ascending: true })
       }
       
       const { data: shows, error: fetchErr } = await query
