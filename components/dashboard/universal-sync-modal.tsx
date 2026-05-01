@@ -176,16 +176,17 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
-      // GENERATE 2D ARRAY (HEADERS + DATA) to prevent column shifting in n8n
-      const headers = globalMapping.map(m => m.header)
-      const rows = shows.map(show => {
-        return globalMapping.map(m => {
+      // PAD SHOWS to prevent column shifting in n8n (ensures all keys exist)
+      const headersArray = globalMapping.map(m => m.header)
+      const paddedShows = shows.map(show => {
+        const paddedShow: any = {}
+        globalMapping.forEach(m => {
           let val = show[m.field] || ''
           if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
-          return val
+          paddedShow[m.field] = val
         })
+        return paddedShow
       })
-      const spreadsheet_values = [headers, ...rows]
 
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
@@ -195,8 +196,10 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           access_token: integration?.access_token || null,
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          mode: 'universal_bulk_export',
-          spreadsheet_values: spreadsheet_values,
+          mode: 'universal_custom_export',
+          headers: headersArray,
+          mapping: globalMapping,
+          shows: paddedShows,
           timestamp: new Date().toISOString()
         })
       })
