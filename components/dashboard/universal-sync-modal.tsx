@@ -186,7 +186,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
       if (!response.ok) throw new Error(result.details || result.error || 'Sync failed')
 
       toast.success('Universal Sync Successful!', {
-        description: `Exported ${shows.length} rows with ${headers.length} custom columns.`
+        description: `Exported ${shows.length} rows with ${globalMapping.length} custom columns.`
       })
       onClose()
     } catch (err: any) {
