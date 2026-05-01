@@ -389,42 +389,44 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       // 1. Match by show_id (works if n8n preserved our generated UUID as the row id)
       // 2. Match by most recent show for this artist created in the last 2 min (always works)
       try {
-        let createdShowId: string | null = null
-        const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString() // 2 min ago
+      // --- Detect the New Show Row (Realtime) ---
+      // Instead of polling, we subscribe to the 'shows' table and wait for n8n to insert the row.
+      let createdShowId: string | null = null
+      
+      createdShowId = await new Promise<string | null>((resolve) => {
+          const channel = supabase
+            .channel('show-creation-waiter')
+            .on(
+              'postgres_changes',
+              {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'shows',
+                filter: `user_id=eq.${userId}`
+              },
+              (payload: any) => {
+                // Verify this is the show we just created
+                // Fallback check 1: Match by artist_id (reliable)
+                // Fallback check 2: Match by show_id UUID if n8n preserved it
+                const isMatch = 
+                  payload.new.artist_id === selectedArtistId || 
+                  payload.new.id === show_id
+                
+                if (isMatch) {
+                  console.log('[Realtime] Show detected:', payload.new.id)
+                  supabase.removeChannel(channel)
+                  resolve(payload.new.id)
+                }
+              }
+            )
+            .subscribe()
 
-        for (let i = 0; i < 12; i++) {
-          // Try 1: n8n may have used our generated show_id as the Supabase row id
-          const { data: byId } = await supabase
-            .from('shows')
-            .select('id')
-            .eq('id', show_id)
-            .maybeSingle()
-
-          if (byId?.id) {
-            createdShowId = byId.id
-            console.log('[ShowReady] Found show by id:', createdShowId)
-            break
-          }
-
-          // Try 2: most recently created show for this artist (we just made it)
-          const { data: byArtist } = await supabase
-            .from('shows')
-            .select('id, created_at')
-            .eq('artist_id', selectedArtistId)
-            .gte('created_at', cutoff)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
-
-          if (byArtist?.id) {
-            createdShowId = byArtist.id
-            console.log('[ShowReady] Found show by artist+time:', createdShowId)
-            break
-          }
-
-          // Wait 1s before next poll
-          await new Promise(r => setTimeout(r, 1000))
-        }
+          // Fail-safe: if realtime misses it or n8n fails, timeout after 15 seconds
+          setTimeout(() => {
+            supabase.removeChannel(channel)
+            resolve(null)
+          }, 15000)
+        })
 
         if (createdShowId) {
           const { error: updateError } = await supabase
