@@ -37,6 +37,7 @@ export default function DashboardHome() {
   const stats = data?.stats || { totalShows: 0, awaitingDocs: 0, overdueDocs: 0 }
   const overdueItems = data?.overdueItems || []
   const isLoading = !data && !fetchError
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -158,7 +159,7 @@ export default function DashboardHome() {
       <CreateShowModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
-        onSuccess={fetchDashboardData}
+        onSuccess={() => mutate()}
       />
     </div>
   )
