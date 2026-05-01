@@ -130,7 +130,7 @@ export default function ShowsPage() {
   }
 
   useEffect(() => {
-    fetchShows()
+    mutate()
   }, [])
 
   if (isLoading) {
