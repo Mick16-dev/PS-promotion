@@ -191,16 +191,16 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         globalMapping.forEach(m => {
           let val = show[m.field] || ''
           if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
-          paddedShow[m.header] = val // Use custom header as key so n8n maps to the right sheet columns
+          paddedShow[m.field] = val // MUST use m.field as key so n8n maps data correctly
         })
         return paddedShow
       })
 
-      // If user is targeting a new sheet, prepend a header row so n8n writes the titles
+      // If user is targeting a new sheet, prepend a fake 'show' where the values are the headers
       if (spreadsheetName !== initialSpreadsheetName || sheetName !== initialSheetName) {
         const headerShow: any = {}
         globalMapping.forEach(m => {
-          headerShow[m.header] = m.header
+          headerShow[m.field] = m.header // Map the custom title text to the database field key
         })
         paddedShows.unshift(headerShow)
       }
