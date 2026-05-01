@@ -32,6 +32,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner"
 import { Reorder, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 interface UniversalSyncModalProps {
   isOpen: boolean
