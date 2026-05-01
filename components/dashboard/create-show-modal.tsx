@@ -253,6 +253,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
             id: newShow.id,
             show_id: newShow.id,
             user_id: userId,
+            show_name: `${artistName} @ ${venue || 'TBD'} — ${showDate || 'TBD'}`,
             access_token: refreshData.access_token || null,
             artist_name: artistName,
             artist_email: selectedArtist?.email,
