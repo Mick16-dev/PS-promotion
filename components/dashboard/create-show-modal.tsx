@@ -191,7 +191,12 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
       const showPortalToken = Math.random().toString(36).substring(2, 17)
       const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
-      const artistName = selectedArtist?.name || 'Unknown Artist'
+      const artistEmail = String(selectedArtist?.email || '').trim()
+      if (!artistEmail || !artistEmail.includes('@')) {
+        toast.error('Artist Email Required', { description: 'Please ensure the selected artist has a valid email address.' })
+        setIsSubmitting(false)
+        return
+      }
 
       // 1. DIRECT SUPABASE INSERT (The Source of Truth)
       const { data: newShow, error: insertError } = await supabase
@@ -200,6 +205,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           id: show_id,
           user_id: userId,
           artist_name: artistName,
+          artist_email: artistEmail, // FIX: Never null, avoids constraint error
           venue: venue,
           city: city,
           show_date: showDate,
