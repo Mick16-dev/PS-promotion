@@ -89,7 +89,7 @@ export default function ShowsPage() {
 
   function handleSync() {
     setIsRefreshing(true)
-    fetchShows()
+    mutate().finally(() => setIsRefreshing(false))
     toast.success('Syncing Data...')
   }
 
@@ -104,7 +104,7 @@ export default function ShowsPage() {
       await supabase.from('materials').delete().eq('show_id', id)
       const { error } = await supabase.from('shows').delete().eq('id', id)
       if (error) throw error
-      setShows(prev => prev.filter(s => s.id !== id))
+      mutate()
       toast.success('Engagement Removed')
     } catch (err: any) {
       toast.error('Deletion Failed')
@@ -282,12 +282,13 @@ export default function ShowsPage() {
                </Link>
             ))}
          </div>
-      </BentoPanel>
+        </BentoPanel>
+      </ErrorBoundary>
 
       <CreateShowModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
-        onSuccess={fetchShows}
+        onSuccess={() => mutate()}
       />
       <UniversalSyncModal 
         isOpen={isSyncModalOpen} 

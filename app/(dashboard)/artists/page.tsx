@@ -34,7 +34,7 @@ export default function ArtistsPage() {
     try {
       const { data, error } = await supabase.from('artists').insert({ name: newName.trim(), email: newEmail.trim() }).select().single()
       if (error) throw error
-      setArtists(prev => [...prev, data])
+      mutate()
       setNewName(''); setNewEmail(''); setShowModal(false)
       toast.success('Artist added to roster.')
     } catch (err: any) { toast.error('Failed: ' + (err.message || '')) } finally { setIsSaving(false) }
@@ -48,7 +48,7 @@ export default function ArtistsPage() {
       const { error } = await supabase.from('artists').delete().eq('id', id)
       if (error) throw error
       
-      setArtists(prev => prev.filter(a => a.id !== id))
+      mutate()
       toast.success('Artist Removed', { description: `${name} has been removed from the directory.` })
     } catch (err: any) {
       console.error('DELETE_ARTIST_ERROR:', err)
