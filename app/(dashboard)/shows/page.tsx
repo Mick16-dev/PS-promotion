@@ -45,18 +45,13 @@ export default function ShowsPage() {
   const { data: showsDataRaw, error: fetchError, mutate } = useSWR('shows-roster', async () => {
     const { data, error } = await supabase
       .from('shows')
-      .select(`
-        id, 
-        artist_name, 
-        venue_name, 
-        venue, 
-        city, 
-        show_date, 
-        materials (status)
-      `)
+      .select('id, artist_name, venue_name, venue, city, show_date')
       .order('show_date', { ascending: true })
     
-    if (error) throw error
+    if (error) {
+      console.error('FETCH_ERROR:', error)
+      throw error
+    }
     return data
   }, { revalidateOnFocus: true, refreshInterval: 60000 })
 
