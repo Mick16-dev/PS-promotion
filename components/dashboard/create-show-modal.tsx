@@ -182,330 +182,138 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
     try {
       // Find full artist details
       const selectedArtist = artists.find(a => a.id === selectedArtistId)
+      const { data: { user } } = await supabase.auth.getUser()
+      const userId = user?.id
+      if (!userId) throw new Error('User session lost.')
 
-      // Generate a stable show ID client-side so n8n can use it when inserting
+      // Generate IDs and Tokens
       const show_id = crypto.randomUUID()
-      // Generate portal base URL (from env var with fallback)
       const basePortalUrl = process.env.NEXT_PUBLIC_ARTIST_PORTAL_URL || 'https://sr-artist-portal-live.vercel.app'
-      
-      // Generate a master portal token for this show (shorter, cleaner for URLs)
       const showPortalToken = Math.random().toString(36).substring(2, 17)
-
-      // Build required_documents
-      const docs = defaultDocs
-        .filter(doc => selectedDocs[doc.id])
-        .map(doc => {
-          return {
-            name: doc.label,
-            deadline: docDates[doc.id] || showDate,
-            portal_token: showPortalToken, // Use the short token
-            portal_url: `${basePortalUrl}/?token=${showPortalToken}`
-          }
-        })
-
       const primaryPortalUrl = `${basePortalUrl}/?token=${showPortalToken}`
       const artistName = selectedArtist?.name || 'Unknown Artist'
 
-
-      // Fetch a FRESH Google access token via the refresh endpoint.
-      // This auto-refreshes the token if it has expired (tokens expire ~1 hour).
-      let access_token: string | null = null
-      try {
-        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
-        if (refreshRes.ok) {
-          const refreshData = await refreshRes.json()
-          access_token = refreshData.access_token ?? null
-        }
-      } catch {
-        // Non-fatal — calendar creation will be skipped in n8n if token is missing
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-      const userId = user?.id
-
-      // Fetch promoter's mapping preferences
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('global_export_mapping, last_spreadsheet_name')
-        .eq('id', userId)
+      // 1. DIRECT SUPABASE INSERT (The Source of Truth)
+      // We create the show row FIRST so we know it exists.
+      const { data: newShow, error: insertError } = await supabase
+        .from('shows')
+        .insert({
+          id: show_id, // Use our stable UUID
+          user_id: userId,
+          artist_id: selectedArtistId,
+          artist_name: artistName,
+          venue_name: venue,
+          venue: venue,
+          city: city,
+          show_date: showDate,
+          show_time: showTime,
+          show_end_time: showEndTime || null,
+          load_in_time: loadInTime || null,
+          soundcheck_time: soundcheckTime || null,
+          changeover_time: changeoverTime || null,
+          doors_time: doorsTime || null,
+          musicians_count: musiciansCount || 0,
+          host_name: hostName || null,
+          artist_epk_url: artistEpkUrl || null,
+          stageplot_url: stageplotUrl || null,
+          technical_notes: technicalNotes || null,
+          artist_comment: artistComment || null,
+          portal_token: showPortalToken,
+          portal_url: primaryPortalUrl,
+          deal_type: dealType,
+          deal_guarantee: dealGuarantee || 0,
+          deal_percentage: dealPercentage || 0,
+          ticket_tiers: ticketTiers,
+          expenses: expenses,
+          status: 'pending'
+        })
+        .select()
         .single()
 
-      const rawMappings = Array.isArray(profile?.global_export_mapping)
-        ? (profile.global_export_mapping as Array<{ source?: string; header?: string }>)
-        : []
-      const sanitizedMappings = rawMappings
-        .map((m) => ({
-          source: String(m?.source || '').trim(),
-          header: String(m?.header || '').trim(),
+      if (insertError) {
+        console.error('Show Creation Failed:', insertError)
+        throw new Error(`Database insert failed: ${insertError.message}`)
+      }
+
+      // 2. TRIGGER N8N FOR AUTOMATIONS (Calendar, Email, Sheets)
+      // Now that the show is safe in DB, we tell n8n to do the rest.
+      const docs = defaultDocs
+        .filter(doc => selectedDocs[doc.id])
+        .map(doc => ({
+          name: doc.label,
+          deadline: docDates[doc.id] || showDate,
+          portal_token: showPortalToken,
+          portal_url: `${basePortalUrl}/?token=${showPortalToken}`
         }))
-        .filter((m) => m.source.length > 0 && m.header.length > 0)
-      const headersArray = sanitizedMappings.map((m) => m.header)
 
-      const sourceValues: Record<string, string> = {
-        artist_name: artistName,
-        venue: venue,
-        venue_name: venue,
-        show_date: showDate,
-        city,
-        show_time: showTime,
-        load_in_time: loadInTime,
-        soundcheck_time: soundcheckTime,
-        deal_guarantee: String(dealGuarantee ?? ''),
-        deal_type: dealType,
-        portal_url: primaryPortalUrl,
-        status: 'pending',
-      }
-
-      // Keep legacy short keys for backwards compatibility in n8n branches.
-      const mappedShowLegacy: Record<string, string> = {
-        artist: artistName,
-        /** Alias expected by older n8n expressions (e.g. shows[0].artist_name). */
-        artist_name: artistName,
-        venue,
-        venue_name: venue,
-        date: showDate,
-        show_date: showDate,
-        show_time: showTime,
-        show_end_time: showEndTime,
-        load_in_time: loadInTime,
-        soundcheck_time: soundcheckTime,
-        changeover_time: changeoverTime,
-        doors_time: doorsTime,
-        sync_to_calendar: syncToCalendar,
-        syncToCalendar: syncToCalendar,
-        city: city,
-        show_id: show_id
-      }
-
-      const mappedShowByHeaders = sanitizedMappings.reduce<Record<string, string>>((acc, mapping) => {
-        acc[mapping.header] = sourceValues[mapping.source] ?? ''
-        return acc
-      }, {})
-      const rowsMapped = Object.keys(mappedShowByHeaders).length ? [mappedShowByHeaders] : [mappedShowLegacy]
-      const valueRows = rowsMapped.map((row) => headersArray.map((header) => row[header] ?? ''))
-      /** Google Sheets Append `values`: row 1 = headers, following rows = data (stable column order). */
-      const spreadsheet_values = headersArray.length ? [headersArray, ...valueRows] : []
-
-      const payload = {
-        ...mappedShowLegacy,
-        user_id: userId,
-        access_token: access_token,
-        spreadsheet_name: profile?.last_spreadsheet_name || 'Master Production Roster',
-        spreadsheetName: profile?.last_spreadsheet_name || 'Master Production Roster',
-        headers: headersArray,
-        header_row: headersArray,
-        columns: headersArray,
-        column_order: headersArray,
-        mapping: sanitizedMappings,
-        rows: rowsMapped,
-        mapped_rows: rowsMapped,
-        value_rows: valueRows,
-        spreadsheet_values: spreadsheet_values,
-        spreadsheetValues: spreadsheet_values,
-        google_sheets_values: spreadsheet_values,
-        shows: [mappedShowLegacy],
-        legacy_rows: [mappedShowLegacy],
-        status: 'pending',
-        artist_id: selectedArtistId,
-        artist_name: artistName,
-        artist_email: String(selectedArtist?.email || '').trim(),
-      }
-
-      if (!payload.artist_email || !payload.artist_email.includes('@')) {
-        toast.error('Invalid Email', { description: 'Please ensure the artist has a valid email address.' })
-        setIsSubmitting(false)
-        return
-      }
-
-      const payloadFinal = {
-        ...payload,
-        show_name: `${artistName} at ${venue}`,
-        venue,
-        venue_name: venue,
-        city,
-        date: showDate,
-        show_date: showDate,
-        show_time: showTime,
-        show_end_time: showEndTime,
-        load_in_time: loadInTime,
-        soundcheck_time: soundcheckTime,
-        changeover_time: changeoverTime,
-        doors_time: doorsTime,
-        sync_to_calendar: syncToCalendar,
-        syncToCalendar: syncToCalendar,
-        required_documents: docs,
-        timestamp: new Date().toISOString(),
-        portal_token: showPortalToken,
-        portal_url: primaryPortalUrl,
-        deal_type: dealType,
-        deal_guarantee: dealGuarantee,
-        deal_percentage: dealPercentage,
-        ticket_tiers: ticketTiers,
-        expenses: expenses
-      };
-
-      console.log('--- N8N PAYLOAD DEBUG ---', payloadFinal);
-
-      // POST to server-side proxy (avoids CORS/mixed-content and hides webhook URL)
-      const response = await fetch('/api/n8n/create-show', {
+      try {
+        const refreshRes = await fetch('/api/auth/google/refresh', { method: 'POST' })
+        const refreshData = await refreshRes.json().catch(() => ({}))
+        
+        await fetch('/api/n8n/create-show', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payloadFinal)
-        })
-
-      if(!response.ok) {
-          let details = ''
-        try {
-            const json = await response.json()
-          details = json?.error || json?.details || json?.body || ''
-          } catch {
-            // ignore JSON parse error for error response
-          }
-        throw new Error(details ? `Request failed (${response.status}): ${details}` : `Request failed (${response.status})`)
-    }
-      
-      // --- Handle Venue Memory ---
-      let finalVenueId = null
-      try {
-        const existingVenue = venuesList.find(v => v.name.toLowerCase() === venue.toLowerCase())
-        if (existingVenue) {
-          finalVenueId = existingVenue.id
-        } else {
-          const { data: newVenue, error } = await supabase.from('venues').insert({
-            name: venue,
-            city: city,
-            default_capacity: ticketTiers.reduce((acc, t) => acc + (Number(t.capacity) || 0), 0)
-          }).select().single()
-          if (!error && newVenue) {
-            finalVenueId = newVenue.id
-          }
-        }
-      } catch (err) {
-        console.error('Failed to upsert venue:', err)
-      }
-
-      // --- Update Show with Financial Data ---
-      // n8n confirmed to NOT save portal_token, so we use two reliable fallbacks:
-      // 1. Match by show_id (works if n8n preserved our generated UUID as the row id)
-      // 2. Match by most recent show for this artist created in the last 2 min (always works)
-      try {
-      // --- Detect the New Show Row (Realtime) ---
-      // Instead of polling, we subscribe to the 'shows' table and wait for n8n to insert the row.
-      let createdShowId: string | null = null
-      
-      createdShowId = await new Promise<string | null>((resolve) => {
-          const channel = supabase
-            .channel('show-creation-waiter')
-            .on(
-              'postgres_changes',
-              {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'shows',
-                filter: `user_id=eq.${userId}`
-              },
-              (payload: any) => {
-                // Verify this is the show we just created
-                // Fallback check 1: Match by artist_id (reliable)
-                // Fallback check 2: Match by show_id UUID if n8n preserved it
-                const isMatch = 
-                  payload.new.artist_id === selectedArtistId || 
-                  payload.new.id === show_id
-                
-                if (isMatch) {
-                  console.log('[Realtime] Show detected:', payload.new.id)
-                  supabase.removeChannel(channel)
-                  resolve(payload.new.id)
-                }
-              }
-            )
-            .subscribe()
-
-          // Fail-safe: if realtime misses it or n8n fails, timeout after 15 seconds
-          setTimeout(() => {
-            supabase.removeChannel(channel)
-            resolve(null)
-          }, 15000)
-        })
-
-        if (createdShowId) {
-          const { error: updateError } = await supabase
-            .from('shows')
-            .update({
-              ticket_tiers: ticketTiers,
-              expenses: expenses,
-              deal_type: dealType,
-              deal_guarantee: dealGuarantee,
-              deal_percentage: dealPercentage,
-              venue_id: finalVenueId,
-              show_end_time: showEndTime || null,
-              changeover_time: changeoverTime || null,
-              musicians_count: musiciansCount || 0,
-              host_name: hostName || null,
-              artist_epk_url: artistEpkUrl || null,
-              stageplot_url: stageplotUrl || null,
-              technical_notes: technicalNotes || null,
-              artist_comment: artistComment || null
-            })
-            .eq('id', createdShowId)
-
-          if (updateError) {
-            console.error('[ShowReady] Financial update error:', updateError)
-            toast.error('Financial data could not be saved.', {
-              description: `DB error: ${updateError.message}`
-            })
-          } else {
-            console.log('[ShowReady] Financial data saved successfully to show:', createdShowId)
-          }
-        } else {
-          console.error('[ShowReady] Show row not found after polling. n8n may be slow or failing.')
-          toast.error('Show created but financial data was not saved.', {
-            description: 'Could not locate the new show row in Supabase. Check your n8n workflow is inserting correctly.'
+          body: JSON.stringify({
+            id: newShow.id,
+            show_id: newShow.id,
+            user_id: userId,
+            access_token: refreshData.access_token || null,
+            artist_name: artistName,
+            artist_email: selectedArtist?.email,
+            venue_name: venue,
+            show_date: showDate,
+            show_time: showTime,
+            portal_url: primaryPortalUrl,
+            required_documents: docs,
+            sync_to_calendar: syncToCalendar,
+            timestamp: new Date().toISOString()
           })
-        }
-      } catch (err: any) {
-        console.error('[ShowReady] Financial update crashed:', err)
+        })
+      } catch (n8nErr) {
+        console.error('Automation Trigger Failed:', n8nErr)
+        // We don't throw here because the show is already in the DB.
+        toast.warning('Show created, but automation (Calendar/Email) may be delayed.')
       }
       
-      toast.success('Show created.', {
-      description: `Portal link sent to the artist. They'll receive an email shortly.`
-    })
+      toast.success('Show Created Successfully', {
+        description: `"${artistName}" has been added to your roster.`
+      })
 
-    onClose()
-    onSuccess?.()
+      onClose()
+      onSuccess?.()
 
-    // Reset form
-    setVenue('')
-    setCity('')
-    setShowDate('')
-    setShowTime('')
-    setLoadInTime('')
-    setSoundcheckTime('')
-    setChangeoverTime('')
-    setDoorsTime('')
-    setShowEndTime('')
-    setMusiciansCount(0)
-    setHostName('')
-    setArtistEpkUrl('')
-    setStageplotUrl('')
-    setTechnicalNotes('')
-    setArtistComment('')
-    setCateringNotes('')
-    setSyncToCalendar(true)
-    setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
-    setDocDates({})
-    setTicketTiers([{ name: 'General Admission', price: 0, capacity: 0 }])
-    setExpenses([{ name: 'Rent', amount: 0 }])
-    setDealType('flat')
-    setDealGuarantee(0)
-    setDealPercentage(0)
-  } catch {
-    console.error('Submission error')
-    toast.error('Failed to create show. Please try again or check n8n connection.')
-  } finally {
-    setIsSubmitting(false)
+      // Reset form
+      setVenue('')
+      setCity('')
+      setShowDate('')
+      setShowTime('')
+      setLoadInTime('')
+      setSoundcheckTime('')
+      setChangeoverTime('')
+      setDoorsTime('')
+      setShowEndTime('')
+      setMusiciansCount(0)
+      setHostName('')
+      setArtistEpkUrl('')
+      setStageplotUrl('')
+      setTechnicalNotes('')
+      setArtistComment('')
+      setCateringNotes('')
+      setSyncToCalendar(true)
+      setSelectedDocs({ epk: true, bio: true, photos: true, rider: true, contract: true })
+      setDocDates({})
+      setTicketTiers([{ name: 'General Admission', price: 0, capacity: 0 }])
+      setExpenses([{ name: 'Rent', amount: 0 }])
+      setDealType('flat')
+      setDealGuarantee(0)
+      setDealPercentage(0)
+    } catch (err: any) {
+      console.error('Submission error:', err)
+      toast.error('Creation Failed', { description: err.message })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
-}
 
 return (
   <Dialog
