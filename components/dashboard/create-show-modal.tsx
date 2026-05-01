@@ -275,8 +275,13 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
         description: `"${artistName}" has been added to your roster.`
       })
 
-      onClose()
-      onSuccess?.()
+      // FORCE UI REFRESH
+      setTimeout(() => {
+        onSuccess?.()
+        onClose()
+        // Hard fallback for SWR cache issues
+        window.location.href = '/shows'
+      }, 500)
 
       // Reset form
       setVenue('')
