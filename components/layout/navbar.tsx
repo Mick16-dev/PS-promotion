@@ -67,8 +67,9 @@ export function Navbar() {
             submitted_at,
             deadline,
             shows (
+              id,
               venue_name,
-              artist ( name )
+              artist_name
             )
           `)
           .order('submitted_at', { ascending: false })
@@ -77,7 +78,6 @@ export function Navbar() {
         if (data && !error) {
            const formatted = data.map((mat: any) => {
              const showData = Array.isArray(mat.shows) ? mat.shows[0] : mat.shows
-             const artistData = showData?.artist ? (Array.isArray(showData.artist) ? showData.artist[0] : showData.artist) : null
              
              const now = new Date()
              const submissionDate = mat.submitted_at ? new Date(mat.submitted_at) : null
@@ -101,7 +101,7 @@ export function Navbar() {
              return {
                id: mat.id,
                type,
-              artist: artistData?.name || 'Unnamed Artist',
+               artist: showData?.artist_name || 'Unnamed Artist',
                document: mat.document_name || 'Document',
                venue: showData?.venue_name || 'Venue',
                time: timeStr
