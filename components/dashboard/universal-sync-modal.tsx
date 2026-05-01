@@ -167,15 +167,18 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
+      const headersArray = globalMapping.map(m => m.header)
+
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: user?.id,
           access_token: integration?.access_token || null,
-          mode: 'universal_bulk_export',
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
+          mode: 'universal_custom_export',
+          headers: headersArray,
           mapping: globalMapping,
           shows: shows,
           timestamp: new Date().toISOString()
