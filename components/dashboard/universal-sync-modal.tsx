@@ -67,6 +67,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
   
   const [spreadsheetName, setSpreadsheetName] = useState('Master Production Roster')
   const [sheetName, setSheetName] = useState('Active Shows')
+  const [initialSpreadsheetName, setInitialSpreadsheetName] = useState('Master Production Roster')
+  const [initialSheetName, setInitialSheetName] = useState('Active Shows')
   const [exportType, setExportType] = useState<'selected' | 'all'>('selected')
   const [selectedShowIds, setSelectedShowIds] = useState<string[]>(initialSelectedIds || [])
   const [availableShows, setAvailableShows] = useState<any[]>([])
@@ -98,8 +100,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
         if (profile) {
           if (profile.global_export_mapping) setGlobalMapping(profile.global_export_mapping)
-          if (profile.last_spreadsheet_name) setSpreadsheetName(profile.last_spreadsheet_name)
-          if (profile.last_sheet_name) setSheetName(profile.last_sheet_name)
+          if (profile.last_spreadsheet_name) {
+            setSpreadsheetName(profile.last_spreadsheet_name)
+            setInitialSpreadsheetName(profile.last_spreadsheet_name)
+          }
+          if (profile.last_sheet_name) {
+            setSheetName(profile.last_sheet_name)
+            setInitialSheetName(profile.last_sheet_name)
+          }
         }
         
         // Load All Shows for Selection
@@ -187,6 +195,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         })
         return paddedShow
       })
+
+      // If user is targeting a new sheet, prepend a header row so n8n writes the titles
+      if (spreadsheetName !== initialSpreadsheetName || sheetName !== initialSheetName) {
+        const headerShow: any = {}
+        globalMapping.forEach(m => {
+          headerShow[m.header] = m.header
+        })
+        paddedShows.unshift(headerShow)
+      }
 
       const response = await fetch('/api/n8n/universal-sync', {
         method: 'POST',
