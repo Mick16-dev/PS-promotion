@@ -153,18 +153,6 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
       if (fetchErr) throw fetchErr
       if (!shows || shows.length === 0) throw new Error('No shows found.')
 
-      // --- NEW: GENERATE 2D ARRAY (HEADERS + DATA) ---
-      const headers = globalMapping.map(m => m.header)
-      const rows = shows.map(show => {
-        return globalMapping.map(m => {
-          let val = show[m.field] || ''
-          // Format date if needed
-          if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
-          return val
-        })
-      })
-      const spreadsheet_values = [headers, ...rows]
-
       // Save global mapping to profile
       await supabase.from('profiles').update({ 
         global_export_mapping: globalMapping,
@@ -188,7 +176,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           mode: 'universal_bulk_export',
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
-          spreadsheet_values: spreadsheet_values, // The structured 2D array
+          mapping: globalMapping,
+          shows: shows,
           timestamp: new Date().toISOString()
         })
       })
