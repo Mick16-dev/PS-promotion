@@ -183,7 +183,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         globalMapping.forEach(m => {
           let val = show[m.field] || ''
           if (m.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
-          paddedShow[m.field] = val
+          paddedShow[m.header] = val // Use custom header as key so n8n maps to the right sheet columns
         })
         return paddedShow
       })
