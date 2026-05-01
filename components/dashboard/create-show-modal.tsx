@@ -221,8 +221,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           deal_guarantee: dealGuarantee || 0,
           deal_percentage: dealPercentage || 0,
           ticket_tiers: ticketTiers,
-          expenses: expenses,
-          show_status: 'pending' // Corrected from 'status'
+          expenses: expenses
         })
         .select()
         .single()
