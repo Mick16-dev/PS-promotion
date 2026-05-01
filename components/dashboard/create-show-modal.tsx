@@ -205,7 +205,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           id: show_id,
           user_id: userId,
           artist_name: artistName,
-          artist_email: artistEmail, // FIX: Never null, avoids constraint error
+          artist_email: artistEmail,
           venue: venue,
           city: city,
           show_date: showDate,
@@ -221,7 +221,7 @@ export function CreateShowModal({ isOpen, onClose, onSuccess }: CreateShowModalP
           deal_percentage: dealPercentage || 0,
           ticket_tiers: ticketTiers,
           expenses: expenses,
-          status: 'pending'
+          show_status: 'pending' // Corrected from 'status'
         })
         .select()
         .single()
