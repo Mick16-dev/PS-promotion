@@ -142,6 +142,19 @@ export default function ShowsPage() {
     )
   }
 
+  const runDiagnostic = async () => {
+    try {
+      const { data, error } = await supabase.from('shows').select('id, artist_name')
+      if (error) {
+        alert(`DB Error: ${error.message}`)
+      } else {
+        alert(`Success: Found ${data?.length || 0} shows in the database.`)
+      }
+    } catch (err: any) {
+      alert(`System Error: ${err.message}`)
+    }
+  }
+
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-20">
       
@@ -211,7 +224,7 @@ export default function ShowsPage() {
             </div>
 
             {/* Data Rows */}
-            {shows.map((show) => (
+            {shows.length > 0 ? shows.map((show) => (
                <Link key={show.id} href={`/shows/${show.id}`}>
                   <div className={cn(
                      "group flex items-center gap-8 px-8 py-6 hover:bg-primary/[0.02] transition-all cursor-pointer relative overflow-hidden",
@@ -231,9 +244,9 @@ export default function ShowsPage() {
                            size="sm"
                            fallback={show.artist}
                            status={{
-                              contract: show.progress > 0,
-                              rider: show.progress > 1,
-                              presskit: show.progress > 2
+                               contract: show.progress > 0,
+                               rider: show.progress > 1,
+                               presskit: show.progress > 2
                            }}
                         />
                         <div className="min-w-0">
@@ -280,7 +293,14 @@ export default function ShowsPage() {
                      </div>
                   </div>
                </Link>
-            ))}
+            )) : (
+              <div className="p-20 text-center space-y-4">
+                 <Calendar className="h-12 w-12 text-muted-foreground/20 mx-auto" />
+                 <p className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">No active engagements found</p>
+                 <Button onClick={() => setIsCreateModalOpen(true)} variant="outline" className="border-white/10 text-xs font-bold uppercase tracking-widest h-10 px-6">Add your first show</Button>
+              </div>
+            )}
+
          </div>
         </BentoPanel>
       </ErrorBoundary>
