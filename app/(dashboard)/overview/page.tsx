@@ -25,6 +25,7 @@ import {
   TelemetryLine, 
   StatusPing 
 } from '@/components/ui/bento-grid'
+import { ErrorBoundary } from '@/components/dashboard/error-boundary'
 
 export default function DashboardHome() {
   const { data, error: fetchError, mutate } = useSWR('dashboard-data', async () => {
@@ -100,63 +101,67 @@ export default function DashboardHome() {
       </div>
 
       {/* STATS BENTO GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: 'Active Advancements', value: stats.totalShows, icon: Calendar, color: 'text-white' },
-          { label: 'Materials Pipeline', value: stats.awaitingDocs, icon: Clock4, color: 'text-amber-500' },
-          { label: 'Priority Overdue', value: stats.overdueDocs, icon: AlertCircle, color: 'text-rose-500' }
-        ].map((stat, i) => (
-          <div key={i} className="bg-surface-elevated border-tactical rounded-2xl p-8 hover-cockpit-glow group">
-             <div className="flex items-center justify-between mb-8">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{stat.label}</span>
-                <stat.icon size={14} className="text-muted-foreground/30 group-hover:text-primary transition-colors" />
-             </div>
-             <div className="flex items-baseline gap-2">
-                <span className={`text-4xl text-raw-data font-black italic ${stat.color}`}>{stat.value}</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Records</span>
-             </div>
-          </div>
-        ))}
-      </div>
+      <ErrorBoundary title="Core Metrics">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { label: 'Active Advancements', value: stats.totalShows, icon: Calendar, color: 'text-white' },
+            { label: 'Materials Pipeline', value: stats.awaitingDocs, icon: Clock4, color: 'text-amber-500' },
+            { label: 'Priority Overdue', value: stats.overdueDocs, icon: AlertCircle, color: 'text-rose-500' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-surface-elevated border-tactical rounded-2xl p-8 hover-cockpit-glow group">
+               <div className="flex items-center justify-between mb-8">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{stat.label}</span>
+                  <stat.icon size={14} className="text-muted-foreground/30 group-hover:text-primary transition-colors" />
+               </div>
+               <div className="flex items-baseline gap-2">
+                  <span className={`text-4xl text-raw-data font-black italic ${stat.color}`}>{stat.value}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Records</span>
+               </div>
+            </div>
+          ))}
+        </div>
+      </ErrorBoundary>
 
       {/* MAIN CONTENT BENTO */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
          
          {/* Priority Feed (2 cols) */}
-         <BentoPanel className="lg:col-span-2" title="Priority Advancements" icon={Activity}>
-            <div className="divide-y divide-white/[0.02] mt-4">
-               {overdueItems.length > 0 ? (
-                 overdueItems.map((item) => (
-                   <Link key={item.id} href={`/shows/${item.showId}`}>
-                     <div className="group flex items-center justify-between py-4 hover:bg-white/[0.02] transition-all px-4 rounded-xl">
-                       <div className="flex items-center gap-6 min-w-0">
-                          <div className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
-                             <FileWarning size={14} />
-                          </div>
-                          <div className="min-w-0">
-                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-bold text-white tracking-tight group-hover:text-primary transition-colors">{item.artist}</span>
-                                <span className="text-muted-foreground/20 text-xs font-black">•</span>
-                                <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{item.venue}</span>
-                             </div>
-                             <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wide mt-0.5">{item.document}</p>
-                          </div>
+         <ErrorBoundary title="Priority Advancement Feed">
+           <BentoPanel className="lg:col-span-2" title="Priority Advancements" icon={Activity}>
+              <div className="divide-y divide-white/[0.02] mt-4">
+                 {overdueItems.length > 0 ? (
+                   overdueItems.map((item) => (
+                     <Link key={item.id} href={`/shows/${item.showId}`}>
+                       <div className="group flex items-center justify-between py-4 hover:bg-white/[0.02] transition-all px-4 rounded-xl">
+                         <div className="flex items-center gap-6 min-w-0">
+                            <div className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
+                               <FileWarning size={14} />
+                            </div>
+                            <div className="min-w-0">
+                               <div className="flex items-center gap-3">
+                                  <span className="text-sm font-bold text-white tracking-tight group-hover:text-primary transition-colors">{item.artist}</span>
+                                  <span className="text-muted-foreground/20 text-xs font-black">•</span>
+                                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{item.venue}</span>
+                               </div>
+                               <p className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wide mt-0.5">{item.document}</p>
+                            </div>
+                         </div>
+                         
+                         <div className="bg-rose-500/10 px-3 py-1 rounded-md border border-rose-500/20">
+                            <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest">Late: {item.deadline}</span>
+                         </div>
                        </div>
-                       
-                       <div className="bg-rose-500/10 px-3 py-1 rounded-md border border-rose-500/20">
-                          <span className="text-[8px] font-black text-rose-500 uppercase tracking-widest">Late: {item.deadline}</span>
-                       </div>
-                     </div>
-                   </Link>
-                 ))
-               ) : (
-                 <div className="py-20 text-center flex flex-col items-center justify-center">
-                    <CheckCircle2 size={32} className="mb-4 text-emerald-500 opacity-20" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Zero Unresolved Items</p>
-                 </div>
-               )}
-            </div>
-         </BentoPanel>
+                     </Link>
+                   ))
+                 ) : (
+                   <div className="py-20 text-center flex flex-col items-center justify-center">
+                      <CheckCircle2 size={32} className="mb-4 text-emerald-500 opacity-20" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Zero Unresolved Items</p>
+                   </div>
+                 )}
+              </div>
+           </BentoPanel>
+         </ErrorBoundary>
 
          {/* Quick Actions / Integration Status (1 col) */}
          <BentoPanel title="Live Diagnostics" icon={Database}>

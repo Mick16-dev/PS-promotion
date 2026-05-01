@@ -27,6 +27,7 @@ import {
   ArtistStatusAvatar, 
   StatusPing 
 } from '@/components/ui/bento-grid'
+import { ErrorBoundary } from '@/components/dashboard/error-boundary'
 import { cn } from '@/lib/utils'
 
 interface Show {
@@ -191,7 +192,8 @@ export default function ShowsPage() {
       </div>
 
       {/* ROSTER TABLE / GRID */}
-      <BentoPanel className="p-0" title="Active Roster Advancements" icon={Calendar}>
+      <ErrorBoundary title="Engagement Roster">
+        <BentoPanel className="p-0" title="Active Roster Advancements" icon={Calendar}>
          <div className="divide-y divide-white/[0.02]">
             {/* Header Row */}
             <div className="px-8 py-4 bg-white/[0.01] flex items-center gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">

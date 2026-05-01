@@ -13,7 +13,11 @@ export function middleware(request: NextRequest) {
   const now = Date.now()
   
   // Only rate limit auth-related and API routes
-  if (request.nextUrl.pathname.startsWith('/api/auth') || request.nextUrl.pathname.startsWith('/login')) {
+  if (
+    request.nextUrl.pathname.startsWith('/api/auth') || 
+    request.nextUrl.pathname.startsWith('/api/n8n') ||
+    request.nextUrl.pathname.startsWith('/login')
+  ) {
     const rateData = ipCache.get(ip) || { count: 0, lastRequest: now }
     
     if (now - rateData.lastRequest > RATE_LIMIT_WINDOW) {
