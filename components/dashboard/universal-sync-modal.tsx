@@ -257,16 +257,22 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
-      // Pad shows using m.header as key — this ensures that the JSON keys
-      // match the exact column titles the user defined in the UI.
+      // 1. Prepare mapping for n8n (ensure unique field keys for custom columns)
+      const mappingForN8n = columns.map(col => ({
+        ...col,
+        field: col.field === 'static_text' ? col.id : col.field
+      }))
+
+      // 2. Pad shows using the field keys defined in mappingForN8n
       const paddedShows = shows.map(show => {
         const row: any = {}
         columns.forEach(col => {
           let val = ''
+          const targetKey = col.field === 'static_text' ? col.id : col.field
+          
           if (col.field === 'static_text') {
             val = col.staticValue || ''
           } else {
-            // Data extraction for complex fields
             if (col.field === 'ticket_price') {
               val = show.ticket_tiers?.[0]?.price?.toString() || '0'
             } else if (col.field === 'capacity') {
@@ -274,10 +280,9 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
             } else {
               val = show[col.field] || ''
             }
-            
             if (col.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
           }
-          row[col.header] = val
+          row[targetKey] = val
         })
         return row
       })
@@ -291,8 +296,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           mode: 'universal_bulk_export',
-          mapping: columns,
-          shows: paddedShows,  // n8n now receives keys matching the headers
+          mapping: mappingForN8n, // Use mapping with unique custom keys
+          shows: paddedShows,
           timestamp: new Date().toISOString()
         })
       })
