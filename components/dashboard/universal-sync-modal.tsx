@@ -181,6 +181,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           .order('show_date', { ascending: true })
         if (shows) setAvailableShows(shows)
 
+        // Dynamic Spreadsheet Naming: Default to "Production - Artist" for single show exports
+        if (selectedShowIds.length === 1) {
+          const currentShow = shows?.find(s => s.id === selectedShowIds[0])
+          if (currentShow && !profile?.last_spreadsheet_name) {
+             setSpreadsheetName(`Production - ${currentShow.artist_name}`)
+          }
+        }
+
         const { data: integration } = await supabase
           .from('user_integrations')
           .select('id')
