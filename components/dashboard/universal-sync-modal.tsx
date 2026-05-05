@@ -406,42 +406,44 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
               </div>
 
               {/* Show Selection */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Engagements</h3>
+              {selectedShowIds.length !== 1 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Engagements</h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setExportType('all')} className={cn("text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all", exportType === 'all' ? "bg-primary text-white" : "text-zinc-500")}>All</button>
+                      <button onClick={() => setExportType('selected')} className={cn("text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all", exportType === 'selected' ? "bg-primary text-white" : "text-zinc-500")}>Selective</button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => setExportType('all')} className={cn("text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all", exportType === 'all' ? "bg-primary text-white" : "text-zinc-500")}>All</button>
-                    <button onClick={() => setExportType('selected')} className={cn("text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all", exportType === 'selected' ? "bg-primary text-white" : "text-zinc-500")}>Selective</button>
-                  </div>
-                </div>
 
-                {exportType === 'selected' && (
-                  <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden max-h-[200px] overflow-y-auto divide-y divide-white/[0.03]">
-                    {availableShows.length === 0 ? (
-                      <div className="p-4 text-center text-[10px] text-zinc-600 font-bold uppercase italic">No engagements found</div>
-                    ) : (
-                      availableShows.map(show => (
-                        <div
-                          key={show.id}
-                          onClick={() => toggleShow(show.id)}
-                          className={cn("flex items-center justify-between px-6 py-3 cursor-pointer transition-colors", selectedShowIds.includes(show.id) ? "bg-primary/5" : "hover:bg-white/[0.01]")}
-                        >
-                          <div className="flex flex-col">
-                            <span className={cn("text-xs font-bold", selectedShowIds.includes(show.id) ? "text-primary" : "text-white")}>{show.artist_name}</span>
-                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">{show.venue || 'Venue TBD'} &bull; {new Date(show.show_date).toLocaleDateString()}</span>
+                  {exportType === 'selected' && (
+                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden max-h-[200px] overflow-y-auto divide-y divide-white/[0.03]">
+                      {availableShows.length === 0 ? (
+                        <div className="p-4 text-center text-[10px] text-zinc-600 font-bold uppercase italic">No engagements found</div>
+                      ) : (
+                        availableShows.map(show => (
+                          <div
+                            key={show.id}
+                            onClick={() => toggleShow(show.id)}
+                            className={cn("flex items-center justify-between px-6 py-3 cursor-pointer transition-colors", selectedShowIds.includes(show.id) ? "bg-primary/5" : "hover:bg-white/[0.01]")}
+                          >
+                            <div className="flex flex-col">
+                              <span className={cn("text-xs font-bold", selectedShowIds.includes(show.id) ? "text-primary" : "text-white")}>{show.artist_name}</span>
+                              <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">{show.venue || 'Venue TBD'} &bull; {new Date(show.show_date).toLocaleDateString()}</span>
+                            </div>
+                            <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center transition-all", selectedShowIds.includes(show.id) ? "bg-primary border-primary" : "border-white/10")}>
+                              {selectedShowIds.includes(show.id) && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                            </div>
                           </div>
-                          <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center transition-all", selectedShowIds.includes(show.id) ? "bg-primary border-primary" : "border-white/10")}>
-                            {selectedShowIds.includes(show.id) && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>

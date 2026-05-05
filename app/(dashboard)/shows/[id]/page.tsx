@@ -222,10 +222,10 @@ export default function ShowDetailPage({ params }: any) {
 
              <button 
                 onClick={() => setIsSyncModalOpen(true)}
-                className="w-full mt-2 h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2"
+                className="w-full mt-2 h-12 bg-surface-elevated border border-white/[0.05] hover:border-primary/50 text-white font-black uppercase text-[10px] px-6 rounded-xl transition-all flex items-center justify-center gap-2"
              >
-                <RefreshCw size={14} />
-                Sync to Google Sheets
+                <Table size={14} className="text-[#0F9D58]" />
+                Universal Export
              </button>
           </BentoPanel>
         </div>
