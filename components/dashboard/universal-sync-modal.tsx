@@ -41,7 +41,7 @@ interface ExportColumn {
 const AVAILABLE_FIELDS = [
   { field: 'artist_name',    label: 'Artist Name' },
   { field: 'show_date',      label: 'Show Date' },
-  { field: 'venue_name',     label: 'Venue' },
+  { field: 'venue',          label: 'Venue' },
   { field: 'city',           label: 'City' },
   { field: 'deal_guarantee', label: 'Fee / Guarantee' },
   { field: 'deal_type',      label: 'Deal Type' },
@@ -60,7 +60,7 @@ const AVAILABLE_FIELDS = [
 const DEFAULT_COLUMNS: ExportColumn[] = [
   { id: 'c1', field: 'artist_name',    header: 'Artist' },
   { id: 'c2', field: 'show_date',      header: 'Date' },
-  { id: 'c3', field: 'venue_name',     header: 'Venue' },
+  { id: 'c3', field: 'venue',          header: 'Venue' },
   { id: 'c4', field: 'city',           header: 'City' },
   { id: 'c5', field: 'deal_guarantee', header: 'Fee' },
   { id: 'c6', field: 'deal_type',      header: 'Deal Type' },
@@ -177,7 +177,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
 
         const { data: shows } = await supabase
           .from('shows')
-          .select('id, artist_name, show_date, venue_name')
+          .select('id, artist_name, show_date, venue')
           .order('show_date', { ascending: true })
         if (shows) setAvailableShows(shows)
 
@@ -266,7 +266,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           if (col.field === 'static_text') {
             val = col.staticValue || ''
           } else {
-            val = show[col.field] || ''
+            // Data extraction for complex fields
+            if (col.field === 'ticket_price') {
+              val = show.ticket_tiers?.[0]?.price?.toString() || '0'
+            } else if (col.field === 'capacity') {
+              val = show.ticket_tiers?.[0]?.capacity?.toString() || '0'
+            } else {
+              val = show[col.field] || ''
+            }
+            
             if (col.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
           }
           row[col.header] = val
@@ -418,7 +426,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
                         >
                           <div className="flex flex-col">
                             <span className={cn("text-xs font-bold", selectedShowIds.includes(show.id) ? "text-primary" : "text-white")}>{show.artist_name}</span>
-                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">{show.venue_name} &bull; {new Date(show.show_date).toLocaleDateString()}</span>
+                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-tighter">{show.venue || 'Venue TBD'} &bull; {new Date(show.show_date).toLocaleDateString()}</span>
                           </div>
                           <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center transition-all", selectedShowIds.includes(show.id) ? "bg-primary border-primary" : "border-white/10")}>
                             {selectedShowIds.includes(show.id) && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
