@@ -34,6 +34,7 @@ interface ExportColumn {
   id: string
   field: string   // database field key — never changes, always used as JSON key
   header: string  // display name in Google Sheet — user can rename freely
+  staticValue?: string // For custom non-DB columns
 }
 
 // All database fields users can pick from when adding a column
@@ -53,6 +54,7 @@ const AVAILABLE_FIELDS = [
   { field: 'doors_time',     label: 'Doors Time' },
   { field: 'load_in_time',   label: 'Load In Time' },
   { field: 'deal_percentage',label: 'Deal %' },
+  { field: 'static_text',    label: 'Custom / Static Text' },
 ]
 
 const DEFAULT_COLUMNS: ExportColumn[] = [
@@ -68,10 +70,11 @@ const DEFAULT_COLUMNS: ExportColumn[] = [
 ]
 
 // Inline editable column chip
-function ColumnChip({ col, onRename, onRemove }: {
+function ColumnChip({ col, onRename, onRemove, onValueChange }: {
   col: ExportColumn
   onRename: (id: string, newHeader: string) => void
   onRemove: (id: string) => void
+  onValueChange: (id: string, newValue: string) => void
 }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(col.header)
@@ -114,6 +117,14 @@ function ColumnChip({ col, onRename, onRemove }: {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <span className="text-sm font-black uppercase italic text-white tracking-tight truncate">{col.header}</span>
           <span className="text-[8px] font-bold text-zinc-600 shrink-0 hidden group-hover:inline">({col.field})</span>
+          {col.field === 'static_text' && (
+            <input
+              placeholder="Enter value..."
+              value={col.staticValue || ''}
+              onChange={e => onValueChange(col.id, e.target.value)}
+              className="bg-primary/10 border-none outline-none text-[10px] font-bold text-primary px-2 py-0.5 rounded-lg w-24 placeholder:text-primary/30"
+            />
+          )}
           <button
             onClick={() => { setDraft(col.header); setEditing(true) }}
             className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 hover:text-primary shrink-0"
@@ -188,13 +199,17 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
 
   const addColumn = (field: string) => {
     const alreadyAdded = columns.some(c => c.field === field)
-    if (alreadyAdded) {
+    if (alreadyAdded && field !== 'static_text') {
       toast.info('Column already added')
       return
     }
     const defaultLabel = AVAILABLE_FIELDS.find(f => f.field === field)?.label || field
     const newId = Math.random().toString(36).substring(2, 9)
     setColumns(prev => [...prev, { id: newId, field, header: defaultLabel }])
+  }
+
+  const updateColumnValue = (id: string, newValue: string) => {
+    setColumns(prev => prev.map(c => c.id === id ? { ...c, staticValue: newValue } : c))
   }
 
   const renameColumn = (id: string, newHeader: string) => {
@@ -247,8 +262,13 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
       const paddedShows = shows.map(show => {
         const row: any = {}
         columns.forEach(col => {
-          let val = show[col.field] || ''
-          if (col.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
+          let val = ''
+          if (col.field === 'static_text') {
+            val = col.staticValue || ''
+          } else {
+            val = show[col.field] || ''
+            if (col.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
+          }
           row[col.header] = val
         })
         return row
@@ -344,19 +364,15 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-[#0f0f10] border-white/10 rounded-2xl p-2 w-52" align="end">
-                      {remainingFields.length === 0 ? (
-                        <div className="px-3 py-2 text-[10px] text-zinc-600 font-bold uppercase">All fields added</div>
-                      ) : (
-                        remainingFields.map(f => (
-                          <DropdownMenuItem
-                            key={f.field}
-                            onClick={() => addColumn(f.field)}
-                            className="text-xs font-bold text-white hover:text-primary cursor-pointer rounded-xl px-3 py-2"
-                          >
-                            {f.label}
-                          </DropdownMenuItem>
-                        ))
-                      )}
+                      {AVAILABLE_FIELDS.map(f => (
+                        <DropdownMenuItem
+                          key={f.field}
+                          onClick={() => addColumn(f.field)}
+                          className="text-xs font-bold text-white hover:text-primary cursor-pointer rounded-xl px-3 py-2"
+                        >
+                          {f.label}
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -369,6 +385,7 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
                         col={col}
                         onRename={renameColumn}
                         onRemove={removeColumn}
+                        onValueChange={updateColumnValue}
                       />
                     ))}
                   </AnimatePresence>
