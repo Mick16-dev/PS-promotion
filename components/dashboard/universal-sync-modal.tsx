@@ -242,14 +242,14 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
         .eq('provider', 'google')
         .maybeSingle()
 
-      // Pad shows using m.field as key — n8n reads values by field key,
-      // and uses mapping[].header to write the column title row in the sheet
+      // Pad shows using m.header as key — this ensures that the JSON keys
+      // match the exact column titles the user defined in the UI.
       const paddedShows = shows.map(show => {
         const row: any = {}
         columns.forEach(col => {
           let val = show[col.field] || ''
           if (col.field === 'show_date' && val) val = new Date(val).toLocaleDateString()
-          row[col.field] = val
+          row[col.header] = val
         })
         return row
       })
@@ -263,8 +263,8 @@ export function UniversalSyncModal({ isOpen, onClose, selectedShowIds: initialSe
           spreadsheet_name: spreadsheetName,
           sheet_name: sheetName,
           mode: 'universal_bulk_export',
-          mapping: columns,    // n8n uses .header to write the title row
-          shows: paddedShows,  // n8n uses .field keys to read values
+          mapping: columns,
+          shows: paddedShows,  // n8n now receives keys matching the headers
           timestamp: new Date().toISOString()
         })
       })
